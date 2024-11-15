@@ -1,0 +1,71 @@
+unKnown:
+  code: "-9999"
+  msg: "알 수 없는 오류가 발생하였습니다."
+
+userNotFound:
+  code: "-1000"
+  msg: "존재하지 않는 회원입니다."
+
+signInFailed:
+  code: "-1001"
+  msg: "계정이 존재하지 않거나, 비밀번호가 맞지 않습니다."
+
+signUpFailed:
+  code: "-1002"
+  msg: "이미 등록된 계정입니다."
+
+entryPoint:
+  code: "-1003"
+  msg: "해당 리소스에 접근하기 위한 권한이 없습니다."
+
+accessDenied:
+  code: "-1004"
+  msg: "보유한 권한으로 접근할 수 없는 리소스 입니다."
+
+communicationError:
+  code: "-1005"
+  msg: "통신 중 오류가 발생하였습니다."
+
+resourceNotExist:
+  code: "-1006"
+  msg: "리소스가 존재하지 않습니다."
+
+notOwner:
+  code: "-1007"
+  msg: "접근 권한이 없거나, 소유의 리소스가 아닙니다."
+
+forbiddenWord:
+  code: "-1008"
+  msg: "입력한 내용에 금칙어({0})가 포함되어 있습니다."
+
+fileUpload:
+  code: "-1009"
+  msg: "파일 업로드에 실패했습니다."
+
+fileDownload:
+  code: "-1010"
+  msg: "파일 다운로드에 실패했습니다."
+
+notFoundLanguage:
+  code: "-1011"
+  msg: "해당 언어는 존재하지 않습니다."
+
+notFoundRoles:
+  code: "-1012"
+  msg: "해당 권한은 존재하지 않습니다."
+
+notFoundDept:
+  code: "-1013"
+  msg: "해당 부서는 존재하지 않습니다."
+
+notFoundSystem:
+  code: "-1014"
+  msg: "해당 시스템은 존재하지 않습니다."
+
+notValidOperation:
+  code: "-1015"
+  msg: "불가능한 수행입니다."
+
+resourceAlreadyExistException:
+  code: "-1016"
+  msg: "리소스가 이미 존재합니다."

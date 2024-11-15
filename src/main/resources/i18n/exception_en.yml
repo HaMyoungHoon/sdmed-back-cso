@@ -1,0 +1,71 @@
+unKnown:
+  code: "-9999"
+  msg: "an unknown error has occurred."
+
+userNotFound:
+  code: "-1000"
+  msg: "this member not exist."
+
+signInFailed:
+  code: "-1001"
+  msg: "your account does not exist or password incorrect."
+
+signUpFailed:
+  code: "-1002"
+  msg: "this account is already registered."
+
+entryPoint:
+  code: "-1003"
+  msg: "you do not have permission to access this resource."
+
+accessDenied:
+  code: "-1004"
+  msg: "a resource that can not be accessed with the privileges it has."
+
+communicationError:
+  code: "-1005"
+  msg: "an error occurred during communication."
+
+resourceNotExist:
+  code: "-1006"
+  msg: "not exist resource."
+
+notOwner:
+  code: "-1007"
+  msg: "you do not have access, or you do not own the resource."
+
+forbiddenWord:
+  code: "-1008"
+  msg: "forbidden words ({0}) are included in the input."
+
+fileUpload:
+  code: "-1009"
+  msg: "file upload failed"
+
+fileDownload:
+  code: "-1010"
+  msg: "file download failed"
+
+notFoundLanguage:
+  code: "-1011"
+  msg: "not ready this language"
+
+notFoundRoles:
+  code: "-1012"
+  msg: "not found this roles name"
+
+notFoundDept:
+  code: "-1013"
+  msg: "not found this dept name"
+
+notFoundSystem:
+  code: "-1014"
+  msg: "not found this system name"
+
+notValidOperation:
+  code: "-1015"
+  msg: "not valid operation"
+
+resourceAlreadyExistException:
+  code: "-1016"
+  msg: "resource already exist"

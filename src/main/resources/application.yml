@@ -1,0 +1,60 @@
+spring:
+  application:
+  name: cso
+
+  datasource:
+    sql-cso:
+      driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+      jdbc-url: jdbc:sqlserver://db.mhha.kr:14333;encrypt=true;trustServerCertificate=true
+      username: cso
+      password: 1234
+
+
+  messages:
+    basename: i18n/exception
+    encoding: UTF-8
+
+  jwt:
+    secret: 12345678123456781234567812345678
+
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 20MB
+      max-request-size: 20MB
+
+  lifecycle:
+    timeout-per-shutdown-phase: 30s
+  mvc:
+    async:
+      request-timeout: -1
+
+  http-port: 25801
+
+
+server:
+  port: 25800
+  ssl:
+    key-store: back.cso.mhha.kr.jks
+    key-store-password: 'back_cso_mhha_ssl'
+  shutdown: immediate
+  forward-headers-strategy: native
+
+logging:
+  level:
+    web: debug
+    org:
+      springframework:
+        web: debug
+      hibernate:
+        sql: debug
+        type: debug
+
+file:
+  defDir: C:/FTP/STORAGE
+  imageDir: C:/FTP/STORAGE/IMAGE
+  documentDir: C:/FTP/STORAGE/DOCUMENT
+
+str:
+  version: 1.0.0
+  profile: prod
