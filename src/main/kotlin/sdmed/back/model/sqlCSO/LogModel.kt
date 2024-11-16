@@ -8,6 +8,7 @@ import java.util.*
 @Entity
 data class LogModel(
 	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(updatable = false, nullable = false)
 	var thisIndex: Long = 0,
 	@Column(name = "this_index", updatable = false)

@@ -20,6 +20,7 @@ import jakarta.persistence.*
 @Entity
 data class UserDataSubModel(
 	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "this_index", updatable = false, nullable = false)
 	@get:JsonProperty("this_index")
 	var thisIndex: Long = 0,

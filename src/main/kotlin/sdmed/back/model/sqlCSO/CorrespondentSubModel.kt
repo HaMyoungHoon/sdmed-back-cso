@@ -25,6 +25,7 @@ import sdmed.back.model.common.*
 @Entity
 data class CorrespondentSubModel(
 	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "this_index", updatable = false, nullable = false)
 	var thisIndex: Long = 0,
 	@Column(nullable = false)

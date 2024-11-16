@@ -44,6 +44,7 @@ enum class UserDept(var flag: Int, var desc: String) {
 			}
 			return ret
 		}
+		fun parseString(data: String?) = entries.find { it.desc == data } ?: None
 	}
 }
 

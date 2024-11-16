@@ -8,6 +8,6 @@ import sdmed.back.model.sqlCSO.CorrespondentSubModel
 @Repository
 interface ICorrespondentSubRepository: JpaRepository<CorrespondentSubModel, Long> {
 	@Query("SELECT * from correspondentSubModel" +
-			"WHERE thisIndex IN :thisIndex", nativeQuery = true)
+			"WHERE thisIndex IN (:thisIndex)", nativeQuery = true)
 	fun findCorrespondentListIDs(thisIndex: List<Long>): List<CorrespondentSubModel>
 }

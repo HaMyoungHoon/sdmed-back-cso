@@ -3,8 +3,12 @@ package sdmed.back.service
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import org.springframework.web.multipart.MultipartFile
 import sdmed.back.advice.exception.*
 import sdmed.back.config.FAmhohwa
+import sdmed.back.config.FExcelFileParser
+import sdmed.back.config.FExcelParserType
+import sdmed.back.config.FExtensions
 import sdmed.back.config.jpa.CSOJPAConfig
 import sdmed.back.config.security.JwtTokenProvider
 import sdmed.back.model.common.UserDept
@@ -27,6 +31,7 @@ class UserService {
 	@Autowired lateinit var userSubDataRepository: IUserSubDataRepository
 	@Autowired lateinit var logRepository: ILogRepository
 	@Autowired lateinit var fAmhohwa: FAmhohwa
+	@Autowired lateinit var excelFileParser: FExcelFileParser
 
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
 	fun signIn(id: String, pw: String): String {
@@ -157,9 +162,64 @@ class UserService {
 		logRepository.save(logModel)
 		return ret
 	}
+	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
+	fun addChild(token: String, motherID: String, childID: List<String>): UserDataModel {
+		isValid(token)
+		val tokenUser = getUserDataByToken(token) ?: throw AuthenticationEntryPointException()
+		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.UserChildChanger))) {
+			throw AuthenticationEntryPointException()
+		}
+
+		val mother = userDataRepository.findById(motherID)?.apply { init() }?.setChild() ?: throw UserNotFoundException()
+		val motherChild = mother.children?.map { it.id } ?: arrayListOf()
+		val childBuff = childID.toMutableList().distinct().toMutableList().apply {
+			remove(motherID)
+		}.filterNot { it in motherChild }
+		val child = userDataRepository.findAllByIdIn(childBuff).onEach { it.init(); }
+		if (child.isEmpty()) {
+			return mother
+		}
+		mother.addChild(child)
+		val ret = userDataRepository.save(mother)
+		val stackTrace = Thread.currentThread().stackTrace
+		val logModel = LogModel().build(tokenUser.thisIndex, stackTrace[1].className, stackTrace[1].methodName, "${mother.id} add child : ${child.joinToString(", ") { it.id }}")
+		logRepository.save(logModel)
+		return ret
+	}
+	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
+	fun delChild(token: String, motherID: String, childID: List<String>): UserDataModel {
+		isValid(token)
+		val tokenUser = getUserDataByToken(token) ?: throw AuthenticationEntryPointException()
+		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.UserChildChanger))) {
+			throw AuthenticationEntryPointException()
+		}
+
+		val mother = userDataRepository.findById(motherID)?.apply { init() } ?: throw UserNotFoundException()
+		val motherChild = mother.children?.map { it.id } ?: arrayListOf()
+		val childBuff = childID.toMutableList().distinct().filter { it in motherChild }
+		val child = userDataRepository.findAllByIdIn(childBuff).onEach { it.init(); it.userData = null }
+		mother.children?.removeIf { it.id in childBuff }
+		val ret = userDataRepository.save(mother)
+		userDataRepository.saveAll(child)
+		val stackTrace = Thread.currentThread().stackTrace
+		val logModel = LogModel().build(tokenUser.thisIndex, stackTrace[1].className, stackTrace[1].methodName, "${mother.id} delete child : ${childBuff.joinToString(",")}")
+		logRepository.save(logModel)
+		return ret
+	}
+	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
+	fun userUpload(token: String, file: MultipartFile): List<UserDataModel> {
+		isValid(token)
+		val tokenUser = getUserDataByToken(token) ?: throw AuthenticationEntryPointException()
+		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.UserFileUploader))) {
+			throw AuthenticationEntryPointException()
+		}
+
+		val ret = excelFileParser.userUploadExcelParse(file)
+		return ret
+	}
 
 	fun getUserData(id: String) = userDataRepository.findById(id)
-	fun getUserDataByToken(token: String) = userDataRepository.findById(jwtTokenProvider.getAllClaimsFromToken(token).id)
+	fun getUserDataByToken(token: String) = userDataRepository.findById(jwtTokenProvider.getAllClaimsFromToken(token).subject)
 	fun isValid(token: String) {
 		if (!jwtTokenProvider.validateToken(token)) {
 			throw AuthenticationEntryPointException()

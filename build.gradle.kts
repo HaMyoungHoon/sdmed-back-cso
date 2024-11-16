@@ -43,6 +43,8 @@ dependencies {
 
 	implementation("io.projectreactor:reactor-core:3.6.6")
 
+	implementation("org.apache.poi:poi-ooxml:5.2.2")
+
 	runtimeOnly("io.jsonwebtoken:jjwt-impl:0.12.5")
 	runtimeOnly("io.jsonwebtoken:jjwt-gson:0.12.5")
 	runtimeOnly("com.microsoft.sqlserver:mssql-jdbc")

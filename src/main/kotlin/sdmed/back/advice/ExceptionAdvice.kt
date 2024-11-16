@@ -83,6 +83,15 @@ class ExceptionAdvice {
 	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
 	protected fun resourceAlreadyExistException(request: HttpServletRequest, exception: ResourceAlreadyExistException) =
 		responseService.getFailResult(getMessage("resourceAlreadyExistException.code").toInt(), getMessage("resourceAlreadyExistException.msg"))
+	@ExceptionHandler(UserDataFileUploadException::class)
+	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+	protected fun userDataFileUploadException(request: HttpServletRequest, exception: UserDataFileUploadException) =
+		responseService.getFailResult(getMessage("userDataFileUploadException.code").toInt(), "${getMessage("userDataFileUploadException.msg")} : ${exception.message.toString()}" )
+	@ExceptionHandler(CorrespondentDataFileUploadException::class)
+	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+	protected fun correspondentDataFileUploadException(request: HttpServletRequest, exception: CorrespondentDataFileUploadException) =
+		responseService.getFailResult(getMessage("correspondentDataFileUploadException.code").toInt(), "${getMessage("correspondentDataFileUploadException.msg")} : ${exception.message.toString()}" )
+
 	@ExceptionHandler(AsyncRequestTimeoutException::class)
 	@ResponseStatus(HttpStatus.OK)
 	protected fun asyncRequestTimeoutException(request: HttpServletRequest, exception: AsyncRequestTimeoutException): AsyncContext =

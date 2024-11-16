@@ -54,6 +54,8 @@ file:
   defDir: C:/FTP/STORAGE
   imageDir: C:/FTP/STORAGE/IMAGE
   documentDir: C:/FTP/STORAGE/DOCUMENT
+  userExcelDir: C:/FTP/STORAGE/EXCEL/USER
+  correspondentExcelDir: C:/FTP/STORAGE/EXCEL/USER
 
 str:
   version: 1.0.0

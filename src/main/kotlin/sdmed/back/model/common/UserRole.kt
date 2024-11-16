@@ -11,7 +11,10 @@ enum class UserRole(var flag: Int, var desc: String) {
 	PasswordChanger(Admin.flag.shl(5), "password changer"),
 	StatusChanger(Admin.flag.shl(6), "StatusChanger"),
 	RoleChanger(Admin.flag.shl(7), "RoleChanger"),
-	DeptChanger(Admin.flag.shl(8), "DeptChanger");
+	DeptChanger(Admin.flag.shl(8), "DeptChanger"),
+	UserChildChanger(Admin.flag.shl(9), "UserChildChanger"),
+	UserFileUploader(Admin.flag.shl(10), "UserFileUploader"),
+	CorrespondentFileUploader(Admin.flag.shl(11), "CorrespondentFileUploader");
 
 	infix fun and(rhs: UserRole) = EnumSet.of(this, rhs)
 	fun toS() = EnumSet.of(this)
@@ -46,6 +49,7 @@ enum class UserRole(var flag: Int, var desc: String) {
 			}
 			return ret
 		}
+		fun parseString(data: String?) = entries.find { it.desc == data } ?: None
 	}
 }
 

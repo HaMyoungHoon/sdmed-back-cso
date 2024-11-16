@@ -9,7 +9,7 @@ import sdmed.back.model.sqlCSO.CorrespondentModel
 interface ICorrespondentRepository: JpaRepository<CorrespondentModel, Long> {
 
 	@Query("SELECT * from correspondentModel" +
-			"WHERE thisIndex IN :thisIndex", nativeQuery = true)
+			"WHERE thisIndex IN (:thisIndex)", nativeQuery = true)
 	fun findCorrespondentListIDs(thisIndex: List<Long>): List<CorrespondentModel>
 	@Query("SELECT * from correspondentModel" +
 			"WHERE taxpayerNumber LIKE %:taxpayerNumber% OR" +

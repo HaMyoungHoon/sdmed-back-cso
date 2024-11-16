@@ -69,3 +69,11 @@ notValidOperation:
 resourceAlreadyExistException:
   code: "-1016"
   msg: "resource already exist"
+
+userDataFileUploadException:
+  code: "-1017"
+  msg: "the file format is invalid"
+
+correspondentDataFileUploadException:
+  code: "-1017"
+  msg: "the file format is invalid"
