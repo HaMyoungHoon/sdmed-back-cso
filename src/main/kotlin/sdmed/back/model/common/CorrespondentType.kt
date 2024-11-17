@@ -14,5 +14,9 @@ enum class CorrespondentType(var index: Int, var desc: String) {
 	Pharmaceutical(10, "통계제약사"),
 	SpecialInst(11, "특수의료시설및학술기관"),
 	SalesAgencyP(12, "판매대행(개인)"),
-	SalesAgencyC(13, "판매대행(사업자)")
+	SalesAgencyC(13, "판매대행(사업자)");
+
+	companion object {
+		fun parseString(data: String?) = entries.find { it.desc == data } ?: None
+	}
 }

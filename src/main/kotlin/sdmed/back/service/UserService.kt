@@ -18,6 +18,7 @@ import sdmed.back.model.common.UserRoles
 import sdmed.back.model.common.UserStatus
 import sdmed.back.model.sqlCSO.LogModel
 import sdmed.back.model.sqlCSO.UserDataModel
+import sdmed.back.model.sqlCSO.UserDataSubModel
 import sdmed.back.repository.sqlCSO.ILogRepository
 import sdmed.back.repository.sqlCSO.IUserDataRepository
 import sdmed.back.repository.sqlCSO.IUserSubDataRepository
@@ -73,9 +74,10 @@ class UserService {
 			data.dept = UserDept.Admin.flag
 			data.status = UserStatus.Live
 		}
-		data.subData?.let {
-			userSubDataRepository.save(it)
+		data.subData = UserDataSubModel().apply {
+			mother = data
 		}
+		userSubDataRepository.save(data.subData!!)
 		val ret = userDataRepository.save(data)
 		val stackTrace = Thread.currentThread().stackTrace
 		val logModel = LogModel().build(null, stackTrace[1].className, stackTrace[1].methodName, "${data.id} ${data.name} signUp")
@@ -214,7 +216,17 @@ class UserService {
 			throw AuthenticationEntryPointException()
 		}
 
-		val ret = excelFileParser.userUploadExcelParse(file)
+		val userDataModel = excelFileParser.userUploadExcelParse(tokenUser.id, file)
+		val already = userDataRepository.findAllByIdIn(userDataModel.map { it.id })
+		userDataModel.removeIf { x -> x.id in already.map { y -> y.id } }
+		if (userDataModel.isEmpty()) {
+			return arrayListOf()
+		}
+		userDataModel.onEach { x -> x.pw = fAmhohwa.encrypt(x.pw) }
+		val ret = userDataRepository.saveAll(userDataModel)
+		val stackTrace = Thread.currentThread().stackTrace
+		val logModel = LogModel().build(tokenUser.thisIndex, stackTrace[1].className, stackTrace[1].methodName, "add user : ${userDataModel.joinToString(",") { it.id }}")
+		logRepository.save(logModel)
 		return ret
 	}
 

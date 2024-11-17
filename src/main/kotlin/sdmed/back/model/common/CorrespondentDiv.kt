@@ -8,5 +8,9 @@ enum class CorrespondentDiv(var index: Int, var desc: String) {
 	Bank(4, "은행처"),
 	Manufacturing(5, "제조사"),
 	Quitter(6, "퇴사자"),
-	Accounting(7, "회계처")
+	Accounting(7, "회계처");
+
+	companion object {
+		fun parseString(data: String?) = entries.find { it.desc == data } ?: None
+	}
 }

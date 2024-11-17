@@ -11,8 +11,7 @@ data class LogModel(
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(updatable = false, nullable = false)
 	var thisIndex: Long = 0,
-	@Column(name = "this_index", updatable = false)
-	@get:JsonProperty("this_index")
+	@Column(updatable = false)
 	var userIndex: Long? = null,
 	@Column(columnDefinition = "nvarchar(255)", updatable = false)
 	var className: String = "",

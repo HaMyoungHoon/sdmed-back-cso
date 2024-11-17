@@ -12,8 +12,9 @@ import jakarta.persistence.*
  * @property taxpayerImageUrl 사업자등록증 이미지
  * @property companyName 회사명
  * @property companyNumber 사업자등록번호
- * @property companyAddress 소제지
+ * @property companyAddress 회사주소
  * @property bankAccountImageUrl 은행계좌 이미지
+ * @property bankAccount 은행계좌번호
  * @property mother
  * @constructor Create empty User data sub model
  */
@@ -21,8 +22,7 @@ import jakarta.persistence.*
 data class UserDataSubModel(
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "this_index", updatable = false, nullable = false)
-	@get:JsonProperty("this_index")
+	@Column(updatable = false, nullable = false)
 	var thisIndex: Long = 0,
 	@Column(columnDefinition = "varchar(500)")
 	var taxpayerImageUrl: String? = null,
@@ -34,6 +34,8 @@ data class UserDataSubModel(
 	var companyAddress: String? = null,
 	@Column(columnDefinition = "varchar(500)")
 	var bankAccountImageUrl: String? = null,
+	@Column(columnDefinition = "varchar(255)")
+	var bankAccount: String? = null,
 	@OneToOne(fetch = FetchType.LAZY, optional = true)
 	@JoinColumn
 	@JsonBackReference

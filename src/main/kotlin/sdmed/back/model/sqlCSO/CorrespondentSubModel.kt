@@ -2,6 +2,7 @@ package sdmed.back.model.sqlCSO
 
 import com.fasterxml.jackson.annotation.JsonBackReference
 import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.annotation.JsonProperty
 import jakarta.persistence.*
 import sdmed.back.model.common.*
 
@@ -13,9 +14,9 @@ import sdmed.back.model.common.*
  * @property correspondentDiv 거래처 구분
  * @property correspondentType 거래처 종류
  * @property correspondentGroup 거래처 그룹
- * @property correspondentDelivery 배송 구분
+ * @property deliveryDiv 배송 구분
  * @property contractType 계약 구분
- * @property correspondentBillType 계산서 발행
+ * @property billType 계산서 발행
  * @property actualPrice 실단가 유무
  * @property prepayment 선결제 여부
  * @property transactionState 거래 유무
@@ -26,7 +27,7 @@ import sdmed.back.model.common.*
 data class CorrespondentSubModel(
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "this_index", updatable = false, nullable = false)
+	@Column(updatable = false, nullable = false)
 	var thisIndex: Long = 0,
 	@Column(nullable = false)
 	var code: Int = 0,
@@ -37,11 +38,11 @@ data class CorrespondentSubModel(
 	@Column(nullable = false)
 	var correspondentGroup: CorrespondentGroup = CorrespondentGroup.None,
 	@Column(nullable = false)
-	var correspondentDelivery: CorrespondentDelivery = CorrespondentDelivery.None,
+	var deliveryDiv: DeliveryDiv = DeliveryDiv.None,
 	@Column(nullable = false)
 	var contractType: ContractType = ContractType.None,
 	@Column(nullable = false)
-	var correspondentBillType: CorrespondentBillType = CorrespondentBillType.None,
+	var billType: BillType = BillType.None,
 	@Column(nullable = false)
 	var actualPrice: Boolean = false,
 	@Column(nullable = false)

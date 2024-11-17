@@ -1,46 +1,18 @@
 package sdmed.back.model.sqlCSO
 
-import com.fasterxml.jackson.annotation.JsonBackReference
-import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonManagedReference
+import com.fasterxml.jackson.annotation.JsonProperty
 import jakarta.persistence.*
 import sdmed.back.config.FConstants
 import sdmed.back.config.FExtensions
+import sdmed.back.model.common.*
 import java.sql.Date
 
-/**
- * CorrespondentModel
- *
- * @property thisIndex
- * @property code 거래처 코드
- * @property taxpayerNumber 사업자등록번호
- * @property orgName 사업자원어명
- * @property innerName 상호(내부)명
- * @property openDate 거래 개시일
- * @property closeDate 거래 종료일
- * @property ownerName 대표자명
- * @property zipCode 우편번호
- * @property address 주소
- * @property addressDetail 상세주소
- * @property businessType 업태
- * @property businessItem 종목
- * @property phoneNumber 전화번호
- * @property faxNumber 팩스번호
- * @property etc1 비고 1
- * @property etc2 비고 2
- * @property taxpayerImageUrl 사업자등록증 image url
- * @property subData 기본정보
- * @property userData 상위 유저
- * @property userDataThisIndex 상위 유저 index
- * @property children 하위 거래처
- * @property correspondent mother
- * @constructor Create empty Correspondent model
- */
 @Entity
 data class CorrespondentModel(
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "this_index", updatable = false, nullable = false)
+	@Column(updatable = false, nullable = false)
 	var thisIndex: Long = 0,
 	@Column(nullable = false)
 	var code: Int = 0,
@@ -50,14 +22,14 @@ data class CorrespondentModel(
 	var orgName: String = "",
 	@Column(columnDefinition = "nvarchar(255)", nullable = false)
 	var innerName: String = "",
-	@Column(nullable = false)
-	var openDate: Date = Date(java.util.Date().time),
+	@Column
+	var openDate: Date? = null,
 	@Column
 	var closeDate: Date? = null,
 	@Column(columnDefinition = "nvarchar(255)", nullable = false)
 	var ownerName: String = "",
 	@Column(columnDefinition = "nvarchar(100)", nullable = false)
-	var zipCode: String = "00000",
+	var zipCode: String = "",
 	@Column(columnDefinition = "nvarchar(255)", nullable = false)
 	var address: String = "",
 	@Column(columnDefinition = "nvarchar(255)")
@@ -80,32 +52,7 @@ data class CorrespondentModel(
 	@JoinColumn
 	@JsonManagedReference
 	var subData: CorrespondentSubModel? = null,
-	@ManyToOne(fetch = FetchType.LAZY, optional = true)
-	@JoinColumn
-	@JsonBackReference
-	var userData: UserDataModel? = null,
-	@Column(insertable = false, updatable = false, name = "userData_thisIndex")
-	var userDataThisIndex: Long? = null,
-	@OneToMany(fetch = FetchType.EAGER, cascade = [CascadeType.ALL])
-	@JoinColumn
-	@JsonManagedReference
-	var children: MutableList<CorrespondentModel>? = null,
-	@ManyToOne(fetch = FetchType.LAZY, optional = true)
-	@JoinColumn
-	@JsonBackReference
-	@JsonIgnore
-	var correspondent: CorrespondentModel? = null,
 ) {
-	fun setChild(): CorrespondentModel {
-		children?.forEach {
-			it.correspondent = this
-			it.setChild()
-		}
-		return this
-	}
-	fun init() {
-		children?.forEach { it.init() }
-	}
 
 	fun setRows(data: List<String>): Boolean? {
 		if (data.size <= 1) {
@@ -129,6 +76,10 @@ data class CorrespondentModel(
 			setIndex(data[13], 13)
 			setIndex(data[14], 14)
 			setIndex(data[15], 15)
+			if (errorCondition()) {
+				return false
+			}
+			setSubData(data)
 			true
 		} catch (_: Exception) {
 			null
@@ -146,15 +97,72 @@ data class CorrespondentModel(
 			data[8] != getTitle(0) || data[9] != getTitle(1) ||
 			data[10] != getTitle(0) || data[11] != getTitle(1) ||
 			data[12] != getTitle(0) || data[13] != getTitle(1) ||
-			data[14] != getTitle(0) || data[15] != getTitle(1)) {
+			data[14] != getTitle(0) || data[15] != getTitle(1) ||
+			data[16] != getTitle(0) || data[17] != getTitle(1) ||
+			data[18] != getTitle(0) || data[19] != getTitle(1) ||
+			data[20] != getTitle(0) || data[21] != getTitle(1) ||
+			data[22] != getTitle(0) || data[23] != getTitle(1) ||
+			data[24] != getTitle(0)) {
 			return false
 		}
 
 		return true
 	}
+	fun errorCondition(): Boolean {
+		if (getIndex(0).isEmpty()) {
+			return true
+		} else if (getIndex(1).isEmpty()) {
+			return true
+		} else if (getIndex(2).isEmpty()) {
+			return true
+		}else if (getIndex(3).isEmpty()) {
+			return true
+		}else if (getIndex(4).isEmpty()) {
+			return true
+		}else if (getIndex(6).isEmpty()) {
+			return true
+		}else if (getIndex(7).isEmpty()) {
+			return true
+		}else if (getIndex(8).isEmpty()) {
+			return true
+		}
+		return false
+	}
 	fun getErrorString(): String {
+		if (getIndex(0) == "0") {
+			return "${getTitle(0)}${FConstants.NOT_FOUND_VALUE_OR_FORMAT}"
+		} else if (getIndex(1).isEmpty()) {
+			return "${getTitle(1)}${FConstants.NOT_FOUND_VALUE_OR_FORMAT}"
+		} else if (getIndex(2).isEmpty()) {
+			return "${getTitle(2)}${FConstants.NOT_FOUND_VALUE_OR_FORMAT}"
+		} else if (getIndex(3).isEmpty()) {
+			return "${getTitle(3)}${FConstants.NOT_FOUND_VALUE_OR_FORMAT}"
+		} else if (getIndex(4).isEmpty()) {
+			return "${getTitle(4)}${FConstants.NOT_FOUND_VALUE_OR_FORMAT}"
+		} else if (getIndex(6).isEmpty()) {
+			return "${getTitle(6)}${FConstants.NOT_FOUND_VALUE_OR_FORMAT}"
+		} else if (getIndex(7).isEmpty()) {
+			return "${getTitle(7)}${FConstants.NOT_FOUND_VALUE_OR_FORMAT}"
+		} else if (getIndex(8).isEmpty()) {
+			return "${getTitle(8)}${FConstants.NOT_FOUND_VALUE_OR_FORMAT}"
+		}
 
-		return ""
+		return "${getTitle(0)} : ${getIndex(0)}\n" +
+			"${getTitle(1)} : ${getIndex(1)}\n" +
+			"${getTitle(2)} : ${getIndex(2)}\n" +
+			"${getTitle(3)} : ${getIndex(3)}\n" +
+			"${getTitle(4)} : ${getIndex(4)}\n" +
+			"${getTitle(5)} : ${getIndex(5)}\n" +
+			"${getTitle(6)} : ${getIndex(6)}\n" +
+			"${getTitle(7)} : ${getIndex(7)}\n" +
+			"${getTitle(8)} : ${getIndex(8)}\n" +
+			"${getTitle(9)} : ${getIndex(9)}\n" +
+			"${getTitle(10)} : ${getIndex(10)}\n" +
+			"${getTitle(11)} : ${getIndex(11)}\n" +
+			"${getTitle(12)} : ${getIndex(12)}\n" +
+			"${getTitle(13)} : ${getIndex(13)}\n" +
+			"${getTitle(14)} : ${getIndex(14)}\n" +
+			"${getTitle(15)} : ${getIndex(15)}\n"
 	}
 	fun getIndex(index: Int): String {
 		return when (index) {
@@ -179,12 +187,12 @@ data class CorrespondentModel(
 	}
 	fun setIndex(data: String?, index: Int) {
 		when (index) {
-			0 -> code = data?.toInt() ?: 0
+			0 -> code = data?.toIntOrNull() ?: 0
 			1 -> taxpayerNumber = data ?: ""
 			2 -> orgName = data ?: ""
 			3 -> innerName = data ?: ""
-			4 -> openDate = FExtensions.parseStringToSqlDate(data, "yyyy-MM-dd")
-			5 -> closeDate = if (data != null) FExtensions.parseStringToSqlDate(data, "yyyy-MM-dd") else null
+			4 -> openDate = if (data.isNullOrEmpty()) null else FExtensions.parseStringToSqlDate(data, "yyyy-MM-dd")
+			5 -> closeDate = if (data.isNullOrEmpty()) null else FExtensions.parseStringToSqlDate(data, "yyyy-MM-dd")
 			6 -> ownerName = data ?: ""
 			7 -> zipCode = data ?: ""
 			8 -> address = data ?: ""
@@ -195,6 +203,21 @@ data class CorrespondentModel(
 			13 -> faxNumber = data
 			14 -> etc1 = data
 			15 -> etc2 = data
+		}
+	}
+	fun setSubData(data: List<String>) {
+		subData = CorrespondentSubModel().apply {
+			code = data[0].toIntOrNull() ?: 0
+			correspondentDiv = CorrespondentDiv.parseString(data[16])
+			correspondentType = CorrespondentType.parseString(data[17])
+			correspondentGroup = CorrespondentGroup.parseString(data[18])
+			deliveryDiv = DeliveryDiv.parseString(data[19])
+			contractType = ContractType.parseString(data[20])
+			billType = BillType.parseString(data[21])
+			actualPrice = data[22].toBoolean()
+			prepayment = data[23].toBoolean()
+			transactionState = data[24].toBoolean()
+			mother = this@CorrespondentModel
 		}
 	}
 	fun getTitle(index: Int): String {
@@ -215,6 +238,15 @@ data class CorrespondentModel(
 			13 -> FConstants.CO_MODEL_FAX
 			14 -> FConstants.CO_MODEL_ETC1
 			15 -> FConstants.CO_MODEL_ETC2
+			16 -> FConstants.CO_MODEL_DIV
+			17 -> FConstants.CO_MODEL_TYPE
+			18 -> FConstants.CO_MODEL_GROUP
+			19 -> FConstants.CO_MODEL_DELIVERY
+			20 -> FConstants.CO_MODEL_CONTRACT_TYPE
+			21 -> FConstants.CO_MODEL_BILL_TYPE
+			22 -> FConstants.CO_MODEL_ACTUAL_PRICE
+			23 -> FConstants.CO_MODEL_PREPAYMENT
+			24 -> FConstants.CO_MODEL_TRANSACTION_STATE
 			else -> ""
 		}
 	}

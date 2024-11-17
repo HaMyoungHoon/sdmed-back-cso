@@ -3,10 +3,17 @@ package sdmed.back.controller.v1
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.core.io.Resource
+import org.springframework.http.HttpHeaders
+import org.springframework.http.MediaType
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import sdmed.back.advice.exception.AuthenticationEntryPointException
+import sdmed.back.config.ContentsType
 import sdmed.back.config.FConstants
+import sdmed.back.config.FExcelParserType
+import sdmed.back.config.FExtensions
 import sdmed.back.model.common.IRestResult
 import sdmed.back.model.common.UserRole
 import sdmed.back.model.common.UserStatus
@@ -64,10 +71,21 @@ class UserController {
 		return responseService.getResult(userService.userStatusModify(token, id, status))
 	}
 	@Operation(summary = "유저 데이터 엑셀 업로드")
-	@PostMapping(value = ["/userUpload"], consumes = ["multipart/form-data"])
-	fun postUserUpload(@RequestHeader(required = true) token: String,
+	@PostMapping(value = ["/dataUploadExcel"], consumes = ["multipart/form-data"])
+	fun postDataUploadExcel(@RequestHeader(required = true) token: String,
 										 @RequestParam(required = true) file: MultipartFile) =
 		responseService.getResult(userService.userUpload(token, file))
+
+	@Operation(summary = "유저 데이터 엑셀 샘플 다운로드")
+	@GetMapping(value = ["/sampleDownloadExcel"])
+	fun getSampleDownloadExcel(): ResponseEntity<Resource> {
+		val ret = FExtensions.sampleFileDownload(FExcelParserType.USER)
+		return ResponseEntity.ok()
+			.contentType(MediaType.parseMediaType(ContentsType.type_xlsx))
+			.contentLength(ret.file.length())
+			.header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=\"excel_upload_sample.xlsx\"")
+			.body(ret)
+	}
 
 	@Operation(summary = "유저 상태 목록")
 	@GetMapping(value = ["/statusList"])
