@@ -104,6 +104,10 @@ class UserService {
 	}
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
 	fun passwordChange(token: String, id: String, changePW: String): UserDataModel {
+		if (changePW.length < 4) {
+			throw AuthenticationEntryPointException()
+		}
+
 		isValid(token)
 		val tokenUser = getUserDataByToken(token) ?: throw UserNotFoundException()
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.PasswordChanger))) {
@@ -159,8 +163,12 @@ class UserService {
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.RoleChanger))) {
 			throw AuthenticationEntryPointException()
 		}
+		var mask = UserRole.Admin.flag
+		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin))) {
+			mask = mask or UserRole.CsoAdmin.flag
+		}
 		val user = userDataRepository.findById(id) ?: throw UserNotFoundException()
-		user.role = roleList.fold(0) { acc, x -> acc or x.flag }
+		user.role = roleList.fold(0) { acc, x -> acc or x.flag } and mask.inv()
 		val ret = userDataRepository.save(user)
 		val stackTrace = Thread.currentThread().stackTrace
 		val logModel = LogModel().build(tokenUser.thisIndex, stackTrace[1].className, stackTrace[1].methodName, "$id role : ${user.role}")
@@ -174,8 +182,12 @@ class UserService {
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.DeptChanger))) {
 			throw AuthenticationEntryPointException()
 		}
+		var mask = UserDept.Admin.flag
+		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin))) {
+			mask = mask or UserDept.CsoAdmin.flag
+		}
 		val user = userDataRepository.findById(id) ?: throw UserNotFoundException()
-		user.dept = deptList.fold(0) { acc, x -> acc or x.flag }
+		user.dept = deptList.fold(0) { acc, x -> acc or x.flag } and mask.inv()
 		val ret = userDataRepository.save(user)
 		val stackTrace = Thread.currentThread().stackTrace
 		val logModel = LogModel().build(tokenUser.thisIndex, stackTrace[1].className, stackTrace[1].methodName, "$id dept : ${user.dept}")
