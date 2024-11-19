@@ -29,11 +29,11 @@ spring:
     async:
       request-timeout: -1
 
-  http-port: 80
+  http-port: 25801
 
 
 server:
-  port: 443
+  port: 25800
   ssl:
     key-store: back.cso.mhha.kr.jks
     key-store-password: 'back_cso_mhha_ssl'
@@ -61,4 +61,4 @@ file:
 
 str:
   version: 1.0.0
-  profile: prod
+  profile: dev

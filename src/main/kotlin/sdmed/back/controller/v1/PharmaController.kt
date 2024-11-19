@@ -24,6 +24,17 @@ class PharmaController {
 	@Autowired lateinit var responseService: ResponseService
 	@Autowired lateinit var pharmaService: PharmaceuticalService
 
+	@Operation(summary = "제약사 정보 조회")
+	@GetMapping(value = ["/all"])
+	fun getPharmaceutical(@RequestHeader(required = true) token: String) =
+		responseService.getResult(pharmaService.getAllPharma(token))
+	@Operation(summary = "제약사 정보 조회")
+	@GetMapping(value = ["/all/{page}/{size}"])
+	fun getPharmaceuticalAllPage(@RequestHeader(required = true) token: String,
+	                       @PathVariable("page") page: Int,
+	                       @PathVariable("size") size: Int) =
+		responseService.getResult(pharmaService.getPagePharma(token, page, size))
+
 	@Operation(summary = "제약사 데이터 엑셀 업로드")
 	@PostMapping(value = ["/dataUploadExcel"], consumes = ["multipart/form-data"])
 	fun postDataUploadExcel(@RequestHeader(required = true) token: String,

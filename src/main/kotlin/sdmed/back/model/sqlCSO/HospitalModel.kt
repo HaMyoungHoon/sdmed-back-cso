@@ -222,14 +222,14 @@ data class HospitalModel(
 			return true
 		} else if (getIndex(2).isEmpty()) {
 			return true
-		} else if (getIndex(3).isEmpty()) {
-			return true
-		} else if (getIndex(4).isEmpty()) {
-			return true
-		} else if (getIndex(7).isEmpty()) {
-			return true
-		} else if (getIndex(8).isEmpty()) {
-			return true
+//		} else if (getIndex(3).isEmpty()) {
+//			return true
+//		} else if (getIndex(4).isEmpty()) {
+//			return true
+//		} else if (getIndex(7).isEmpty()) {
+//			return true
+//		} else if (getIndex(8).isEmpty()) {
+//			return true
 		}
 		return false
 	}

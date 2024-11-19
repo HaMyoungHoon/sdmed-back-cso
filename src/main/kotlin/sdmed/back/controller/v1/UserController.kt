@@ -28,6 +28,18 @@ import sdmed.back.service.UserService
 class UserController {
 	@Autowired lateinit var responseService: ResponseService
 	@Autowired lateinit var userService: UserService
+
+	@Operation(summary = "유저 정보 전체")
+	@GetMapping(value = ["/all"])
+	fun getUserAll(@RequestHeader(required = true) token: String) =
+		responseService.getResult(userService.getAllUser(token))
+	@Operation(summary = "유저 정보 전체")
+	@GetMapping(value = ["/all/{page}/{size}"])
+	fun getUserAllPage(@RequestHeader(required = true) token: String,
+										 @PathVariable("page") page: Int,
+										 @PathVariable("size") size: Int) =
+		responseService.getResult(userService.getAllUser(token, page, size))
+
 	@Operation(summary = "로그인")
 	@GetMapping(value = ["/signIn"])
 	fun signIn(@RequestParam(required = true) id: String, @RequestParam(required = true) pw: String): IRestResult =

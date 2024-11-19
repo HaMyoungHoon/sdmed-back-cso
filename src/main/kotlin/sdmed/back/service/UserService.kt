@@ -1,21 +1,20 @@
 package sdmed.back.service
 
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
 import sdmed.back.advice.exception.*
 import sdmed.back.config.FAmhohwa
 import sdmed.back.config.FExcelFileParser
-import sdmed.back.config.FExcelParserType
-import sdmed.back.config.FExtensions
 import sdmed.back.config.jpa.CSOJPAConfig
 import sdmed.back.config.security.JwtTokenProvider
-import sdmed.back.model.common.UserDept
-import sdmed.back.model.common.UserRole
+import sdmed.back.model.common.*
+import sdmed.back.model.common.UserDept.Companion.getFlag
 import sdmed.back.model.common.UserRole.Companion.getFlag
 import sdmed.back.model.common.UserRoles
-import sdmed.back.model.common.UserStatus
 import sdmed.back.model.sqlCSO.LogModel
 import sdmed.back.model.sqlCSO.UserDataModel
 import sdmed.back.model.sqlCSO.UserDataSubModel
@@ -34,6 +33,25 @@ class UserService {
 	@Autowired lateinit var fAmhohwa: FAmhohwa
 	@Autowired lateinit var excelFileParser: FExcelFileParser
 
+	fun getAllUser(token: String): List<UserDataModel> {
+		isValid(token)
+		val tokenUser = getUserDataByToken(token) ?: throw UserNotFoundException()
+		if (haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin))) {
+			return userDataRepository.findAllByOrderByNameDesc().onEach { it.pw = "" }
+		}
+
+		return userDataRepository.selectWhereDeptOrderByNameAsc(UserDepts.of(UserDept.TaxPayer, UserDept.Personal).getFlag()).onEach { it.pw = "" }
+	}
+	fun getAllUser(token: String, page: Int, size: Int): Page<UserDataModel> {
+		isValid(token)
+		val tokenUser = getUserDataByToken(token) ?: throw UserNotFoundException()
+		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee))) {
+			throw AuthenticationEntryPointException()
+		}
+
+		val pageable = PageRequest.of(page, size)
+		return userDataRepository.findAllByOrderByNameDesc(pageable).onEach { it.pw = "" }
+	}
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
 	fun signIn(id: String, pw: String): String {
 		val user = getUserData(id) ?: throw SignInFailedException()
@@ -88,7 +106,7 @@ class UserService {
 	fun passwordChange(token: String, id: String, changePW: String): UserDataModel {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token) ?: throw UserNotFoundException()
-		if (!haveRole(tokenUser, UserRole.Admin and UserRole.PasswordChanger)) {
+		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.PasswordChanger))) {
 			throw AuthenticationEntryPointException()
 		}
 
@@ -119,7 +137,7 @@ class UserService {
 	fun userStatusModify(token: String, id: String, status: UserStatus): UserDataModel {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token) ?: throw AuthenticationEntryPointException()
-		if (!haveRole(tokenUser, UserRole.Admin and UserRole.StatusChanger)) {
+		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.StatusChanger))) {
 			throw AuthenticationEntryPointException()
 		}
 
@@ -132,13 +150,13 @@ class UserService {
 		return ret
 	}
 	fun getUserStatusList() = UserStatus.entries
-	fun getUserRoleList() = UserRole.entries
-	fun getUserDeptList() = UserDept.entries
+	fun getUserRoleList() = UserRole.entries.filterNot { it in listOf(UserRole.Admin, UserRole.CsoAdmin) }
+	fun getUserDeptList() = UserDept.entries.filterNot { it in listOf(UserDept.Admin, UserDept.CsoAdmin) }
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
 	fun userRoleModify(token: String, id: String, roleList: List<UserRole>): UserDataModel {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token) ?: throw AuthenticationEntryPointException()
-		if (!haveRole(tokenUser, UserRole.Admin and UserRole.RoleChanger)) {
+		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.RoleChanger))) {
 			throw AuthenticationEntryPointException()
 		}
 		val user = userDataRepository.findById(id) ?: throw UserNotFoundException()
@@ -209,25 +227,52 @@ class UserService {
 		return ret
 	}
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
-	fun userUpload(token: String, file: MultipartFile): List<UserDataModel> {
+	fun userUpload(token: String, file: MultipartFile): String {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token) ?: throw AuthenticationEntryPointException()
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.UserFileUploader))) {
 			throw AuthenticationEntryPointException()
 		}
 
+		var index = 0
 		val userDataModel = excelFileParser.userUploadExcelParse(tokenUser.id, file)
-		val already = userDataRepository.findAllByIdIn(userDataModel.map { it.id })
+		val already: MutableList<UserDataModel> = mutableListOf()
+		while (true) {
+			if (userDataModel.count() > index + 500) {
+				already.addAll(userDataRepository.findAllByIdIn(userDataModel.subList(index, index + 500).map { it.id }))
+			} else {
+				already.addAll(userDataRepository.findAllByIdIn(userDataModel.subList(index, userDataModel.count()).map { it.id }))
+				break
+			}
+			index += 500
+		}
 		userDataModel.removeIf { x -> x.id in already.map { y -> y.id } }
 		if (userDataModel.isEmpty()) {
-			return arrayListOf()
+			return "count : 0"
 		}
-		userDataModel.onEach { x -> x.pw = fAmhohwa.encrypt(x.pw) }
-		val ret = userDataRepository.saveAll(userDataModel)
+		userDataModel.onEach { x ->
+			x.pw = fAmhohwa.encrypt(x.pw)
+			x.subData = UserDataSubModel().apply {
+				mother = x
+			}
+		}
+		index = 0
+		var retCount = 0
+		while (true) {
+			if (userDataModel.count() > index + 500) {
+				userSubDataRepository.saveAll(userDataModel.subList(index, index + 500).map { it.subData })
+				retCount += userDataRepository.saveAll(userDataModel.subList(index, index + 500)).count()
+			} else {
+				userSubDataRepository.saveAll(userDataModel.subList(index, userDataModel.count()).map { it.subData })
+				retCount += userDataRepository.saveAll(userDataModel.subList(index, userDataModel.count())).count()
+				break
+			}
+			index += 500
+		}
 		val stackTrace = Thread.currentThread().stackTrace
-		val logModel = LogModel().build(tokenUser.thisIndex, stackTrace[1].className, stackTrace[1].methodName, "add user : ${userDataModel.joinToString(",") { it.id }}")
+		val logModel = LogModel().build(tokenUser.thisIndex, stackTrace[1].className, stackTrace[1].methodName, "add user count : $retCount")
 		logRepository.save(logModel)
-		return ret
+		return "count : $retCount"
 	}
 
 	fun getUserData(id: String) = userDataRepository.findById(id)

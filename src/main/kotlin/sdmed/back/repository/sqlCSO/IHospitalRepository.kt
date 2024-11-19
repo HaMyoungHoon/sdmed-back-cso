@@ -1,10 +1,14 @@
 package sdmed.back.repository.sqlCSO
 
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
 import sdmed.back.model.sqlCSO.HospitalModel
 
 @Repository
 interface IHospitalRepository: JpaRepository<HospitalModel, Long> {
+	fun findAllByOrderByCode(): List<HospitalModel>
+	fun findAllByOrderByCode(pageable: Pageable): Page<HospitalModel>
 	fun findAllByCodeIn(codes: List<Int>): List<HospitalModel>
 }

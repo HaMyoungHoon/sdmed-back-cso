@@ -1,6 +1,8 @@
 package sdmed.back.service
 
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
@@ -29,8 +31,23 @@ class PharmaceuticalService {
 	@Autowired lateinit var pharmaceuticalRepository: IPharmaceuticalRepository
 
 
+	fun getAllPharma(token: String): List<PharmaceuticalModel> {
+		isValid(token)
+		val tokenUser = getUserDataByToken(token) ?: throw AuthenticationEntryPointException()
+		isLive(tokenUser)
+
+		return pharmaceuticalRepository.findAllByOrderByCode()
+	}
+	fun getPagePharma(token: String, page: Int, size: Int): Page<PharmaceuticalModel> {
+		isValid(token)
+		val tokenUser = getUserDataByToken(token) ?: throw AuthenticationEntryPointException()
+		isLive(tokenUser)
+
+		val pageable = PageRequest.of(page, size)
+		return pharmaceuticalRepository.findAllByOrderByCode(pageable)
+	}
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
-	fun pharmaUpload(token: String, file: MultipartFile): List<PharmaceuticalModel> {
+	fun pharmaUpload(token: String, file: MultipartFile): String {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token) ?: throw AuthenticationEntryPointException()
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.PharmaFileUploader))) {
@@ -38,16 +55,36 @@ class PharmaceuticalService {
 		}
 
 		val pharmaDataModel = excelFileParser.pharmaUploadExcelParse(tokenUser.id, file)
-		val already = pharmaceuticalRepository.findAllByCodeIn(pharmaDataModel.map { it.code })
+		var index = 0
+		val already: MutableList<PharmaceuticalModel> = mutableListOf()
+		while (true) {
+			if (pharmaDataModel.count() > index + 500) {
+				already.addAll(pharmaceuticalRepository.findAllByCodeIn(pharmaDataModel.subList(index, index + 500).map { it.code }))
+			} else {
+				already.addAll(pharmaceuticalRepository.findAllByCodeIn(pharmaDataModel.subList(index, pharmaDataModel.count()).map { it.code }))
+				break
+			}
+			index += 500
+		}
 		pharmaDataModel.removeIf { x -> x.code in already.map { y -> y.code } }
 		if (pharmaDataModel.isEmpty()) {
-			return arrayListOf()
+			return "count : 0"
 		}
-		val ret = pharmaceuticalRepository.saveAll(pharmaDataModel)
+		index = 0
+		var retCount = 0
+		while (true) {
+			if (pharmaDataModel.count() > index + 500) {
+				retCount += pharmaceuticalRepository.saveAll(pharmaDataModel.subList(index, index + 500)).count()
+			} else {
+				retCount += pharmaceuticalRepository.saveAll(pharmaDataModel.subList(index, pharmaDataModel.count())).count()
+				break
+			}
+			index += 500
+		}
 		val stackTrace = Thread.currentThread().stackTrace
-		val logModel = LogModel().build(tokenUser.thisIndex, stackTrace[1].className, stackTrace[1].methodName, "add pharma : ${pharmaDataModel.joinToString(",") { it.innerName }}")
+		val logModel = LogModel().build(tokenUser.thisIndex, stackTrace[1].className, stackTrace[1].methodName, "add pharma count : $retCount")
 		logRepository.save(logModel)
-		return ret
+		return "count : $retCount"
 	}
 
 	fun getUserData(id: String) = userDataRepository.findById(id)

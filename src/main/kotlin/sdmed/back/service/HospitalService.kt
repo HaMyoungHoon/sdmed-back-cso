@@ -1,6 +1,8 @@
 package sdmed.back.service
 
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
@@ -27,9 +29,24 @@ class HospitalService {
 	@Autowired lateinit var excelFileParser: FExcelFileParser
 	@Autowired lateinit var userDataRepository: IUserDataRepository
 	@Autowired lateinit var hospitalRepository: IHospitalRepository
+	fun getAllHospital(token: String): List<HospitalModel> {
+		isValid(token)
+		val tokenUser = getUserDataByToken(token) ?: throw AuthenticationEntryPointException()
+		isLive(tokenUser)
 
+		return hospitalRepository.findAllByOrderByCode()
+	}
+
+	fun getPageHospital(token: String, page: Int, size: Int): Page<HospitalModel> {
+		isValid(token)
+		val tokenUser = getUserDataByToken(token) ?: throw AuthenticationEntryPointException()
+		isLive(tokenUser)
+
+		val pageable = PageRequest.of(page, size)
+		return hospitalRepository.findAllByOrderByCode(pageable)
+	}
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
-	fun hospitalUpload(token: String, file: MultipartFile): List<HospitalModel> {
+	fun hospitalUpload(token: String, file: MultipartFile): String {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token) ?: throw AuthenticationEntryPointException()
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.HospitalFileUploader))) {
@@ -37,16 +54,36 @@ class HospitalService {
 		}
 
 		val hospitalDataModel = excelFileParser.hospitalUploadExcelParse(tokenUser.id, file)
-		val already = hospitalRepository.findAllByCodeIn(hospitalDataModel.map { it.code })
+		var index = 0
+		val already: MutableList<HospitalModel> = mutableListOf()
+		while (true) {
+			if (hospitalDataModel.count() > index + 500) {
+				already.addAll(hospitalRepository.findAllByCodeIn(hospitalDataModel.subList(index, index + 500).map { it.code }))
+			} else {
+				already.addAll(hospitalRepository.findAllByCodeIn(hospitalDataModel.subList(index, hospitalDataModel.count()).map { it.code }))
+				break
+			}
+			index += 500
+		}
 		hospitalDataModel.removeIf { x -> x.code in already.map { y -> y.code } }
 		if (hospitalDataModel.isEmpty()) {
-			return arrayListOf()
+			return "count : 0"
 		}
-		val ret = hospitalRepository.saveAll(hospitalDataModel)
+		index = 0
+		var retCount = 0
+		while (true) {
+			if (hospitalDataModel.count() > index + 500) {
+				retCount += hospitalRepository.saveAll(hospitalDataModel.subList(index, index + 500)).count()
+			} else {
+				retCount += hospitalRepository.saveAll(hospitalDataModel.subList(index, hospitalDataModel.count())).count()
+				break
+			}
+			index += 500
+		}
 		val stackTrace = Thread.currentThread().stackTrace
-		val logModel = LogModel().build(tokenUser.thisIndex, stackTrace[1].className, stackTrace[1].methodName, "add hospital : ${hospitalDataModel.joinToString(",") { it.innerName }}")
+		val logModel = LogModel().build(tokenUser.thisIndex, stackTrace[1].className, stackTrace[1].methodName, "add hospital count : $retCount")
 		logRepository.save(logModel)
-		return ret
+		return "count : $retCount"
 	}
 
 	fun getUserData(id: String) = userDataRepository.findById(id)
