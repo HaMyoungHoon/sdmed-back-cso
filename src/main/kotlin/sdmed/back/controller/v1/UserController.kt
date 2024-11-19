@@ -15,6 +15,7 @@ import sdmed.back.config.FConstants
 import sdmed.back.config.FExcelParserType
 import sdmed.back.config.FExtensions
 import sdmed.back.model.common.IRestResult
+import sdmed.back.model.common.UserDept
 import sdmed.back.model.common.UserRole
 import sdmed.back.model.common.UserStatus
 import sdmed.back.model.sqlCSO.UserDataModel
@@ -47,21 +48,18 @@ class UserController {
 	@Operation(summary = "회원가입")
 	@PostMapping(value = ["/signUp"])
 	fun signUp(@RequestParam(required = true) confirmPW: String,
-	           @RequestBody data: UserDataModel): IRestResult {
-		return responseService.getResult(userService.signUp(confirmPW, data))
-	}
+	           @RequestBody data: UserDataModel) =
+		responseService.getResult(userService.signUp(confirmPW, data))
 	@Operation(summary = "비밀번호 변경")
 	@PutMapping(value = ["/passwordChange"])
 	fun passwordChange(@RequestHeader(required = true) token: String,
 	                   @RequestParam(required = true) id: String,
-	                   @RequestParam(required = true) changePW: String): IRestResult {
-		return responseService.getResult(userService.passwordChange(token, id, changePW))
-	}
+	                   @RequestParam(required = true) changePW: String) =
+		responseService.getResult(userService.passwordChange(token, id, changePW))
 	@Operation(summary = "로그인 토큰 새로고침")
 	@PostMapping(value = ["/tokenRefresh"])
-	fun tokenRefresh(@RequestHeader(required = true) token: String): IRestResult {
-		return responseService.getResult(userService.tokenRefresh(token))
-	}
+	fun tokenRefresh(@RequestHeader(required = true) token: String) =
+		responseService.getResult(userService.tokenRefresh(token))
 	@Operation(summary = "유저 데이터 검색")
 	@GetMapping(value = ["/userData"])
 	fun getUserData(@RequestHeader(required = true) token: String, @RequestParam(required = false) id: String?): IRestResult {
@@ -73,6 +71,22 @@ class UserController {
 			return responseService.getResult(userService.getUserData(id))
 		}
 		return responseService.getResult(userService.getUserDataByToken(token))
+	}
+	@Operation(summary = "유저 권한 변경")
+	@PutMapping(value = ["/userRoleModify"])
+	fun putUserRoleModify(@RequestHeader(required = true) token: String,
+												@RequestParam(required = true) id: String,
+												@RequestParam(required = true) roles: List<UserRole>): IRestResult {
+		if (id == "mhha") throw AuthenticationEntryPointException()
+		return responseService.getResult(userService.userRoleModify(token, id, roles))
+	}
+	@Operation(summary = "유저 부서 변경")
+	@PutMapping(value = ["/userDeptModify"])
+	fun putUserDeptModify(@RequestHeader(required = true) token: String,
+	                      @RequestParam(required = true) id: String,
+	                      @RequestParam(required = true) depts: List<UserDept>): IRestResult {
+		if (id == "mhha") throw AuthenticationEntryPointException()
+		return responseService.getResult(userService.userDeptModify(token, id, depts))
 	}
 	@Operation(summary = "유저 상태 변경")
 	@PutMapping(value = ["/userStatusModify"])
