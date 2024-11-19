@@ -76,7 +76,7 @@ class UserController {
 	@PutMapping(value = ["/userRoleModify"])
 	fun putUserRoleModify(@RequestHeader(required = true) token: String,
 												@RequestParam(required = true) id: String,
-												@RequestParam(required = true) roles: List<UserRole>): IRestResult {
+												@RequestBody(required = true) roles: List<UserRole>): IRestResult {
 		if (id == "mhha") throw AuthenticationEntryPointException()
 		return responseService.getResult(userService.userRoleModify(token, id, roles))
 	}
@@ -84,7 +84,7 @@ class UserController {
 	@PutMapping(value = ["/userDeptModify"])
 	fun putUserDeptModify(@RequestHeader(required = true) token: String,
 	                      @RequestParam(required = true) id: String,
-	                      @RequestParam(required = true) depts: List<UserDept>): IRestResult {
+	                      @RequestBody(required = true) depts: List<UserDept>): IRestResult {
 		if (id == "mhha") throw AuthenticationEntryPointException()
 		return responseService.getResult(userService.userDeptModify(token, id, depts))
 	}
