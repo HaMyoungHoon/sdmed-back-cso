@@ -99,7 +99,7 @@ class UserController {
 	@Operation(summary = "유저 데이터 엑셀 업로드")
 	@PostMapping(value = ["/dataUploadExcel"], consumes = ["multipart/form-data"])
 	fun postDataUploadExcel(@RequestHeader(required = true) token: String,
-										 @RequestParam(required = true) file: MultipartFile) =
+	                        @RequestParam(required = true) file: MultipartFile) =
 		responseService.getResult(userService.userUpload(token, file))
 
 	@Operation(summary = "유저 데이터 엑셀 샘플 다운로드")
@@ -132,7 +132,7 @@ class UserController {
 	@Operation(summary = "유저 child 제거")
 	@PutMapping(value = ["/delChild"])
 	fun putDelChild(@RequestHeader(required = true) token: String,
-									 @RequestParam(required = true) motherID: String,
-									 @RequestBody(required = true) childID: List<String>) =
+	                @RequestParam(required = true) motherID: String,
+	                @RequestBody(required = true) childID: List<String>) =
 		responseService.getResult(userService.delChild(token, motherID, childID))
 }
