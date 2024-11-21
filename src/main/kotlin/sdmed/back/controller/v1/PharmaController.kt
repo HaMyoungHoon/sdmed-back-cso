@@ -26,7 +26,7 @@ class PharmaController {
 
 	@Operation(summary = "제약사 정보 조회")
 	@GetMapping(value = ["/all"])
-	fun getPharma(@RequestHeader(required = true) token: String) =
+	fun getPharmaAll(@RequestHeader(required = true) token: String) =
 		responseService.getResult(pharmaService.getAllPharma(token))
 	@Operation(summary = "제약사 정보 조회")
 	@GetMapping(value = ["/all/{page}/{size}"])
@@ -38,7 +38,7 @@ class PharmaController {
 	@Operation(summary = "제약사 데이터 엑셀 업로드")
 	@PostMapping(value = ["/dataUploadExcel"], consumes = ["multipart/form-data"])
 	fun postDataUploadExcel(@RequestHeader(required = true) token: String,
-										 @RequestParam(required = true) file: MultipartFile) =
+	                        @RequestParam(required = true) file: MultipartFile) =
 		responseService.getResult(pharmaService.pharmaUpload(token, file))
 
 	@Operation(summary = "제약사 데이터 엑셀 샘플 다운로드")

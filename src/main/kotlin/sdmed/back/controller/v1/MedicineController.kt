@@ -33,13 +33,13 @@ class MedicineController {
 	@Autowired lateinit var responseService: ResponseService
 	@Autowired lateinit var medicineService: MedicineService
 
-	@Operation(summary = "약제급여목록 테스트 노 토큰")
+	@Operation(summary = "약제급여목록")
 	@GetMapping(value = ["/all"])
 	fun getMedicineAll(@RequestHeader(required = true) token: String) =
 		responseService.getResult(medicineService.getMedicine(token))
 	@Operation(summary = "약제급여목록")
 	@GetMapping(value = ["/all/{page}/{size}"])
-	fun getMedicineAll(@RequestHeader(required = true) token: String,
+	fun getMedicineAllPage(@RequestHeader(required = true) token: String,
 										 @PathVariable("page") page: Int,
 										 @PathVariable("size") size: Int) =
 		responseService.getResult(medicineService.getMedicine(token, page, size))
