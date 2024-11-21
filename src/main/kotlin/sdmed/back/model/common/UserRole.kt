@@ -16,7 +16,8 @@ enum class UserRole(var flag: Int, var desc: String) {
 	UserFileUploader(Admin.flag.shl(9), "UserFileUploader"),
 	CorrespondentFileUploader(Admin.flag.shl(10), "CorrespondentFileUploader"),
 	PharmaFileUploader(Admin.flag.shl(11), "PharmaFileUploader"),
-	HospitalFileUploader(Admin.flag.shl(12), "HospitalFileUploader");
+	HospitalFileUploader(Admin.flag.shl(12), "HospitalFileUploader"),
+	MedicineFileUploader(Admin.flag.shl(13), "MedicineFileUploader");
 
 	infix fun and(rhs: UserRole) = EnumSet.of(this, rhs)
 	fun toS() = EnumSet.of(this)

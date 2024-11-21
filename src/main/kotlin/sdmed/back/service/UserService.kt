@@ -1,5 +1,6 @@
 package sdmed.back.service
 
+import jakarta.persistence.EntityManager
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
@@ -8,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
 import sdmed.back.advice.exception.*
 import sdmed.back.config.FAmhohwa
+import sdmed.back.config.FConstants
 import sdmed.back.config.FExcelFileParser
 import sdmed.back.config.jpa.CSOJPAConfig
 import sdmed.back.config.security.JwtTokenProvider
@@ -17,21 +19,20 @@ import sdmed.back.model.common.UserRole.Companion.getFlag
 import sdmed.back.model.common.UserRoles
 import sdmed.back.model.sqlCSO.LogModel
 import sdmed.back.model.sqlCSO.UserDataModel
-import sdmed.back.model.sqlCSO.UserDataSubModel
 import sdmed.back.repository.sqlCSO.ILogRepository
 import sdmed.back.repository.sqlCSO.IUserDataRepository
-import sdmed.back.repository.sqlCSO.IUserSubDataRepository
 import java.sql.Timestamp
 import java.util.*
+import java.util.stream.Collectors
 
 @Service
 class UserService {
 	@Autowired lateinit var jwtTokenProvider: JwtTokenProvider
 	@Autowired lateinit var userDataRepository: IUserDataRepository
-	@Autowired lateinit var userSubDataRepository: IUserSubDataRepository
 	@Autowired lateinit var logRepository: ILogRepository
 	@Autowired lateinit var fAmhohwa: FAmhohwa
 	@Autowired lateinit var excelFileParser: FExcelFileParser
+	@Autowired lateinit var entityManager: EntityManager
 
 	fun getAllUser(token: String): List<UserDataModel> {
 		isValid(token)
@@ -92,10 +93,6 @@ class UserService {
 			data.dept = UserDept.Admin.flag
 			data.status = UserStatus.Live
 		}
-		data.subData = UserDataSubModel().apply {
-			mother = data
-		}
-		userSubDataRepository.save(data.subData!!)
 		val ret = userDataRepository.save(data)
 		val stackTrace = Thread.currentThread().stackTrace
 		val logModel = LogModel().build(null, stackTrace[1].className, stackTrace[1].methodName, "${data.id} ${data.name} signUp")
@@ -264,19 +261,14 @@ class UserService {
 		}
 		userDataModel.onEach { x ->
 			x.pw = fAmhohwa.encrypt(x.pw)
-			x.subData = UserDataSubModel().apply {
-				mother = x
-			}
 		}
 		index = 0
 		var retCount = 0
 		while (true) {
 			if (userDataModel.count() > index + 500) {
-				userSubDataRepository.saveAll(userDataModel.subList(index, index + 500).map { it.subData })
-				retCount += userDataRepository.saveAll(userDataModel.subList(index, index + 500)).count()
+				retCount += insertAll(userDataModel.subList(index, index + 500))
 			} else {
-				userSubDataRepository.saveAll(userDataModel.subList(index, userDataModel.count()).map { it.subData })
-				retCount += userDataRepository.saveAll(userDataModel.subList(index, userDataModel.count())).count()
+				retCount += insertAll(userDataModel.subList(index, userDataModel.count()))
 				break
 			}
 			index += 500
@@ -285,6 +277,17 @@ class UserService {
 		val logModel = LogModel().build(tokenUser.thisIndex, stackTrace[1].className, stackTrace[1].methodName, "add user count : $retCount")
 		logRepository.save(logModel)
 		return "count : $retCount"
+	}
+
+	private fun insertAll(data: List<UserDataModel>): Int {
+		val values: String = data.stream().map(this::renderSqlUserModel).collect(Collectors.joining(","))
+		val ret = entityManager.createNativeQuery("${FConstants.MODEL_USER_INSERT_INTO}$values").executeUpdate()
+		entityManager.flush()
+		entityManager.clear()
+		return ret
+	}
+	private fun renderSqlUserModel(data: UserDataModel): String {
+		return data.insertString()
 	}
 
 	fun getUserData(id: String) = userDataRepository.findById(id)

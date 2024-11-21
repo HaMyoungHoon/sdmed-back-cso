@@ -20,9 +20,9 @@ object FExtensions {
 	var imageDir: String = ""
 	var documentDir: String = ""
 	var userExcelDir: String = ""
-	var correspondentExcelDir: String = ""
 	var pharmaExcelDir: String = ""
 	var hospitalExcelDir: String = ""
+	var medicineExcelDir: String = ""
 
 	fun fileTransfer(excelType: FExcelParserType) {
 
@@ -33,9 +33,9 @@ object FExtensions {
 	fun fileLocation(excelType: FExcelParserType, withTime: Boolean = true): Path {
 		val ret = when (excelType) {
 			FExcelParserType.USER -> userExcelDir
-			FExcelParserType.CORRESPONDENT -> correspondentExcelDir
 			FExcelParserType.PHARMA -> pharmaExcelDir
 			FExcelParserType.HOSPITAL -> hospitalExcelDir
+			FExcelParserType.MEDICINE -> medicineExcelDir
 		}
 		return if (withTime) {
 			Paths.get("${ret}/${getDateTimeString("yyyy-MM-dd")}").toAbsolutePath().normalize()
@@ -58,33 +58,36 @@ object FExtensions {
 
 	fun getDateTimeString(pattern: String): String {
 		val currentDate = Date()
-		val localDate = currentDate.toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDateTime()
+		val localDate = currentDate.toInstant().atZone(java.time.ZoneId.of("UTC")).toLocalDateTime()
 		return localDate.format(DateTimeFormatter.ofPattern(pattern))
 	}
-	fun parseDateTimeString(date: Date?, pattern: String): String {
-		if (date == null) {
-			return ""
-		}
-
-		val localDate = date.toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate()
-		return localDate.format(DateTimeFormatter.ofPattern(pattern))
+	fun parseDateTimeString(date: Date?, pattern: String) = date?.let {
+		val localDate = date.toInstant().atZone(java.time.ZoneId.of("UTC")).toLocalDateTime()
+		localDate.format(DateTimeFormatter.ofPattern(pattern))
 	}
+	fun parseDateTimeString(date: java.sql.Date?, pattern: String) = date?.let {
+		parseDateTimeString(Date(it.time), pattern)
+	} ?: ""
 	fun parseStringToSqlDate(date: String?, pattern: String): java.sql.Date {
 		val localDate = LocalDate.parse(date, DateTimeFormatter.ofPattern(pattern))
 		return java.sql.Date.valueOf(localDate)
 	}
 	fun parseStringToJavaDate(date: String?, pattern: String): Date {
 		val localDate = LocalDate.parse(date, DateTimeFormatter.ofPattern(pattern))
-		return Date.from(localDate.atStartOfDay(java.time.ZoneId.systemDefault()).toInstant())
+		return Date.from(localDate.atStartOfDay(java.time.ZoneId.of("UTC")).toInstant())
 	}
 
 	fun sampleFileDownload(excelType: FExcelParserType): Resource {
 		val filePath = when (excelType) {
 			FExcelParserType.USER -> Paths.get("${userExcelDir}/excel_upload_sample.xlsx").toAbsolutePath().normalize()
-			FExcelParserType.CORRESPONDENT -> Paths.get("${correspondentExcelDir}/excel_upload_sample.xlsx").toAbsolutePath().normalize()
 			FExcelParserType.PHARMA -> Paths.get("${pharmaExcelDir}/excel_upload_sample.xlsx").toAbsolutePath().normalize()
 			FExcelParserType.HOSPITAL -> Paths.get("${hospitalExcelDir}/excel_upload_sample.xlsx").toAbsolutePath().normalize()
+			FExcelParserType.MEDICINE -> Paths.get("${medicineExcelDir}/excel_upload_sample.xlsx").toAbsolutePath().normalize()
 		}
 		return UrlResource(filePath.toUri())
 	}
+
+	fun regexSpecialCharRemove(data: String?) = data?.let { Regex(FConstants.REGEX_SPECIAL_CHAR_REMOVE).replace(it, "") } ?: ""
+	fun regexOnlyAlphabet(data: String?) = data?.let { Regex(FConstants.REGEX_ONLY_ALPHABET).replace(it, "") } ?: ""
+	fun escapeString(data: String?) = data?.let { it.replace(Regex(FConstants.REGEX_ESCAPE_SQL)) { x -> ""} } ?: ""
 }
