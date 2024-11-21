@@ -4,5 +4,5 @@ enum class FExcelParserType {
 	USER,
 	PHARMA,
 	HOSPITAL,
-	CORRESPONDENT,
+	MEDICINE,
 }

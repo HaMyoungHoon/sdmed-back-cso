@@ -3,10 +3,8 @@ package sdmed.back.config
 import org.springframework.stereotype.Component
 import org.springframework.web.multipart.MultipartFile
 import sdmed.back.advice.exception.UserDataFileUploadException
-import sdmed.back.model.sqlCSO.CorrespondentModel
-import sdmed.back.model.sqlCSO.HospitalModel
-import sdmed.back.model.sqlCSO.PharmaceuticalModel
-import sdmed.back.model.sqlCSO.UserDataModel
+import sdmed.back.model.sqlCSO.*
+import java.util.*
 
 @Component
 class FExcelFileParser {
@@ -23,7 +21,7 @@ class FExcelFileParser {
 		val ret: MutableList<UserDataModel> = mutableListOf()
 		excelSheetHandler.rows.forEach { x ->
 			val model = UserDataModel()
-			val setRowRet = model.setRows(x)
+			val setRowRet = model.rowSet(x)
 			if (setRowRet == null) {
 				FExtensions.fileDelete(copiedLocation)
 				throw UserDataFileUploadException(model.errorString())
@@ -36,20 +34,20 @@ class FExcelFileParser {
 
 		return ret
 	}
-	fun pharmaUploadExcelParse(uploaderID: String, file: MultipartFile): MutableList<PharmaceuticalModel> {
+	fun pharmaUploadExcelParse(uploaderID: String, file: MultipartFile): MutableList<PharmaModel> {
 		FExtensions.folderExist(FExcelParserType.PHARMA)
 		val copiedLocation = FExtensions.fileCopy(file, FExcelParserType.PHARMA, uploaderID)
 		val excelSheetHandler = ExcelSheetHandler.readExcel(copiedLocation.toFile())
 
-		if (!PharmaceuticalModel().findHeader(excelSheetHandler.header)) {
+		if (!PharmaModel().findHeader(excelSheetHandler.header)) {
 			FExtensions.fileDelete(copiedLocation)
 			throw UserDataFileUploadException()
 		}
 
-		val ret: MutableList<PharmaceuticalModel> = mutableListOf()
+		val ret: MutableList<PharmaModel> = mutableListOf()
 		excelSheetHandler.rows.forEach { x ->
-			val model = PharmaceuticalModel()
-			val setRowRet = model.setRows(x)
+			val model = PharmaModel()
+			val setRowRet = model.rowSet(x)
 			if (setRowRet == null) {
 				FExtensions.fileDelete(copiedLocation)
 				throw UserDataFileUploadException(model.errorString())
@@ -75,7 +73,7 @@ class FExcelFileParser {
 		val ret: MutableList<HospitalModel> = mutableListOf()
 		excelSheetHandler.rows.forEach { x ->
 			val model = HospitalModel()
-			val setRowRet = model.setRows(x)
+			val setRowRet = model.rowSet(x)
 			if (setRowRet == null) {
 				FExtensions.fileDelete(copiedLocation)
 				throw UserDataFileUploadException(model.errorString())
@@ -88,28 +86,28 @@ class FExcelFileParser {
 
 		return ret
 	}
-
-	fun correspondentUploadExcelParse(uploaderID: String, file: MultipartFile): MutableList<CorrespondentModel> {
-		FExtensions.folderExist(FExcelParserType.CORRESPONDENT)
-		val copiedLocation = FExtensions.fileCopy(file, FExcelParserType.CORRESPONDENT, uploaderID)
+	fun medicineUploadExcelParse(uploaderID: String, applyDate: Date, file: MultipartFile): MutableList<MedicineModel> {
+		FExtensions.folderExist(FExcelParserType.MEDICINE)
+		val copiedLocation = FExtensions.fileCopy(file, FExcelParserType.MEDICINE, uploaderID)
 		val excelSheetHandler = ExcelSheetHandler.readExcel(copiedLocation.toFile())
 
-		if (!CorrespondentModel().findHeader(excelSheetHandler.header)) {
+		if (!MedicineModel().findHeader(excelSheetHandler.header)) {
 			FExtensions.fileDelete(copiedLocation)
 			throw UserDataFileUploadException()
 		}
 
-		val ret: MutableList<CorrespondentModel> = mutableListOf()
+		val ret: MutableList<MedicineModel> = mutableListOf()
 		excelSheetHandler.rows.forEach { x ->
-			val model = CorrespondentModel()
-			val setRowRet = model.setRows(x)
+			val model = MedicineModel()
+			val setRowRet = model.rowSet(x)
 			if (setRowRet == null) {
 				FExtensions.fileDelete(copiedLocation)
-				throw UserDataFileUploadException(model.getErrorString())
+				throw UserDataFileUploadException(model.errorString())
 			}
 			if (setRowRet == false) {
 				return@forEach
 			}
+			model.applyDate = applyDate
 			ret.add(model)
 		}
 

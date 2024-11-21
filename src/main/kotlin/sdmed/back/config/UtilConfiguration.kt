@@ -10,9 +10,9 @@ class UtilConfiguration {
 	@Value(value = "\${file.imageDir}") var imageDir: String = ""
 	@Value(value = "\${file.documentDir}") var documentDir: String = ""
 	@Value(value = "\${file.userExcelDir}") var userExcelDir: String = ""
-	@Value(value = "\${file.correspondentExcelDir}") var correspondentExcelDir: String = ""
 	@Value(value = "\${file.pharmaExcelDir}") var pharmaExcelDir: String = ""
 	@Value(value = "\${file.hospitalExcelDir}") var hospitalExcelDir: String = ""
+	@Value(value = "\${file.medicineExcelDir}") var medicineExcelDir: String = ""
 
 	@PostConstruct
 	fun init() {
@@ -20,8 +20,8 @@ class UtilConfiguration {
 		FExtensions.imageDir = imageDir
 		FExtensions.documentDir = documentDir
 		FExtensions.userExcelDir = userExcelDir
-		FExtensions.correspondentExcelDir = correspondentExcelDir
 		FExtensions.pharmaExcelDir = pharmaExcelDir
 		FExtensions.hospitalExcelDir = hospitalExcelDir
+		FExtensions.medicineExcelDir = medicineExcelDir
 	}
 }
