@@ -8,7 +8,7 @@ import java.lang.StringBuilder
 import java.sql.Date
 
 /**
- * PharmaceuticalModel
+ * PharmaModel
  *
  * @property thisIndex
  * @property code 거래처코드
@@ -24,8 +24,8 @@ import java.sql.Date
  * @property businessType 업태
  * @property businessItem 종목
  * @property billType 계산서발행
- * @property pharmaceuticalType 거래처종류
- * @property pharmaceuticalGroup 거래처그룹
+ * @property pharmaType 거래처종류
+ * @property pharmaGroup 거래처그룹
  * @property contractType 계약구분
  * @property deliveryDiv 배송구분
  * @property mail 메일
@@ -36,11 +36,11 @@ import java.sql.Date
  * @property etc2 비고2
  * @property imageUrl 사업자등록증이미지
  * @property userDataModel
- * @property userHospitalRelations
+ * @property userPharmaHosMedicineR
  * @constructor Create empty Pharmaceutical model
  */
 @Entity
-data class PharmaceuticalModel(
+data class PharmaModel(
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(updatable = false, nullable = false)
@@ -55,74 +55,74 @@ data class PharmaceuticalModel(
 	var ownerName: String = "",
 	@Column(columnDefinition = "nvarchar(255)", nullable = false)
 	var taxpayerNumber: String = "",
-	@Column(columnDefinition = "nvarchar(255)")
-	var phoneNumber: String? = null,
-	@Column(columnDefinition = "nvarchar(255)")
-	var faxNumber: String? = null,
+	@Column(columnDefinition = "nvarchar(255)", nullable = false)
+	var phoneNumber: String = "",
+	@Column(columnDefinition = "nvarchar(255)", nullable = false)
+	var faxNumber: String = "",
 	@Column(columnDefinition = "nvarchar(100)", nullable = false)
 	var zipCode: String = "",
 	@Column(columnDefinition = "nvarchar(255)", nullable = false)
 	var address: String = "",
-	@Column(columnDefinition = "nvarchar(255)")
-	var addressDetail: String? = null,
-	@Column(columnDefinition = "nvarchar(255)")
-	var businessType: String? = null,
-	@Column(columnDefinition = "nvarchar(255)")
-	var businessItem: String? = null,
+	@Column(columnDefinition = "nvarchar(255)", nullable = false)
+	var addressDetail: String = "",
+	@Column(columnDefinition = "nvarchar(255)", nullable = false)
+	var businessType: String = "",
+	@Column(columnDefinition = "nvarchar(255)", nullable = false)
+	var businessItem: String = "",
 	@Column(nullable = false)
 	var billType: BillType = BillType.None,
 	@Column(nullable = false)
-	var pharmaceuticalType: PharmaceuticalType = PharmaceuticalType.None,
+	var pharmaType: PharmaType = PharmaType.None,
 	@Column(nullable = false)
-	var pharmaceuticalGroup: PharmaceuticalGroup = PharmaceuticalGroup.None,
+	var pharmaGroup: PharmaGroup = PharmaGroup.None,
 	@Column(nullable = false)
 	var contractType: ContractType = ContractType.None,
 	@Column(nullable = false)
 	var deliveryDiv: DeliveryDiv = DeliveryDiv.None,
-	@Column(columnDefinition = "nvarchar(255)")
-	var mail: String? = null,
-	@Column(columnDefinition = "nvarchar(255)")
-	var mobilePhone: String? = null,
+	@Column(columnDefinition = "nvarchar(255)", nullable = false)
+	var mail: String = "",
+	@Column(columnDefinition = "nvarchar(255)", nullable = false)
+	var mobilePhone: String = "",
 	@Column
 	var openDate: Date? = null,
 	@Column
 	var closeDate: Date? = null,
-	@Column(columnDefinition = "nvarchar(500)")
-	var etc1: String? = null,
-	@Column(columnDefinition = "nvarchar(500)")
-	var etc2: String? = null,
-	@Column(columnDefinition = "nvarchar(500)")
-	var imageUrl: String? = null,
-	@ManyToMany(mappedBy = "pharmaceuticals")
+	@Column(columnDefinition = "nvarchar(500)", nullable = false)
+	var etc1: String = "",
+	@Column(columnDefinition = "nvarchar(500)", nullable = false)
+	var etc2: String = "",
+	@Column(columnDefinition = "nvarchar(500)", nullable = false)
+	var imageUrl: String = "",
+	@ManyToMany(mappedBy = "pharmas")
 	var userDataModel: MutableList<UserDataModel>? = null,
-	@OneToMany(mappedBy = "pharmaceuticalModel")
-	val userHospitalRelations: MutableList<UserPharmaceuticalHospital> = mutableListOf()
+	@OneToMany(mappedBy = "pharmaModel")
+	val userPharmaHosMedicineR: MutableList<UserPharmaHosMedicine> = mutableListOf()
 	) {
 
 	fun findHeader(data: List<String>): Boolean {
-		if (data.size < FConstants.PHARMA_MODEL_COUNT) {
+		if (data.size < FConstants.MODEL_PHARMA_COUNT) {
 			return false
 		}
 
-		if (data[0] != getTitle(0) || data[1] != getTitle(1) || data[2] != getTitle(2) || data[3] != getTitle(3) ||
-			data[4] != getTitle(4) || data[5] != getTitle(5) ||	data[6] != getTitle(6) || data[7] != getTitle(7) ||
-			data[8] != getTitle(8) || data[9] != getTitle(9) ||	data[10] != getTitle(10) || data[11] != getTitle(11) ||
-			data[12] != getTitle(12) || data[13] != getTitle(13) ||	data[14] != getTitle(14) || data[15] != getTitle(15) ||
-			data[16] != getTitle(16) || data[17] != getTitle(17) ||	data[18] != getTitle(18) || data[19] != getTitle(19) ||
-			data[20] != getTitle(20) || data[21] != getTitle(21) ||	data[22] != getTitle(22)) {
+		if (data[0] != titleGet(0) || data[1] != titleGet(1) || data[2] != titleGet(2) || data[3] != titleGet(3) ||
+			data[4] != titleGet(4) || data[5] != titleGet(5) ||	data[6] != titleGet(6) || data[7] != titleGet(7) ||
+			data[8] != titleGet(8) || data[9] != titleGet(9) ||	data[10] != titleGet(10) || data[11] != titleGet(11) ||
+			data[12] != titleGet(12) || data[13] != titleGet(13) ||	data[14] != titleGet(14) || data[15] != titleGet(15) ||
+			data[16] != titleGet(16) || data[17] != titleGet(17) ||	data[18] != titleGet(18) || data[19] != titleGet(19) ||
+			data[20] != titleGet(20) || data[21] != titleGet(21) ||	data[22] != titleGet(22)) {
 			return false
 		}
 
 		return true
 	}
-	fun setRows(data: List<String>): Boolean? {
+	fun rowSet(data: List<String>): Boolean? {
 		if (data.size <= 1) {
 			return false
 		}
 
 		return try {
 			for ((index, value) in data.withIndex()) {
-				setIndex(value, index)
+				indexSet(value, index)
 			}
 			if (errorCondition()) {
 				return false
@@ -132,62 +132,62 @@ data class PharmaceuticalModel(
 			null
 		}
 	}
-	fun getIndex(index: Int): String {
+	fun indexGet(index: Int): String {
 		return when (index) {
 			0 -> code.toString()
 			1 -> orgName
 			2 -> innerName
 			3 -> ownerName
 			4 -> taxpayerNumber
-			5 -> phoneNumber ?: ""
-			6 -> faxNumber ?: ""
+			5 -> phoneNumber
+			6 -> faxNumber
 			7 -> zipCode
 			8 -> address
-			9 -> addressDetail ?: ""
-			10 -> businessType ?: ""
-			11 -> businessItem ?: ""
+			9 -> addressDetail
+			10 -> businessType
+			11 -> businessItem
 			12 -> billType.desc
-			13 -> pharmaceuticalType.desc
-			14 -> pharmaceuticalGroup.desc
+			13 -> pharmaType.desc
+			14 -> pharmaGroup.desc
 			15 -> contractType.desc
 			16 -> deliveryDiv.desc
-			17 -> mail ?: ""
-			18 -> mobilePhone ?: ""
+			17 -> mail
+			18 -> mobilePhone
 			19 -> FExtensions.parseDateTimeString(openDate, "yyyy-MM-dd")
 			20 -> FExtensions.parseDateTimeString(closeDate, "yyyy-MM-dd")
-			21 -> etc1 ?: ""
-			22 -> etc2 ?: ""
+			21 -> etc1
+			22 -> etc2
 			else -> ""
 		}
 	}
-	fun setIndex(data: String?, index: Int) {
+	fun indexSet(data: String?, index: Int) {
 		when (index) {
 			0 -> code = data?.toIntOrNull() ?: 0
 			1 -> orgName = data ?: ""
 			2 -> innerName = data ?: ""
 			3 -> ownerName = data ?: ""
 			4 -> taxpayerNumber = data ?: ""
-			5 -> phoneNumber = data
-			6 -> faxNumber = data
+			5 -> phoneNumber = data ?: ""
+			6 -> faxNumber = data ?: ""
 			7 -> zipCode = data ?: ""
 			8 -> address = data ?: ""
-			9 -> addressDetail = data
-			10 -> businessType = data
-			11 -> businessItem = data
+			9 -> addressDetail = data ?: ""
+			10 -> businessType = data ?: ""
+			11 -> businessItem = data ?: ""
 			12 -> billType = BillType.parseString(data)
-			13 -> pharmaceuticalType = PharmaceuticalType.parseString(data)
-			14 -> pharmaceuticalGroup = PharmaceuticalGroup.parseString(data)
+			13 -> pharmaType = PharmaType.parseString(data)
+			14 -> pharmaGroup = PharmaGroup.parseString(data)
 			15 -> contractType = ContractType.parseString(data)
 			16 -> deliveryDiv = DeliveryDiv.parseString(data)
-			17 -> mail = data
-			18 -> mobilePhone = data
+			17 -> mail = data ?: ""
+			18 -> mobilePhone = data ?: ""
 			19 -> openDate = if (data.isNullOrEmpty()) null else FExtensions.parseStringToSqlDate(data, "yyyy-MM-dd")
 			20 -> closeDate = if (data.isNullOrEmpty()) null else FExtensions.parseStringToSqlDate(data, "yyyy-MM-dd")
-			21 -> etc1 = data
-			22 -> etc2 = data
+			21 -> etc1 = data ?: ""
+			22 -> etc2 = data ?: ""
 		}
 	}
-	fun getTitle(index: Int): String {
+	fun titleGet(index: Int): String {
 		return when (index) {
 			0 -> FConstants.MODEL_CODE
 			1 -> FConstants.MODEL_ORG_NAME
@@ -216,11 +216,11 @@ data class PharmaceuticalModel(
 		}
 	}
 	fun errorCondition(): Boolean {
-		if (getIndex(0) == "0") {
+		if (indexGet(0) == "0") {
 			return true
-		} else if (getIndex(1).isEmpty()) {
+		} else if (indexGet(1).isEmpty()) {
 			return true
-		} else if (getIndex(2).isEmpty()) {
+		} else if (indexGet(2).isEmpty()) {
 			return true
 //		} else if (getIndex(3).isEmpty()) {
 //			return true
@@ -235,9 +235,29 @@ data class PharmaceuticalModel(
 	}
 	fun errorString(): String {
 		val ret = StringBuilder()
-		for (i in 0 until FConstants.PHARMA_MODEL_COUNT) {
-			ret.append("${getTitle(i)} : ${getIndex(i)}\n")
+		for (i in 0 until FConstants.MODEL_PHARMA_COUNT) {
+			ret.append("${titleGet(i)} : ${indexGet(i)}\n")
 		}
 		return ret.toString()
+	}
+	fun insertString(): String {
+		val orgName = FExtensions.escapeString(orgName)
+		val innerName = FExtensions.escapeString(innerName)
+		val ownerName = FExtensions.escapeString(ownerName)
+		val taxpayerNumber = FExtensions.escapeString(taxpayerNumber)
+		val phoneNumber = FExtensions.escapeString(phoneNumber)
+		val faxNumber = FExtensions.escapeString(faxNumber)
+		val zipCode = FExtensions.escapeString(zipCode)
+		val address = FExtensions.escapeString(address)
+		val addressDetail = FExtensions.escapeString(addressDetail)
+		val businessType = FExtensions.escapeString(businessType)
+		val businessItem = FExtensions.escapeString(businessItem)
+		val mail = FExtensions.escapeString(mail)
+		val mobilePhone = FExtensions.escapeString(mobilePhone)
+		val openDateString: String = openDate?.let { "'${FExtensions.parseDateTimeString(it, "yyyy-MM-dd")}'" } ?: "null"
+		val closeDateString: String = closeDate?.let { "'${FExtensions.parseDateTimeString(it, "yyyy-MM-dd")}'" } ?: "null"
+		val etc1 = FExtensions.escapeString(etc1)
+		val etc2 = FExtensions.escapeString(etc2)
+		return "('$code', '$orgName', '$innerName', '$ownerName', '$taxpayerNumber', '$phoneNumber', '$faxNumber', '$zipCode', '$address', '$addressDetail', '$businessType', '$businessItem', '${billType.index}', '${pharmaType.index}', '${pharmaGroup.index}', '${contractType.index}', '${deliveryDiv.index}', '$mail', '$mobilePhone', $openDateString, $closeDateString, '$etc1', '$etc2', '$imageUrl')"
 	}
 }

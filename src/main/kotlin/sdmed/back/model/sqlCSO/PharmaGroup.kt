@@ -1,6 +1,6 @@
 package sdmed.back.model.sqlCSO
 
-enum class PharmaceuticalGroup(var index: Int, var desc: String) {
+enum class PharmaGroup(var index: Int, var desc: String) {
 	None(0, "미지정"),
 	Recipient(1, "공급받는자"),
 	Supplier(2, "공급사"),

@@ -13,26 +13,26 @@ import sdmed.back.config.ContentsType
 import sdmed.back.config.FConstants
 import sdmed.back.config.FExcelParserType
 import sdmed.back.config.FExtensions
-import sdmed.back.service.PharmaceuticalService
+import sdmed.back.service.PharmaService
 import sdmed.back.service.ResponseService
 
 @Tag(name = "PharmaController")
 @RestController
-@RequestMapping(value = ["/v1/pharma"])
-@CrossOrigin(origins = [FConstants.HTTP_MHHA, FConstants.HTTPS_MHHA], allowedHeaders = ["*"])
+	@RequestMapping(value = ["/v1/pharma"])
+	@CrossOrigin(origins = [FConstants.HTTP_MHHA, FConstants.HTTPS_MHHA], allowedHeaders = ["*"])
 class PharmaController {
 	@Autowired lateinit var responseService: ResponseService
-	@Autowired lateinit var pharmaService: PharmaceuticalService
+	@Autowired lateinit var pharmaService: PharmaService
 
 	@Operation(summary = "제약사 정보 조회")
 	@GetMapping(value = ["/all"])
-	fun getPharmaceutical(@RequestHeader(required = true) token: String) =
+	fun getPharma(@RequestHeader(required = true) token: String) =
 		responseService.getResult(pharmaService.getAllPharma(token))
 	@Operation(summary = "제약사 정보 조회")
 	@GetMapping(value = ["/all/{page}/{size}"])
-	fun getPharmaceuticalAllPage(@RequestHeader(required = true) token: String,
-	                       @PathVariable("page") page: Int,
-	                       @PathVariable("size") size: Int) =
+	fun getPharmaAllPage(@RequestHeader(required = true) token: String,
+	                     @PathVariable("page") page: Int,
+	                     @PathVariable("size") size: Int) =
 		responseService.getResult(pharmaService.getPagePharma(token, page, size))
 
 	@Operation(summary = "제약사 데이터 엑셀 업로드")

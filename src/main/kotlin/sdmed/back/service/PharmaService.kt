@@ -1,5 +1,6 @@
 package sdmed.back.service
 
+import jakarta.persistence.EntityManager
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
@@ -8,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
 import sdmed.back.advice.exception.AuthenticationEntryPointException
 import sdmed.back.advice.exception.NotValidOperationException
+import sdmed.back.config.FConstants
 import sdmed.back.config.FExcelFileParser
 import sdmed.back.config.jpa.CSOJPAConfig
 import sdmed.back.config.security.JwtTokenProvider
@@ -16,35 +18,37 @@ import sdmed.back.model.common.UserRole.Companion.getFlag
 import sdmed.back.model.common.UserRoles
 import sdmed.back.model.common.UserStatus
 import sdmed.back.model.sqlCSO.LogModel
-import sdmed.back.model.sqlCSO.PharmaceuticalModel
+import sdmed.back.model.sqlCSO.PharmaModel
 import sdmed.back.model.sqlCSO.UserDataModel
 import sdmed.back.repository.sqlCSO.ILogRepository
-import sdmed.back.repository.sqlCSO.IPharmaceuticalRepository
+import sdmed.back.repository.sqlCSO.IPharmaRepository
 import sdmed.back.repository.sqlCSO.IUserDataRepository
+import java.util.stream.Collectors
 
 @Service
-class PharmaceuticalService {
+class PharmaService {
 	@Autowired lateinit var jwtTokenProvider: JwtTokenProvider
 	@Autowired lateinit var logRepository: ILogRepository
 	@Autowired lateinit var excelFileParser: FExcelFileParser
 	@Autowired lateinit var userDataRepository: IUserDataRepository
-	@Autowired lateinit var pharmaceuticalRepository: IPharmaceuticalRepository
+	@Autowired lateinit var pharmaRepository: IPharmaRepository
+	@Autowired lateinit var entityManager: EntityManager
 
 
-	fun getAllPharma(token: String): List<PharmaceuticalModel> {
+	fun getAllPharma(token: String): List<PharmaModel> {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token) ?: throw AuthenticationEntryPointException()
 		isLive(tokenUser)
 
-		return pharmaceuticalRepository.findAllByOrderByCode()
+		return pharmaRepository.findAllByOrderByCode()
 	}
-	fun getPagePharma(token: String, page: Int, size: Int): Page<PharmaceuticalModel> {
+	fun getPagePharma(token: String, page: Int, size: Int): Page<PharmaModel> {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token) ?: throw AuthenticationEntryPointException()
 		isLive(tokenUser)
 
 		val pageable = PageRequest.of(page, size)
-		return pharmaceuticalRepository.findAllByOrderByCode(pageable)
+		return pharmaRepository.findAllByOrderByCode(pageable)
 	}
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
 	fun pharmaUpload(token: String, file: MultipartFile): String {
@@ -56,12 +60,12 @@ class PharmaceuticalService {
 
 		val pharmaDataModel = excelFileParser.pharmaUploadExcelParse(tokenUser.id, file)
 		var index = 0
-		val already: MutableList<PharmaceuticalModel> = mutableListOf()
+		val already: MutableList<PharmaModel> = mutableListOf()
 		while (true) {
 			if (pharmaDataModel.count() > index + 500) {
-				already.addAll(pharmaceuticalRepository.findAllByCodeIn(pharmaDataModel.subList(index, index + 500).map { it.code }))
+				already.addAll(pharmaRepository.findAllByCodeIn(pharmaDataModel.subList(index, index + 500).map { it.code }))
 			} else {
-				already.addAll(pharmaceuticalRepository.findAllByCodeIn(pharmaDataModel.subList(index, pharmaDataModel.count()).map { it.code }))
+				already.addAll(pharmaRepository.findAllByCodeIn(pharmaDataModel.subList(index, pharmaDataModel.count()).map { it.code }))
 				break
 			}
 			index += 500
@@ -74,9 +78,9 @@ class PharmaceuticalService {
 		var retCount = 0
 		while (true) {
 			if (pharmaDataModel.count() > index + 500) {
-				retCount += pharmaceuticalRepository.saveAll(pharmaDataModel.subList(index, index + 500)).count()
+				retCount += insertAll(pharmaDataModel.subList(index, index + 500))
 			} else {
-				retCount += pharmaceuticalRepository.saveAll(pharmaDataModel.subList(index, pharmaDataModel.count())).count()
+				retCount += insertAll(pharmaDataModel.subList(index, pharmaDataModel.count()))
 				break
 			}
 			index += 500
@@ -87,6 +91,16 @@ class PharmaceuticalService {
 		return "count : $retCount"
 	}
 
+	private fun insertAll(data: List<PharmaModel>): Int {
+		val values: String = data.stream().map(this::renderSqlForPharmaModel).collect(Collectors.joining(","))
+		val ret = entityManager.createNativeQuery("${FConstants.MODEL_PHARMA_INSERT_INTO}$values").executeUpdate()
+		entityManager.flush()
+		entityManager.clear()
+		return ret
+	}
+	private fun renderSqlForPharmaModel(data: PharmaModel): String {
+		return data.insertString()
+	}
 	fun getUserData(id: String) = userDataRepository.findById(id)
 	fun getUserDataByToken(token: String) = userDataRepository.findById(jwtTokenProvider.getAllClaimsFromToken(token).subject)
 	fun isValid(token: String) {

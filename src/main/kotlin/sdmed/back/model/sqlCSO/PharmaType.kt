@@ -1,6 +1,6 @@
 package sdmed.back.model.sqlCSO
 
-enum class PharmaceuticalType(var index: Int, var desc: String) {
+enum class PharmaType(var index: Int, var desc: String) {
 	None(0, "미지정"),
 	ETC(1, "기타"),
 	Wholesale(2, "도매업체"),
