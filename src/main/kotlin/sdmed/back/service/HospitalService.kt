@@ -1,5 +1,6 @@
 package sdmed.back.service
 
+import jakarta.persistence.EntityManager
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
@@ -8,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
 import sdmed.back.advice.exception.AuthenticationEntryPointException
 import sdmed.back.advice.exception.NotValidOperationException
+import sdmed.back.config.FConstants
 import sdmed.back.config.FExcelFileParser
 import sdmed.back.config.jpa.CSOJPAConfig
 import sdmed.back.config.security.JwtTokenProvider
@@ -21,6 +23,7 @@ import sdmed.back.model.sqlCSO.UserDataModel
 import sdmed.back.repository.sqlCSO.IHospitalRepository
 import sdmed.back.repository.sqlCSO.ILogRepository
 import sdmed.back.repository.sqlCSO.IUserDataRepository
+import java.util.stream.Collectors
 
 @Service
 class HospitalService {
@@ -29,6 +32,8 @@ class HospitalService {
 	@Autowired lateinit var excelFileParser: FExcelFileParser
 	@Autowired lateinit var userDataRepository: IUserDataRepository
 	@Autowired lateinit var hospitalRepository: IHospitalRepository
+	@Autowired lateinit var entityManager: EntityManager
+
 	fun getAllHospital(token: String): List<HospitalModel> {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token) ?: throw AuthenticationEntryPointException()
@@ -73,9 +78,9 @@ class HospitalService {
 		var retCount = 0
 		while (true) {
 			if (hospitalDataModel.count() > index + 500) {
-				retCount += hospitalRepository.saveAll(hospitalDataModel.subList(index, index + 500)).count()
+				retCount += insertAll(hospitalDataModel.subList(index, index + 500))
 			} else {
-				retCount += hospitalRepository.saveAll(hospitalDataModel.subList(index, hospitalDataModel.count())).count()
+				retCount += insertAll(hospitalDataModel.subList(index, hospitalDataModel.count()))
 				break
 			}
 			index += 500
@@ -86,6 +91,16 @@ class HospitalService {
 		return "count : $retCount"
 	}
 
+	private fun insertAll(data: List<HospitalModel>): Int {
+		val values: String = data.stream().map(this::renderSqlForHosModel).collect(Collectors.joining(","))
+		val ret = entityManager.createNativeQuery("${FConstants.MODEL_HOS_INSERT_INTO}$values").executeUpdate()
+		entityManager.flush()
+		entityManager.clear()
+		return ret
+	}
+	private fun renderSqlForHosModel(data: HospitalModel): String {
+		return data.insertString()
+	}
 	fun getUserData(id: String) = userDataRepository.findById(id)
 	fun getUserDataByToken(token: String) = userDataRepository.findById(jwtTokenProvider.getAllClaimsFromToken(token).subject)
 	fun isValid(token: String) {
