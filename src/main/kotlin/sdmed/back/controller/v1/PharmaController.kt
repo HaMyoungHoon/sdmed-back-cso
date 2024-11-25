@@ -37,12 +37,14 @@ class PharmaController {
 
 	@Operation(summary = "제약사 조회 with medicine")
 	@GetMapping(value = ["/{pharmaPK}/withMedicine"])
-	fun getPharmaWithMedicine(@PathVariable("pharmaPK") pharmaPK: String) =
-		responseService.getResult(pharmaService.getPharmaWithDrug("", pharmaPK))
+	fun getPharmaWithMedicine(@RequestHeader(required = true) token: String,
+	                          @PathVariable("pharmaPK") pharmaPK: String) =
+		responseService.getResult(pharmaService.getPharmaWithDrug(token, pharmaPK))
 	@Operation(summary = "제약사 조회 with medicine")
 	@GetMapping(value = ["/{pharmaPK}"])
-	fun getPharma(@PathVariable("pharmaPK") pharmaPK: String) =
-		responseService.getResult(pharmaService.getPharma("", pharmaPK))
+	fun getPharma(@RequestHeader(required = true) token: String,
+	              @PathVariable("pharmaPK") pharmaPK: String) =
+		responseService.getResult(pharmaService.getPharma(token, pharmaPK))
 	@Operation(summary = "제약사 medicine list add")
 	@PostMapping(value = ["/{pharmaPK}/addMedicine"])
 	fun postPharmaAddMedicine(@RequestHeader(required = true) token: String,

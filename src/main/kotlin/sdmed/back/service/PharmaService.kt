@@ -58,9 +58,9 @@ class PharmaService {
 	}
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
 	fun getPharma(token: String, pharmaPK: String): PharmaModel? {
-//		isValid(token)
-//		val tokenUser = getUserDataByToken(token) ?: throw AuthenticationEntryPointException()
-//		isLive(tokenUser)
+		isValid(token)
+		val tokenUser = getUserDataByToken(token) ?: throw AuthenticationEntryPointException()
+		isLive(tokenUser)
 		return pharmaRepository.findByThisPK(pharmaPK)?.apply { medicineList = mutableListOf() }
 	}
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
