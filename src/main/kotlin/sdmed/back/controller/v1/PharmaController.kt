@@ -37,20 +37,24 @@ class PharmaController {
 
 	@Operation(summary = "제약사 조회 with medicine")
 	@GetMapping(value = ["/{pharmaPK}/withMedicine"])
-	fun getPharmaWithMedicine(@RequestHeader(required = true) token: String,
-	                          @PathVariable("pharmaPK") pharmaPK: String) =
-		responseService.getResult(pharmaService.getPharmaWithDrug(pharmaPK))
+	fun getPharmaWithMedicine(@PathVariable("pharmaPK") pharmaPK: String) =
+		responseService.getResult(pharmaService.getPharmaWithDrug("", pharmaPK))
 	@Operation(summary = "제약사 조회 with medicine")
 	@GetMapping(value = ["/{pharmaPK}"])
-	fun getPharma(@RequestHeader(required = true) token: String,
-	              @PathVariable("pharmaPK") pharmaPK: String) =
-		responseService.getResult(pharmaService.getPharma(pharmaPK))
+	fun getPharma(@PathVariable("pharmaPK") pharmaPK: String) =
+		responseService.getResult(pharmaService.getPharma("", pharmaPK))
 	@Operation(summary = "제약사 medicine list add")
 	@PostMapping(value = ["/{pharmaPK}/addMedicine"])
 	fun postPharmaAddMedicine(@RequestHeader(required = true) token: String,
 	                          @PathVariable("pharmaPK") pharmaPK: String,
 	                          @RequestBody(required = true) medicinePKList: List<String>) =
-		responseService.getResult(pharmaService.addPharmaDrugList(pharmaPK, medicinePKList))
+		responseService.getResult(pharmaService.addPharmaDrugList(token, pharmaPK, medicinePKList))
+	@Operation(summary = "제약사 medicine list modify")
+	@PutMapping(value = ["/{pharmaPK}/modMedicine"])
+	fun putPharmaModMedicine(@RequestHeader(required = true) token: String,
+													 @PathVariable("pharmaPK") pharmaPK: String,
+													 @RequestBody(required = true) medicinePKList: List<String>) =
+		responseService.getResult(pharmaService.modPharmaDrugList(token, pharmaPK, medicinePKList))
 
 	@Operation(summary = "제약사 데이터 엑셀 업로드")
 	@PostMapping(value = ["/dataUploadExcel"], consumes = ["multipart/form-data"])

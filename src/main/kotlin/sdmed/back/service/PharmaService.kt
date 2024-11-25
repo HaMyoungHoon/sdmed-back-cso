@@ -56,50 +56,76 @@ class PharmaService {
 	fun getAllPharma(): List<PharmaModel> {
 		return pharmaRepository.findAllByOrderByCode()
 	}
-//	fun getPharmaWithDrug(token: String, pharmaPK: String): PharmaModel? {
-	fun getPharmaWithDrug(pharmaPK: String): PharmaModel? {
+	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
+	fun getPharma(token: String, pharmaPK: String): PharmaModel? {
 //		isValid(token)
 //		val tokenUser = getUserDataByToken(token) ?: throw AuthenticationEntryPointException()
 //		isLive(tokenUser)
-
-		val ret = pharmaRepository.findByThisPK(pharmaPK)
+		return pharmaRepository.findByThisPK(pharmaPK)?.apply { medicineList = mutableListOf() }
+	}
+	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
+	fun getPharmaWithDrug(token: String, pharmaPK: String): PharmaModel? {
+		val ret = getPharma(token, pharmaPK)
 		ret?.let {
 			ret.medicineList.addAll(medicineRepository.findAllByPharma(it))
 		}
 
 		return ret
 	}
-	//	fun getPharmaWithDrug(token: String, pharmaPK: String): PharmaModel? {
-	fun getPharma(pharmaPK: String): PharmaModel? {
-//		isValid(token)
-//		val tokenUser = getUserDataByToken(token) ?: throw AuthenticationEntryPointException()
-//		isLive(tokenUser)
-
-		val ret = pharmaRepository.findByThisPK(pharmaPK)
-
-		return ret
-	}
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
-	fun addPharmaDrugList(pharmaPK: String, medicinePKList: List<String>) {
+	fun addPharmaDrugList(token: String, pharmaPK: String, medicinePKList: List<String>) {
+		isValid(token)
+		val tokenUser = getUserDataByToken(token) ?: throw AuthenticationEntryPointException()
+		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.PharmaFileUploader))) {
+			throw AuthenticationEntryPointException()
+		}
+
 		val ret = pharmaRepository.findByThisPK(pharmaPK) ?: throw NotValidOperationException()
-		val buff = medicinePKList.toMutableList()
+		ret.medicineList.addAll(medicineRepository.findAllByPharma(ret))
+		val buff = medicinePKList.toMutableList().distinct().toMutableList()
 		buff.removeIf { x -> x in ret.medicineList.map { y -> y.thisPK } }
 		if (buff.isEmpty()) {
 			return
 		}
 
-		val medicineList = medicineRepository.findAllByThisPKIn(buff).onEach { it.pharma = ret }
+		val medicineList = medicineRepository.findAllByThisPKIn(buff)
 		if (medicineList.isEmpty()) {
 			return
 		}
 
 		ret.medicineList.addAll(medicineList)
+		ret.medicineList = ret.medicineList.distinctBy { it.thisPK }.toMutableList().onEach { it.pharma = ret }
 		pharmaRepository.save(ret)
-		val retCount = medicineRepository.saveAll(medicineList)
+		val retCount = medicineRepository.saveAll(ret.medicineList).count()
 
-//		val stackTrace = Thread.currentThread().stackTrace
-//		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "add pharma ${ret.innerName} count : $retCount")
-//		logRepository.save(logModel)
+		val stackTrace = Thread.currentThread().stackTrace
+		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "add pharma ${ret.innerName} count : $retCount")
+		logRepository.save(logModel)
+	}
+
+	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
+	fun modPharmaDrugList(token: String, pharmaPK: String, medicinePKList: List<String>) {
+		isValid(token)
+		val tokenUser = getUserDataByToken(token) ?: throw AuthenticationEntryPointException()
+		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.PharmaFileUploader))) {
+			throw AuthenticationEntryPointException()
+		}
+
+		val ret = pharmaRepository.findByThisPK(pharmaPK) ?: throw NotValidOperationException()
+		val childBuff = medicineRepository.findAllByThisPKIn(medicineRepository.findAllByPharma(ret).map { it.thisPK }).onEach { it.pharma = null }
+		medicineRepository.saveAll(childBuff)
+		ret.medicineList.removeIf { x -> x.thisPK in childBuff.map { y -> y.thisPK } }
+		val buff = medicinePKList.toMutableList().distinct().toMutableList()
+		val medicineList = medicineRepository.findAllByThisPKIn(buff).onEach { it.pharma = ret }
+
+		ret.medicineList.addAll(medicineList)
+		ret.medicineList = ret.medicineList.distinctBy { it.thisPK }.toMutableList().onEach { it.pharma = ret }
+		pharmaRepository.save(ret)
+		val retCount = medicineRepository.saveAll(ret.medicineList).count()
+
+		val stackTrace = Thread.currentThread().stackTrace
+		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "add pharma ${ret.innerName} count : $retCount")
+		logRepository.save(logModel)
 	}
 
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)

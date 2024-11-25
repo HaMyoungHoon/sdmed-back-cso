@@ -101,7 +101,7 @@ data class PharmaModel(
 	@OneToMany(fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
 	@JoinColumn
 	@JsonManagedReference
-	val medicineList: MutableList<MedicineModel> = mutableListOf()
+	var medicineList: MutableList<MedicineModel> = mutableListOf()
 	) {
 
 	fun findHeader(data: List<String>): Boolean {
