@@ -8,11 +8,12 @@ import sdmed.back.model.common.ContractType
 import sdmed.back.model.common.DeliveryDiv
 import java.lang.StringBuilder
 import java.sql.Date
+import java.util.*
 
 /**
  * HospitalModel
  *
- * @property thisIndex
+ * @property thisPK
  * @property code 거래처코드
  * @property orgName 사업자원어명
  * @property innerName 사업자내부명
@@ -43,9 +44,8 @@ import java.sql.Date
 @Entity
 data class HospitalModel(
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(updatable = false, nullable = false)
-	var thisIndex: Long = 0,
+	@Column(columnDefinition = "nvarchar(36)", updatable = false, nullable = false)
+	var thisPK: String = UUID.randomUUID().toString(),
 	@Column(nullable = false)
 	var code: Int = 0,
 	@Column(columnDefinition = "nvarchar(255)", nullable = false)
@@ -260,6 +260,6 @@ data class HospitalModel(
 		val closeDateString: String = closeDate?.let { "'${FExtensions.parseDateTimeString(it, "yyyy-MM-dd")}'" } ?: "null"
 		val etc1 = FExtensions.escapeString(etc1)
 		val etc2 = FExtensions.escapeString(etc2)
-		return "('$code', '$orgName', '$innerName', '$ownerName', '$taxpayerNumber', '$phoneNumber', '$faxNumber', '$zipCode', '$address', '$addressDetail', '$businessType', '$businessItem', '${billType.index}', '$licenseNumber', '$nursingHomeNumber', '${contractType.index}', '${deliveryDiv.index}', '$mail', '$mobilePhone', $openDateString, $closeDateString, '$etc1', '$etc2', '$imageUrl')"
+		return "('$thisPK', '$code', '$orgName', '$innerName', '$ownerName', '$taxpayerNumber', '$phoneNumber', '$faxNumber', '$zipCode', '$address', '$addressDetail', '$businessType', '$businessItem', '${billType.index}', '$licenseNumber', '$nursingHomeNumber', '${contractType.index}', '${deliveryDiv.index}', '$mail', '$mobilePhone', $openDateString, $closeDateString, '$etc1', '$etc2', '$imageUrl')"
 	}
 }

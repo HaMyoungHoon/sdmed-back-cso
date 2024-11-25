@@ -46,7 +46,7 @@ class CSOJPAConfig {
 	}
 	fun additionalProperties(): Properties = Properties().apply {
 		this.setProperty("hibernate.hbm2ddl.auto", "update")
-		this.setProperty("hibernate.dialect", "org.hibernate.dialect.SQLServerDialect")
+		this.setProperty("hibernate.dialect", "org.hibernate.dialect.MySQL8Dialect")
 		this.setProperty("hibernate.show_sql", "true")
 	}
 }

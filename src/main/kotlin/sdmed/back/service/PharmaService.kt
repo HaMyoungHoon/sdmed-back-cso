@@ -21,6 +21,7 @@ import sdmed.back.model.sqlCSO.LogModel
 import sdmed.back.model.sqlCSO.PharmaModel
 import sdmed.back.model.sqlCSO.UserDataModel
 import sdmed.back.repository.sqlCSO.ILogRepository
+import sdmed.back.repository.sqlCSO.IMedicineRepository
 import sdmed.back.repository.sqlCSO.IPharmaRepository
 import sdmed.back.repository.sqlCSO.IUserDataRepository
 import java.util.stream.Collectors
@@ -32,6 +33,7 @@ class PharmaService {
 	@Autowired lateinit var excelFileParser: FExcelFileParser
 	@Autowired lateinit var userDataRepository: IUserDataRepository
 	@Autowired lateinit var pharmaRepository: IPharmaRepository
+	@Autowired lateinit var medicineRepository: IMedicineRepository
 	@Autowired lateinit var entityManager: EntityManager
 
 
@@ -50,6 +52,56 @@ class PharmaService {
 		val pageable = PageRequest.of(page, size)
 		return pharmaRepository.findAllByOrderByCode(pageable)
 	}
+
+	fun getAllPharma(): List<PharmaModel> {
+		return pharmaRepository.findAllByOrderByCode()
+	}
+//	fun getPharmaWithDrug(token: String, pharmaPK: String): PharmaModel? {
+	fun getPharmaWithDrug(pharmaPK: String): PharmaModel? {
+//		isValid(token)
+//		val tokenUser = getUserDataByToken(token) ?: throw AuthenticationEntryPointException()
+//		isLive(tokenUser)
+
+		val ret = pharmaRepository.findByThisPK(pharmaPK)
+		ret?.let {
+			ret.medicineList.addAll(medicineRepository.findAllByPharma(it))
+		}
+
+		return ret
+	}
+	//	fun getPharmaWithDrug(token: String, pharmaPK: String): PharmaModel? {
+	fun getPharma(pharmaPK: String): PharmaModel? {
+//		isValid(token)
+//		val tokenUser = getUserDataByToken(token) ?: throw AuthenticationEntryPointException()
+//		isLive(tokenUser)
+
+		val ret = pharmaRepository.findByThisPK(pharmaPK)
+
+		return ret
+	}
+	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
+	fun addPharmaDrugList(pharmaPK: String, medicinePKList: List<String>) {
+		val ret = pharmaRepository.findByThisPK(pharmaPK) ?: throw NotValidOperationException()
+		val buff = medicinePKList.toMutableList()
+		buff.removeIf { x -> x in ret.medicineList.map { y -> y.thisPK } }
+		if (buff.isEmpty()) {
+			return
+		}
+
+		val medicineList = medicineRepository.findAllByThisPKIn(buff).onEach { it.pharma = ret }
+		if (medicineList.isEmpty()) {
+			return
+		}
+
+		ret.medicineList.addAll(medicineList)
+		pharmaRepository.save(ret)
+		val retCount = medicineRepository.saveAll(medicineList)
+
+//		val stackTrace = Thread.currentThread().stackTrace
+//		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "add pharma ${ret.innerName} count : $retCount")
+//		logRepository.save(logModel)
+	}
+
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
 	fun pharmaUpload(token: String, file: MultipartFile): String {
 		isValid(token)
@@ -86,7 +138,7 @@ class PharmaService {
 			index += 500
 		}
 		val stackTrace = Thread.currentThread().stackTrace
-		val logModel = LogModel().build(tokenUser.thisIndex, stackTrace[1].className, stackTrace[1].methodName, "add pharma count : $retCount")
+		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "add pharma count : $retCount")
 		logRepository.save(logModel)
 		return "count : $retCount"
 	}

@@ -12,18 +12,18 @@ data class LogModel(
 	@Column(updatable = false, nullable = false)
 	var thisIndex: Long = 0,
 	@Column(updatable = false)
-	var userIndex: Long? = null,
+	var userPK: String? = null,
 	@Column(columnDefinition = "nvarchar(255)", updatable = false)
 	var className: String = "",
 	@Column(columnDefinition = "nvarchar(255)", updatable = false)
 	var funcName: String = "",
-	@Column(columnDefinition = "nvarchar(512)", updatable = false)
+	@Column(columnDefinition = "text", updatable = false)
 	var content: String = "",
 	@Column(updatable = false, nullable = false)
 	var regDate: Timestamp = Timestamp(Date().time)
 ) {
-	fun build(user: Long?, className: String, func: String, content: String): LogModel {
-		userIndex = user
+	fun build(user: String?, className: String, func: String, content: String): LogModel {
+		userPK = user
 		this.className = className
 		funcName = func
 		this.content = content

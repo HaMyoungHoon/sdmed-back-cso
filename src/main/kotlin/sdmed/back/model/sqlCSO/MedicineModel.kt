@@ -1,20 +1,16 @@
 package sdmed.back.model.sqlCSO
 
-import jakarta.persistence.Column
-import jakarta.persistence.Entity
-import jakarta.persistence.GeneratedValue
-import jakarta.persistence.GenerationType
-import jakarta.persistence.Id
+import com.fasterxml.jackson.annotation.JsonBackReference
+import jakarta.persistence.*
 import sdmed.back.config.FConstants
 import sdmed.back.config.FExtensions
-import java.util.Date
+import java.util.*
 
 @Entity
 data class MedicineModel(
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(updatable = false, nullable = false)
-	var thisIndex: Long = 0,
+	@Column(columnDefinition = "nvarchar(36)", updatable = false, nullable = false)
+	var thisPK: String = UUID.randomUUID().toString(),
 	@Column
 	var serialNumber: Int = 0,
 	@Column(columnDefinition = "nvarchar(100)", nullable = false)
@@ -36,13 +32,17 @@ data class MedicineModel(
 	@Column
 	var maxPrice: Int = 0,
 	@Column
-	var general: Boolean = false,
+	var general: Int = 0,
 	@Column(columnDefinition = "nvarchar(500)", nullable = false)
 	var etc: String = "",
 	@Column
 	var ancestorCode: Int = 0,
 	@Column
-	var applyDate: Date = Date()
+	var applyDate: Date = Date(),
+	@ManyToOne(fetch = FetchType.LAZY, optional = true)
+	@JoinColumn
+	@JsonBackReference
+	var pharma: PharmaModel? = null,
 ) {
 
 	fun findHeader(data: List<String>): Boolean {
@@ -106,7 +106,7 @@ data class MedicineModel(
 			7 -> standard = data ?: ""
 			8 -> unit = data ?: ""
 			9 -> maxPrice = data?.toIntOrNull() ?: 0
-			10 -> general = data == "일반"
+			10 -> general = if (data == "일반") 0 else 1
 			11 -> etc = data ?: ""
 			12 -> ancestorCode = data?.toIntOrNull() ?: 0
 		}
@@ -171,6 +171,7 @@ data class MedicineModel(
 		val standard = FExtensions.escapeString(standard)
 		val unit = FExtensions.escapeString(unit)
 		val etc = FExtensions.escapeString(etc)
-		return "('$serialNumber', '$method', '$classify', '$mainIngredientCode', '$kdCode', '$name', '$pharmaName', '$standard', '$unit', '$maxPrice', '$general', '$etc', '$ancestorCode', '${FExtensions.parseDateTimeString(applyDate, "yyyy-MM-dd")}')"
+		return "('$thisPK', '$serialNumber', '$method', '$classify', '$mainIngredientCode', '$kdCode', '$name', '$pharmaName', '$standard', '$unit', '$maxPrice', '$general', '$etc', '$ancestorCode', '${FExtensions.parseDateTimeString(applyDate, "yyyy-MM-dd")}')"
 	}
+
 }

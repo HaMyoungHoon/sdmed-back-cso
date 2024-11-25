@@ -16,7 +16,7 @@ import java.util.*
 /**
  * User data model
  *
- * @property thisIndex
+ * @property thisPK
  * @property id 아이디
  * @property pw 비번
  * @property name 이름
@@ -41,9 +41,8 @@ import java.util.*
 @Entity
 data class UserDataModel(
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(updatable = false, nullable = false)
-	var thisIndex: Long = 0,
+	@Column(columnDefinition = "nvarchar(36)", updatable = false, nullable = false)
+	var thisPK: String = UUID.randomUUID().toString(),
 	@Column(columnDefinition = "nvarchar(255)", nullable = false, updatable = false, unique = true)
 	var id: String = "",
 	@Column(columnDefinition = "nvarchar(255)", nullable = false)
@@ -108,7 +107,7 @@ data class UserDataModel(
 		}
 	}
 	fun buildData(claims: Claims): UserDataModel {
-		this.thisIndex = claims[FConstants.CLAIM_INDEX].toString().toLong()
+		this.thisPK = claims[FConstants.CLAIM_INDEX].toString()
 		this.id = claims[FConstants.CLAIM_ID].toString()
 		this.name = claims[FConstants.CLAIM_NAME].toString()
 		this.role = claims[FConstants.CLAIM_ROLE].toString().toInt()
@@ -242,6 +241,6 @@ data class UserDataModel(
 		val companyAddress = FExtensions.escapeString(companyAddress)
 		val bankAccount = FExtensions.escapeString(bankAccount)
 		val regDateString = FExtensions.parseDateTimeString(regDate, "yyyy-MM-dd HH:mm:ss")
-		return "('$id', '$pw', '$name', '$mail', '$phoneNumber', '$role', '$dept', '${status.index}', '$companyName', '$companyNumber', '$companyAddress', '$bankAccount', '$regDateString')"
+		return "('$thisPK', '$id', '$pw', '$name', '$mail', '$phoneNumber', '$role', '$dept', '${status.index}', '$companyName', '$companyNumber', '$companyAddress', '$bankAccount', '$regDateString')"
 	}
 }

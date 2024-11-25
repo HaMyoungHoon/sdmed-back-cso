@@ -86,7 +86,7 @@ class HospitalService {
 			index += 500
 		}
 		val stackTrace = Thread.currentThread().stackTrace
-		val logModel = LogModel().build(tokenUser.thisIndex, stackTrace[1].className, stackTrace[1].methodName, "add hospital count : $retCount")
+		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "add hospital count : $retCount")
 		logRepository.save(logModel)
 		return "count : $retCount"
 	}

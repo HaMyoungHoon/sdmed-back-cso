@@ -6,12 +6,15 @@ import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.stereotype.Repository
 import sdmed.back.model.sqlCSO.MedicineModel
+import sdmed.back.model.sqlCSO.PharmaModel
 import java.util.Date
 
 @Repository
 interface IMedicineRepository: JpaRepository<MedicineModel, Long> {
 	fun findAllByOrderByName(pageable: Pageable): Page<MedicineModel>
 	fun findAllByOrderByPharmaName(pageable: Pageable): Page<MedicineModel>
+	fun findAllByThisPKIn(medicinePK: List<String>): List<MedicineModel>
+	fun findAllByPharma(pharma: PharmaModel): List<MedicineModel>
 
 	fun findAllByApplyDate(applyDate: Date): List<MedicineModel>
 

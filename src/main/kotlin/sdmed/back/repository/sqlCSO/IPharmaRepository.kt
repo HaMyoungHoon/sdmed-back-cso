@@ -11,5 +11,7 @@ interface IPharmaRepository: JpaRepository<PharmaModel, Long> {
 	fun findAllByOrderByCode(): List<PharmaModel>
 	fun findAllByOrderByCode(pageable: Pageable): Page<PharmaModel>
 
+	fun findByThisPK(pharmaPK: String): PharmaModel?
+
 	fun findAllByCodeIn(codes: List<Int>): List<PharmaModel>
 }

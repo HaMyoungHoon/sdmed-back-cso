@@ -115,7 +115,7 @@ class UserService {
 		user.pw = fAmhohwa.encrypt(changePW)
 		val ret = userDataRepository.save(user)
 		val stackTrace = Thread.currentThread().stackTrace
-		val logModel = LogModel().build(tokenUser.thisIndex, stackTrace[1].className, stackTrace[1].methodName, "${user.id} password change")
+		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "${user.id} password change")
 		logRepository.save(logModel)
 		return ret
 	}
@@ -146,7 +146,7 @@ class UserService {
 		user.status = status
 		val ret = userDataRepository.save(user)
 		val stackTrace = Thread.currentThread().stackTrace
-		val logModel = LogModel().build(tokenUser.thisIndex, stackTrace[1].className, stackTrace[1].methodName, "$id role : ${user.role}")
+		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "$id role : ${user.role}")
 		logRepository.save(logModel)
 		return ret
 	}
@@ -168,7 +168,7 @@ class UserService {
 		user.role = roleList.fold(0) { acc, x -> acc or x.flag } and mask.inv()
 		val ret = userDataRepository.save(user)
 		val stackTrace = Thread.currentThread().stackTrace
-		val logModel = LogModel().build(tokenUser.thisIndex, stackTrace[1].className, stackTrace[1].methodName, "$id role : ${user.role}")
+		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "$id role : ${user.role}")
 		logRepository.save(logModel)
 		return ret
 	}
@@ -187,7 +187,7 @@ class UserService {
 		user.dept = deptList.fold(0) { acc, x -> acc or x.flag } and mask.inv()
 		val ret = userDataRepository.save(user)
 		val stackTrace = Thread.currentThread().stackTrace
-		val logModel = LogModel().build(tokenUser.thisIndex, stackTrace[1].className, stackTrace[1].methodName, "$id dept : ${user.dept}")
+		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "$id dept : ${user.dept}")
 		logRepository.save(logModel)
 		return ret
 	}
@@ -211,7 +211,7 @@ class UserService {
 		mother.addChild(child)
 		val ret = userDataRepository.save(mother)
 		val stackTrace = Thread.currentThread().stackTrace
-		val logModel = LogModel().build(tokenUser.thisIndex, stackTrace[1].className, stackTrace[1].methodName, "${mother.id} add child : ${child.joinToString(", ") { it.id }}")
+		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "${mother.id} add child : ${child.joinToString(", ") { it.id }}")
 		logRepository.save(logModel)
 		return ret
 	}
@@ -231,7 +231,7 @@ class UserService {
 		val ret = userDataRepository.save(mother)
 		userDataRepository.saveAll(child)
 		val stackTrace = Thread.currentThread().stackTrace
-		val logModel = LogModel().build(tokenUser.thisIndex, stackTrace[1].className, stackTrace[1].methodName, "${mother.id} delete child : ${childBuff.joinToString(",")}")
+		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "${mother.id} delete child : ${childBuff.joinToString(",")}")
 		logRepository.save(logModel)
 		return ret
 	}
@@ -274,7 +274,7 @@ class UserService {
 			index += 500
 		}
 		val stackTrace = Thread.currentThread().stackTrace
-		val logModel = LogModel().build(tokenUser.thisIndex, stackTrace[1].className, stackTrace[1].methodName, "add user count : $retCount")
+		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "add user count : $retCount")
 		logRepository.save(logModel)
 		return "count : $retCount"
 	}

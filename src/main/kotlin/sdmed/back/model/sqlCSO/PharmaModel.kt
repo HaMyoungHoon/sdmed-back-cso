@@ -1,16 +1,18 @@
 package sdmed.back.model.sqlCSO
 
+import com.fasterxml.jackson.annotation.JsonManagedReference
 import jakarta.persistence.*
 import sdmed.back.config.FConstants
 import sdmed.back.config.FExtensions
 import sdmed.back.model.common.*
 import java.lang.StringBuilder
 import java.sql.Date
+import java.util.*
 
 /**
  * PharmaModel
  *
- * @property thisIndex
+ * @property thisPK
  * @property code 거래처코드
  * @property orgName 사업자원어명
  * @property innerName 사업자내부명
@@ -42,9 +44,8 @@ import java.sql.Date
 @Entity
 data class PharmaModel(
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(updatable = false, nullable = false)
-	var thisIndex: Long = 0,
+	@Column(columnDefinition = "nvarchar(36)", updatable = false, nullable = false)
+	var thisPK: String = UUID.randomUUID().toString(),
 	@Column(nullable = false)
 	var code: Int = 0,
 	@Column(columnDefinition = "nvarchar(255)", nullable = false)
@@ -96,7 +97,11 @@ data class PharmaModel(
 	@ManyToMany(mappedBy = "pharmas")
 	var userDataModel: MutableList<UserDataModel>? = null,
 	@OneToMany(mappedBy = "pharmaModel")
-	val userPharmaHosMedicineR: MutableList<UserPharmaHosMedicine> = mutableListOf()
+	val userPharmaHosMedicineR: MutableList<UserPharmaHosMedicine> = mutableListOf(),
+	@OneToMany(fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
+	@JoinColumn
+	@JsonManagedReference
+	val medicineList: MutableList<MedicineModel> = mutableListOf()
 	) {
 
 	fun findHeader(data: List<String>): Boolean {
@@ -258,6 +263,6 @@ data class PharmaModel(
 		val closeDateString: String = closeDate?.let { "'${FExtensions.parseDateTimeString(it, "yyyy-MM-dd")}'" } ?: "null"
 		val etc1 = FExtensions.escapeString(etc1)
 		val etc2 = FExtensions.escapeString(etc2)
-		return "('$code', '$orgName', '$innerName', '$ownerName', '$taxpayerNumber', '$phoneNumber', '$faxNumber', '$zipCode', '$address', '$addressDetail', '$businessType', '$businessItem', '${billType.index}', '${pharmaType.index}', '${pharmaGroup.index}', '${contractType.index}', '${deliveryDiv.index}', '$mail', '$mobilePhone', $openDateString, $closeDateString, '$etc1', '$etc2', '$imageUrl')"
+		return "('$thisPK', '$code', '$orgName', '$innerName', '$ownerName', '$taxpayerNumber', '$phoneNumber', '$faxNumber', '$zipCode', '$address', '$addressDetail', '$businessType', '$businessItem', '${billType.index}', '${pharmaType.index}', '${pharmaGroup.index}', '${contractType.index}', '${deliveryDiv.index}', '$mail', '$mobilePhone', $openDateString, $closeDateString, '$etc1', '$etc2', '$imageUrl')"
 	}
 }

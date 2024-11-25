@@ -51,7 +51,7 @@ object FConstants {
 	const val MODEL_USER_COMPANY_ADDRESS = "회사주소"
 	const val MODEL_USER_BANK_ACCOUNT = "은행계좌번호"
 	const val MODEL_USER_COUNT = 12
-	const val MODEL_USER_INSERT_INTO = "INSERT INTO userDataModel (id, pw, name, mail, phoneNumber, role, dept, status, companyName, companyNumber, companyAddress, bankAccount, regDate) VALUES "
+	const val MODEL_USER_INSERT_INTO = "INSERT INTO userDataModel (thisPK, id, pw, name, mail, phoneNumber, role, dept, status, companyName, companyNumber, companyAddress, bankAccount, regDate) VALUES "
 	const val MODEL_CODE = "거래처코드"
 	const val MODEL_ORG_NAME = "사업자원어명"
 	const val MODEL_INNER_NAME = "사업자내부명"
@@ -76,12 +76,12 @@ object FConstants {
 	const val MODEL_ETC1 = "비고1"
 	const val MODEL_ETC2 = "비고2"
 	const val MODEL_PHARMA_COUNT = 23
-	const val MODEL_PHARMA_INSERT_INTO = "INSERT INTO pharmaModel (code, orgName, innerName, ownerName, taxpayerNumber, phoneNumber, faxNumber, zipCode, address, addressDetail, businessType, businessItem, billType, pharmaType, pharmaGroup, contractType, deliveryDiv, mail, mobilePhone, openDate, closeDate, etc1, etc2, imageUrl) VALUES "
+	const val MODEL_PHARMA_INSERT_INTO = "INSERT INTO pharmaModel (thisPK, code, orgName, innerName, ownerName, taxpayerNumber, phoneNumber, faxNumber, zipCode, address, addressDetail, businessType, businessItem, billType, pharmaType, pharmaGroup, contractType, deliveryDiv, mail, mobilePhone, openDate, closeDate, etc1, etc2, imageUrl) VALUES "
 
 	const val MODEL_LICENSE_NUMBER = "면허번호"
 	const val MODEL_NURSING_HOME_NUMBER = "요양기관번호"
 	const val MODEL_HOS_COUNT = 23
-	const val MODEL_HOS_INSERT_INTO = "INSERT INTO hospitalModel (code, orgName, innerName, ownerName, taxpayerNumber, phoneNumber, faxNumber, zipCode, address, addressDetail, businessType, businessItem, billType, licenseNumber, nursingHomeNumber, contractType, deliveryDiv, mail, mobilePhone, openDate, closeDate, etc1, etc2, imageUrl) VALUES "
+	const val MODEL_HOS_INSERT_INTO = "INSERT INTO hospitalModel (thisPK, code, orgName, innerName, ownerName, taxpayerNumber, phoneNumber, faxNumber, zipCode, address, addressDetail, businessType, businessItem, billType, licenseNumber, nursingHomeNumber, contractType, deliveryDiv, mail, mobilePhone, openDate, closeDate, etc1, etc2, imageUrl) VALUES "
 
 	const val MODEL_DRUG_INDEX = "연번"
 	const val MODEL_DRUG_METHOD = "투여"
@@ -97,7 +97,7 @@ object FConstants {
 	const val MODEL_DRUG_ETC = "비고"
 	const val MODEL_DRUG_ANCESTOR_CODE = "목록정비전코드"
 	const val MODEL_DRUG_COUNT = 13
-	const val MODEL_DRUG_INSERT_INTO = "INSERT INTO medicineModel (serialNumber, method, classify, mainIngredientCode, kdCode, name, pharmaName, standard, unit, maxPrice, general, etc, ancestorCode, applyDate) VALUES "
+	const val MODEL_DRUG_INSERT_INTO = "INSERT INTO medicineModel (thisPK, serialNumber, method, classify, mainIngredientCode, kdCode, name, pharmaName, standard, unit, maxPrice, general, etc, ancestorCode, applyDate) VALUES "
 
 	const val REGEX_ONLY_ALPHABET = "[^a-zA-Z0-9]"
 	const val REGEX_SPECIAL_CHAR_REMOVE = "[^가-힣a-zA-Z0-9\\s]"
