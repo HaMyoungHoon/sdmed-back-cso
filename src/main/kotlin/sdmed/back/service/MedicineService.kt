@@ -11,7 +11,6 @@ import sdmed.back.advice.exception.AuthenticationEntryPointException
 import sdmed.back.advice.exception.NotValidOperationException
 import sdmed.back.config.FConstants
 import sdmed.back.config.FExcelFileParser
-import sdmed.back.config.FExtensions
 import sdmed.back.config.jpa.CSOJPAConfig
 import sdmed.back.config.security.JwtTokenProvider
 import sdmed.back.model.common.UserRole
@@ -52,44 +51,52 @@ class MedicineService {
 			throw AuthenticationEntryPointException()
 		}
 
-		val medicineModel = excelFileParser.medicineUploadExcelParse(tokenUser.id, applyDate, file)
-		var index = 0
-		val already = medicineRepository.selectAllByApplyDate(FExtensions.parseDateTimeString(applyDate, "yyyy-MM-dd") ?: "")
-//		medicineModel.removeAll { x -> already.map { y -> y.mainIngredientCode }.toSet().contains(x.mainIngredientCode) }
-		medicineModel.removeIf { x -> x.mainIngredientCode in already.map { y -> y.mainIngredientCode } }
-		medicineModel.parallelStream()
-		if (medicineModel.isEmpty()) {
-			return "count : 0"
-		}
-		index = 0
+		val excelModel = excelFileParser.medicineUploadExcelParse(tokenUser.id, applyDate, file)
+//		val already = medicineRepository.selectAllByApplyDate(FExtensions.parseDateTimeString(applyDate, "yyyy-MM-dd") ?: "").toMutableList()
+		val already = medicineRepository.selectAllByRecentData()
+		val newData: MutableList<MedicineModel> = mutableListOf()
+		margeMedicine(already, excelModel, newData)
+
 		var retCount = 0
-		while (true) {
-			if (medicineModel.count() > index + 500) {
-				retCount += insertAll(medicineModel.subList(index, index + 500))
-			} else {
-				retCount += insertAll(medicineModel.subList(index, medicineModel.count()))
-				break
-			}
-			index += 500
+		newData.filter { it.pharma != null }.chunked(500).forEach {
+			retCount += insertAll(it, true)
 		}
+		newData.filter { it.pharma == null }.chunked(500).forEach {
+			retCount += insertAll(it)
+		}
+
 		val stackTrace = Thread.currentThread().stackTrace
 		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "add medicine count : $retCount")
 		logRepository.save(logModel)
 		return "count : $retCount"
 	}
+	private fun margeMedicine(lhsList: List<MedicineModel>, rhsList: MutableList<MedicineModel>, newData: MutableList<MedicineModel>): MutableList<MedicineModel> {
+		val lhsMap = lhsList.associateBy { it.kdCode }.toMutableMap()
+		for (rhs in rhsList) {
+			val lhs = lhsMap[rhs.kdCode]
+			if (lhs != null) {
+				if (lhs.maxPrice != rhs.maxPrice) {
+					rhs.pharma = lhs.pharma
+					newData.add(rhs)
+				}
+			} else {
+				newData.add(rhs)
+			}
+		}
+		return newData
+	}
 
-	private fun insertAll(data: List<MedicineModel>): Int {
-		val values: String = data.stream().map(this::renderSqlForMedicineModel).collect(joining(","))
-		val ret = entityManager.createNativeQuery("${FConstants.MODEL_DRUG_INSERT_INTO}$values").executeUpdate()
+	private fun insertAll(data: List<MedicineModel>, withPharma: Boolean = false): Int {
+		val values: String = data.stream().map(this::renderSqlForInsertMedicineModel).collect(joining(","))
+		val sqlString = if (withPharma) "${FConstants.MODEL_DRUG_INSERT_INTO_WITH_PHARMA}$values" else "${FConstants.MODEL_DRUG_INSERT_INTO}$values"
+		val ret = entityManager.createNativeQuery(sqlString).executeUpdate()
 		entityManager.flush()
 		entityManager.clear()
 		return ret
 	}
-	private fun renderSqlForMedicineModel(data: MedicineModel): String {
-		return data.insertString()
-	}
-	fun getUserData(id: String) = userDataRepository.findById(id)
-	fun getUserDataByToken(token: String) = userDataRepository.findById(jwtTokenProvider.getAllClaimsFromToken(token).subject)
+	private fun renderSqlForInsertMedicineModel(data: MedicineModel) = data.insertString()
+	fun getUserData(id: String) = userDataRepository.selectById(id)
+	fun getUserDataByToken(token: String) = userDataRepository.selectById(jwtTokenProvider.getAllClaimsFromToken(token).subject)
 	fun isValid(token: String) {
 		if (!jwtTokenProvider.validateToken(token)) {
 			throw AuthenticationEntryPointException()

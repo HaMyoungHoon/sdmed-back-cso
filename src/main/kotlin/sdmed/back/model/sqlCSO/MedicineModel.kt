@@ -171,7 +171,10 @@ data class MedicineModel(
 		val standard = FExtensions.escapeString(standard)
 		val unit = FExtensions.escapeString(unit)
 		val etc = FExtensions.escapeString(etc)
-		return "('$thisPK', '$serialNumber', '$method', '$classify', '$mainIngredientCode', '$kdCode', '$name', '$pharmaName', '$standard', '$unit', '$maxPrice', '$general', '$etc', '$ancestorCode', '${FExtensions.parseDateTimeString(applyDate, "yyyy-MM-dd")}')"
+		return if (pharma == null) {
+			"('$thisPK', '$serialNumber', '$method', '$classify', '$mainIngredientCode', '$kdCode', '$name', '$pharmaName', '$standard', '$unit', '$maxPrice', '$general', '$etc', '$ancestorCode', '${FExtensions.parseDateTimeString(applyDate, "yyyy-MM-dd")}')"
+		} else {
+			"('$thisPK', '$serialNumber', '$method', '$classify', '$mainIngredientCode', '$kdCode', '$name', '$pharmaName', '$standard', '$unit', '$maxPrice', '$general', '$etc', '$ancestorCode', '${FExtensions.parseDateTimeString(applyDate, "yyyy-MM-dd")}', '${pharma?.thisPK}', '${pharma?.thisPK}')"
+		}
 	}
-
 }
