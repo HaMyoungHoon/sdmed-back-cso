@@ -82,7 +82,7 @@ class UserService {
 		if (data.pw != confirmPW) {
 			throw SignUpFailedException()
 		}
-		val existUser = userDataRepository.findById(data.id)
+		val existUser = userDataRepository.selectById(data.id)
 		if (existUser != null) {
 			throw SignUpFailedException()
 		}
@@ -150,6 +150,20 @@ class UserService {
 		logRepository.save(logModel)
 		return ret
 	}
+	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
+	fun userDataModify(token: String, userData: UserDataModel): UserDataModel {
+		isValid(token)
+		val tokenUser = getUserDataByToken(token) ?: throw AuthenticationEntryPointException()
+		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.StatusChanger))) {
+			throw AuthenticationEntryPointException()
+		}
+
+		val ret = userDataRepository.save(userData)
+		val stackTrace = Thread.currentThread().stackTrace
+		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "${userData.id} modify : $userData")
+		logRepository.save(logModel)
+		return ret
+	}
 	fun getUserStatusList() = UserStatus.entries
 	fun getUserRoleList() = UserRole.entries.filterNot { it in listOf(UserRole.Admin, UserRole.CsoAdmin) }
 	fun getUserDeptList() = UserDept.entries.filterNot { it in listOf(UserDept.Admin, UserDept.CsoAdmin) }
@@ -164,7 +178,7 @@ class UserService {
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin))) {
 			mask = mask or UserRole.CsoAdmin.flag
 		}
-		val user = userDataRepository.findById(id) ?: throw UserNotFoundException()
+		val user = userDataRepository.selectById(id) ?: throw UserNotFoundException()
 		user.role = roleList.fold(0) { acc, x -> acc or x.flag } and mask.inv()
 		val ret = userDataRepository.save(user)
 		val stackTrace = Thread.currentThread().stackTrace
@@ -183,7 +197,7 @@ class UserService {
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin))) {
 			mask = mask or UserDept.CsoAdmin.flag
 		}
-		val user = userDataRepository.findById(id) ?: throw UserNotFoundException()
+		val user = userDataRepository.selectById(id) ?: throw UserNotFoundException()
 		user.dept = deptList.fold(0) { acc, x -> acc or x.flag } and mask.inv()
 		val ret = userDataRepository.save(user)
 		val stackTrace = Thread.currentThread().stackTrace
@@ -199,7 +213,7 @@ class UserService {
 			throw AuthenticationEntryPointException()
 		}
 
-		val mother = userDataRepository.findById(motherID)?.apply { init() }?.setChild() ?: throw UserNotFoundException()
+		val mother = userDataRepository.selectById(motherID)?.apply { init() }?.setChild() ?: throw UserNotFoundException()
 		val motherChild = mother.children?.map { it.id } ?: arrayListOf()
 		val childBuff = childID.toMutableList().distinct().toMutableList().apply {
 			remove(motherID)
@@ -223,7 +237,7 @@ class UserService {
 			throw AuthenticationEntryPointException()
 		}
 
-		val mother = userDataRepository.findById(motherID)?.apply { init() } ?: throw UserNotFoundException()
+		val mother = userDataRepository.selectById(motherID)?.apply { init() } ?: throw UserNotFoundException()
 		val motherChild = mother.children?.map { it.id } ?: arrayListOf()
 		val childBuff = childID.toMutableList().distinct().filter { it in motherChild }
 		val child = userDataRepository.findAllByIdIn(childBuff).onEach { it.init(); it.userData = null }
@@ -290,8 +304,8 @@ class UserService {
 		return data.insertString()
 	}
 
-	fun getUserData(id: String) = userDataRepository.findById(id)
-	fun getUserDataByToken(token: String) = userDataRepository.findById(jwtTokenProvider.getAllClaimsFromToken(token).subject)
+	fun getUserData(id: String) = userDataRepository.selectById(id)
+	fun getUserDataByToken(token: String) = userDataRepository.selectById(jwtTokenProvider.getAllClaimsFromToken(token).subject)
 	fun isValid(token: String) {
 		if (!jwtTokenProvider.validateToken(token)) {
 			throw AuthenticationEntryPointException()

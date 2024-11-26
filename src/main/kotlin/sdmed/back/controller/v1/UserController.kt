@@ -10,15 +10,15 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import sdmed.back.advice.exception.AuthenticationEntryPointException
+import sdmed.back.advice.exception.NotValidOperationException
+import sdmed.back.advice.exception.UserNotFoundException
 import sdmed.back.config.ContentsType
 import sdmed.back.config.FConstants
 import sdmed.back.config.FExcelParserType
 import sdmed.back.config.FExtensions
-import sdmed.back.model.common.IRestResult
-import sdmed.back.model.common.UserDept
-import sdmed.back.model.common.UserRole
-import sdmed.back.model.common.UserStatus
+import sdmed.back.model.common.*
 import sdmed.back.model.sqlCSO.UserDataModel
+import sdmed.back.service.AzureBlobService
 import sdmed.back.service.ResponseService
 import sdmed.back.service.UserService
 
@@ -29,6 +29,7 @@ import sdmed.back.service.UserService
 class UserController {
 	@Autowired lateinit var responseService: ResponseService
 	@Autowired lateinit var userService: UserService
+	@Autowired lateinit var azureBlobService: AzureBlobService
 
 	@Operation(summary = "유저 정보 전체")
 	@GetMapping(value = ["/all"])
@@ -96,6 +97,41 @@ class UserController {
 		if (id == "mhha") throw AuthenticationEntryPointException()
 		return responseService.getResult(userService.userStatusModify(token, id, status))
 	}
+	@Operation(summary = "유저 계좌이미지 업로드")
+	@PutMapping(value = ["/userBankImageUpload"], consumes = ["multipart/form-data"])
+	fun putUserBankImageUpload(@RequestHeader(required = true) token: String,
+														 @RequestParam(required = true) id: String,
+														 @RequestParam file: MultipartFile): IRestResult {
+		userService.isValid(token)
+		val tokenUser = userService.getUserDataByToken(token) ?: throw AuthenticationEntryPointException()
+		if (!userService.haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.StatusChanger))) {
+			throw AuthenticationEntryPointException()
+		}
+
+		val today = FExtensions.getDateTimeString("yyyyMMdd")
+		val userData = userService.getUserData(id) ?: throw UserNotFoundException()
+		val blobUrl = azureBlobService.uploadFile(file, "${userData.id}/${today}", tokenUser.thisPK)
+		userData.bankAccountImageUrl = blobUrl
+		return responseService.getResult(userService.userDataModify(token, userData))
+	}
+	@Operation(summary = "유저 사업자등록증 업로드")
+	@PutMapping(value = ["/userTaxImageUpload"], consumes = ["multipart/form-data"])
+	fun putUserTaxImageUpload(@RequestHeader(required = true) token: String,
+	                           @RequestParam(required = true) id: String,
+	                           @RequestParam file: MultipartFile): IRestResult {
+		userService.isValid(token)
+		val tokenUser = userService.getUserDataByToken(token) ?: throw AuthenticationEntryPointException()
+		if (!userService.haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.StatusChanger))) {
+			throw AuthenticationEntryPointException()
+		}
+
+		val today = FExtensions.getDateTimeString("yyyyMMdd")
+		val userData = userService.getUserData(id) ?: throw UserNotFoundException()
+		val blobUrl = azureBlobService.uploadFile(file, "${userData.id}/${today}", tokenUser.thisPK)
+		userData.taxpayerImageUrl = blobUrl
+		return responseService.getResult(userService.userDataModify(token, userData))
+	}
+
 	@Operation(summary = "유저 데이터 엑셀 업로드")
 	@PostMapping(value = ["/dataUploadExcel"], consumes = ["multipart/form-data"])
 	fun postDataUploadExcel(@RequestHeader(required = true) token: String,
