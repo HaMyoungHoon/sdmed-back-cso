@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository
 import sdmed.back.model.sqlCSO.PharmaModel
 
 @Repository
-interface IPharmaRepository: JpaRepository<PharmaModel, Long> {
+interface IPharmaRepository: JpaRepository<PharmaModel, String> {
 	fun findAllByOrderByCode(): List<PharmaModel>
 	fun findAllByOrderByCode(pageable: Pageable): Page<PharmaModel>
 

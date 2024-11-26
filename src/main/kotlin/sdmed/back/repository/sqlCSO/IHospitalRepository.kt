@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository
 import sdmed.back.model.sqlCSO.HospitalModel
 
 @Repository
-interface IHospitalRepository: JpaRepository<HospitalModel, Long> {
+interface IHospitalRepository: JpaRepository<HospitalModel, String> {
 	fun findAllByOrderByCode(): List<HospitalModel>
 	fun findAllByOrderByCode(pageable: Pageable): Page<HospitalModel>
 	fun findAllByCodeIn(codes: List<Int>): List<HospitalModel>

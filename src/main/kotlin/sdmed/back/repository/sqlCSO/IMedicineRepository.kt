@@ -10,7 +10,7 @@ import sdmed.back.model.sqlCSO.PharmaModel
 import java.util.Date
 
 @Repository
-interface IMedicineRepository: JpaRepository<MedicineModel, Long> {
+interface IMedicineRepository: JpaRepository<MedicineModel, String> {
 	fun findAllByOrderByName(pageable: Pageable): Page<MedicineModel>
 	fun findAllByOrderByPharmaName(pageable: Pageable): Page<MedicineModel>
 	fun findAllByThisPKIn(medicinePK: List<String>): List<MedicineModel>
