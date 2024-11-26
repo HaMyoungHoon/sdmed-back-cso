@@ -179,8 +179,8 @@ class PharmaService {
 	private fun renderSqlForPharmaModel(data: PharmaModel): String {
 		return data.insertString()
 	}
-	fun getUserData(id: String) = userDataRepository.findById(id)
-	fun getUserDataByToken(token: String) = userDataRepository.findById(jwtTokenProvider.getAllClaimsFromToken(token).subject)
+	fun getUserData(id: String) = userDataRepository.selectById(id)
+	fun getUserDataByToken(token: String) = userDataRepository.selectById(jwtTokenProvider.getAllClaimsFromToken(token).subject)
 	fun isValid(token: String) {
 		if (!jwtTokenProvider.validateToken(token)) {
 			throw AuthenticationEntryPointException()
