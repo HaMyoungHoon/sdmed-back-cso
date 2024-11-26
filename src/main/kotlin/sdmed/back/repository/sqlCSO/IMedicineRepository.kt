@@ -27,4 +27,10 @@ interface IMedicineRepository: JpaRepository<MedicineModel, String> {
 			")\n" +
 			"SELECT * FROM RankedMedicine as MedicineModel WHERE RN = 1", nativeQuery = true)
 	fun selectAllByRecentData(): List<MedicineModel>
+
+	@Query("WITH RankedMedicine AS (\n" +
+			"    SELECT *, ROW_NUMBER() OVER (PARTITION BY kdCode ORDER BY applyDate DESC) as RN FROM MedicineModel\n" +
+			")\n" +
+			"SELECT * FROM RankedMedicine as MedicineModel WHERE RN = 1 AND pharma_thisPK = :pharmaPK", nativeQuery = true)
+	fun selectAllByRecentChild(pharmaPK: String): List<MedicineModel>
 }

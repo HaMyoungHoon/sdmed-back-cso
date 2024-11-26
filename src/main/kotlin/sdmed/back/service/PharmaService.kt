@@ -64,10 +64,14 @@ class PharmaService {
 		return pharmaRepository.findByThisPK(pharmaPK)?.apply { medicineList = mutableListOf() }
 	}
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
-	fun getPharmaWithDrug(token: String, pharmaPK: String): PharmaModel? {
+	fun getPharmaWithDrug(token: String, pharmaPK: String, historical: Boolean = false): PharmaModel? {
 		val ret = getPharma(token, pharmaPK)
 		ret?.let {
-			ret.medicineList.addAll(medicineRepository.findAllByPharma(it))
+			ret.medicineList.addAll(if (historical) {
+				medicineRepository.findAllByPharma(it)
+			} else {
+				medicineRepository.selectAllByRecentChild(it.thisPK)
+			})
 		}
 
 		return ret
@@ -126,6 +130,20 @@ class PharmaService {
 		val stackTrace = Thread.currentThread().stackTrace
 		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "add pharma ${ret.innerName} count : $retCount")
 		logRepository.save(logModel)
+	}
+	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
+	fun pharmaDataModify(token: String, pharmaData: PharmaModel): PharmaModel {
+		isValid(token)
+		val tokenUser = getUserDataByToken(token) ?: throw AuthenticationEntryPointException()
+		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.PharmaFileUploader))) {
+			throw AuthenticationEntryPointException()
+		}
+
+		val ret = pharmaRepository.save(pharmaData)
+		val stackTrace = Thread.currentThread().stackTrace
+		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "${pharmaData.orgName} modify")
+		logRepository.save(logModel)
+		return ret
 	}
 
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)

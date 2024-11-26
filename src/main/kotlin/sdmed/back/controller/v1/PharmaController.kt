@@ -9,10 +9,16 @@ import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
+import sdmed.back.advice.exception.AuthenticationEntryPointException
+import sdmed.back.advice.exception.UserNotFoundException
 import sdmed.back.config.ContentsType
 import sdmed.back.config.FConstants
 import sdmed.back.config.FExcelParserType
 import sdmed.back.config.FExtensions
+import sdmed.back.model.common.IRestResult
+import sdmed.back.model.common.UserRole
+import sdmed.back.model.common.UserRoles
+import sdmed.back.service.AzureBlobService
 import sdmed.back.service.PharmaService
 import sdmed.back.service.ResponseService
 
@@ -23,6 +29,7 @@ import sdmed.back.service.ResponseService
 class PharmaController {
 	@Autowired lateinit var responseService: ResponseService
 	@Autowired lateinit var pharmaService: PharmaService
+	@Autowired lateinit var azureBlobService: AzureBlobService
 
 	@Operation(summary = "제약사 정보 조회")
 	@GetMapping(value = ["/all"])
@@ -57,6 +64,23 @@ class PharmaController {
 													 @PathVariable("pharmaPK") pharmaPK: String,
 													 @RequestBody(required = true) medicinePKList: List<String>) =
 		responseService.getResult(pharmaService.modPharmaDrugList(token, pharmaPK, medicinePKList))
+
+	@Operation(summary = "제약사 사업자등록증 업로드")
+	@PutMapping(value = ["/{pharmaPK}/taxImageUpload"], consumes = ["multiphart/form-data"])
+	fun putPharmaTaxImageUpload(@RequestHeader(required = true) token: String,
+															@PathVariable("pharmaPK") pharmaPK: String,
+															@RequestParam file: MultipartFile): IRestResult {
+		pharmaService.isValid(token)
+		val tokenUser = pharmaService.getUserDataByToken(token) ?: throw AuthenticationEntryPointException()
+		if (!pharmaService.haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.PharmaFileUploader))) {
+			throw AuthenticationEntryPointException()
+		}
+
+		val pharmaData = pharmaService.getPharma(token, pharmaPK) ?: throw UserNotFoundException()
+		val blobUrl = azureBlobService.uploadFile(file, pharmaData.orgName, tokenUser.thisPK)
+		pharmaData.imageUrl = blobUrl
+		return responseService.getResult(pharmaService.pharmaDataModify(token, pharmaData))
+	}
 
 	@Operation(summary = "제약사 데이터 엑셀 업로드")
 	@PostMapping(value = ["/dataUploadExcel"], consumes = ["multipart/form-data"])
