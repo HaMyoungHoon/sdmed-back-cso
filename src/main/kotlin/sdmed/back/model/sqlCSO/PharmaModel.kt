@@ -9,38 +9,6 @@ import java.lang.StringBuilder
 import java.sql.Date
 import java.util.*
 
-/**
- * PharmaModel
- *
- * @property thisPK
- * @property code 거래처코드
- * @property orgName 사업자원어명
- * @property innerName 사업자내부명
- * @property ownerName 대표자명
- * @property taxpayerNumber 사업자번호
- * @property phoneNumber 전화번호
- * @property faxNumber 팩스번호
- * @property zipCode 우편번호
- * @property address 주소
- * @property addressDetail 상세주소
- * @property businessType 업태
- * @property businessItem 종목
- * @property billType 계산서발행
- * @property pharmaType 거래처종류
- * @property pharmaGroup 거래처그룹
- * @property contractType 계약구분
- * @property deliveryDiv 배송구분
- * @property mail 메일
- * @property mobilePhone 담당자번호
- * @property openDate 거래개시일
- * @property closeDate 거래종료일
- * @property etc1 비고1
- * @property etc2 비고2
- * @property imageUrl 사업자등록증이미지
- * @property userDataModel
- * @property userPharmaHosMedicineR
- * @constructor Create empty Pharmaceutical model
- */
 @Entity
 data class PharmaModel(
 	@Id
@@ -94,10 +62,10 @@ data class PharmaModel(
 	var etc2: String = "",
 	@Column(columnDefinition = "nvarchar(500)", nullable = false)
 	var imageUrl: String = "",
-	@ManyToMany(mappedBy = "pharmas")
-	var userDataModel: MutableList<UserDataModel>? = null,
-	@OneToMany(mappedBy = "pharmaModel")
-	val userPharmaHosMedicineR: MutableList<UserPharmaHosMedicine> = mutableListOf(),
+	@OneToMany(fetch = FetchType.LAZY, cascade = [CascadeType.ALL], mappedBy = "pharmaModel")
+	var userPharma: MutableList<UserPharmaModel>? = null,
+	@OneToMany(fetch = FetchType.LAZY, cascade = [CascadeType.ALL], mappedBy = "pharmaModel")
+	var pharmaHos: MutableList<PharmaHosModel>? = null,
 	@OneToMany(fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
 	@JoinColumn
 	@JsonManagedReference

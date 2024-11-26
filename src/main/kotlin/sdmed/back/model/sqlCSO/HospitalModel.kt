@@ -1,5 +1,6 @@
 package sdmed.back.model.sqlCSO
 
+import com.fasterxml.jackson.annotation.JsonManagedReference
 import jakarta.persistence.*
 import sdmed.back.config.FConstants
 import sdmed.back.config.FExtensions
@@ -10,37 +11,6 @@ import java.lang.StringBuilder
 import java.sql.Date
 import java.util.*
 
-/**
- * HospitalModel
- *
- * @property thisPK
- * @property code 거래처코드
- * @property orgName 사업자원어명
- * @property innerName 사업자내부명
- * @property ownerName 대표자명
- * @property taxpayerNumber 사업자번호
- * @property phoneNumber 전화번호
- * @property faxNumber 팩스번호
- * @property zipCode 우편번호
- * @property address 주소
- * @property addressDetail 상세주소
- * @property businessType 업태
- * @property businessItem 종목
- * @property billType 계산서발행
- * @property contractType 거래처종류
- * @property deliveryDiv 거래처그룹
- * @property licenseNumber 면허번호
- * @property nursingHomeNumber 요양기관번호
- * @property mail 메일
- * @property mobilePhone 담당자번호
- * @property openDate 거래개시일
- * @property closeDate 거래종료일
- * @property etc1 비고1
- * @property etc2 비고2
- * @property imageUrl 사업자등록증이미지
- * @property userPharmaHosMedicineR
- * @constructor Create empty Hospital model
- */
 @Entity
 data class HospitalModel(
 	@Id
@@ -96,8 +66,10 @@ data class HospitalModel(
 	var etc2: String = "",
 	@Column(columnDefinition = "nvarchar(500)", nullable = false)
 	var imageUrl: String = "",
-	@OneToMany(mappedBy = "hospitalModel")
-	var userPharmaHosMedicineR: MutableList<UserPharmaHosMedicine>? = null
+	@OneToMany(fetch = FetchType.LAZY, cascade = [CascadeType.ALL], mappedBy = "hospitalModel")
+	var pharmaHos: MutableList<PharmaHosModel>? = null,
+	@OneToMany(fetch = FetchType.LAZY, cascade = [CascadeType.ALL], mappedBy = "hospitalModel")
+	var hosMedicine: MutableList<HosMedicineModel>? = null
 	) {
 	fun findHeader(data: List<String>): Boolean {
 		if (data.size < FConstants.MODEL_HOS_COUNT) {

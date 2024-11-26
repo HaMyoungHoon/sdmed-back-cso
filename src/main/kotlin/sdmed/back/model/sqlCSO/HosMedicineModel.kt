@@ -4,21 +4,15 @@ import jakarta.persistence.*
 import java.util.*
 
 @Entity
-data class UserPharmaHosMedicine(
+data class HosMedicineModel(
 	@Id
 	@Column(columnDefinition = "nvarchar(36)", updatable = false, nullable = false)
 	var thisPK: String = UUID.randomUUID().toString(),
 	@ManyToOne
-	@JoinColumn(name = "user_id")
-	var userDataModel: UserDataModel? = null,
-	@ManyToOne
-	@JoinColumn(name = "pharma_id")
-	var pharmaModel: PharmaModel? = null,
-	@ManyToOne
-	@JoinColumn(name = "hospital_id")
+	@JoinColumn(name = "hospitalModel_thisPK")
 	var hospitalModel: HospitalModel? = null,
 	@ManyToOne
-	@JoinColumn(name = "medicine_id")
+	@JoinColumn(name = "medicineModel_thisPK")
 	var medicineModel: MedicineModel? = null,
 ) {
 }

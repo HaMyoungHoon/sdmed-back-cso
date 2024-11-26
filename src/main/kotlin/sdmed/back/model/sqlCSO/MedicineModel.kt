@@ -1,6 +1,7 @@
 package sdmed.back.model.sqlCSO
 
 import com.fasterxml.jackson.annotation.JsonBackReference
+import com.fasterxml.jackson.annotation.JsonManagedReference
 import jakarta.persistence.*
 import sdmed.back.config.FConstants
 import sdmed.back.config.FExtensions
@@ -39,6 +40,8 @@ data class MedicineModel(
 	var ancestorCode: Int = 0,
 	@Column
 	var applyDate: Date = Date(),
+	@OneToMany(fetch = FetchType.LAZY, cascade = [CascadeType.ALL], mappedBy = "medicineModel")
+	var hosMedicine: MutableList<HosMedicineModel>? = null,
 	@ManyToOne(fetch = FetchType.LAZY, optional = true)
 	@JoinColumn
 	@JsonBackReference

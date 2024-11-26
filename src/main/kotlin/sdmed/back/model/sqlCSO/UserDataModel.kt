@@ -13,31 +13,6 @@ import java.lang.StringBuilder
 import java.sql.Timestamp
 import java.util.*
 
-/**
- * User data model
- *
- * @property thisPK
- * @property id 아이디
- * @property pw 비번
- * @property name 이름
- * @property mail 메일
- * @property phoneNumber 번호
- * @property role 권한
- * @property dept 부서
- * @property status 상태
- * @property taxpayerImageUrl
- * @property companyName
- * @property companyNumber
- * @property companyAddress
- * @property bankAccountImageUrl
- * @property bankAccount
- * @property regDate 등록일
- * @property lastLoginDate 마지막로그인일
- * @property children
- * @property userData
- * @property pharmas
- * @constructor Create empty User data model
- */
 @Entity
 data class UserDataModel(
 	@Id
@@ -84,14 +59,8 @@ data class UserDataModel(
 	@JsonBackReference
 	@JsonIgnore
 	var userData: UserDataModel? = null,
-	@ManyToMany(fetch = FetchType.EAGER, cascade = [CascadeType.ALL])
-	@JoinTable(
-		name = "user_pharma",
-		joinColumns = [JoinColumn(name = "user_id")],
-		inverseJoinColumns = [JoinColumn(name = "pharma_id")]
-	)
-	@JsonManagedReference
-	var pharmas: MutableList<PharmaModel>? = null,
+	@OneToMany(fetch = FetchType.EAGER, cascade = [CascadeType.ALL], mappedBy = "userDataModel")
+	var userPharma: MutableList<UserPharmaModel>? = null,
 ) {
 	fun setChild(): UserDataModel {
 		children?.forEach {
@@ -101,7 +70,7 @@ data class UserDataModel(
 		return this
 	}
 	fun init() {
-		pharmas = mutableListOf()
+		userPharma = mutableListOf()
 		children?.forEach {
 			it.init()
 		}
