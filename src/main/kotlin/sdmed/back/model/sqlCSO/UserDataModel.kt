@@ -243,4 +243,22 @@ data class UserDataModel(
 		val regDateString = FExtensions.parseDateTimeString(regDate, "yyyy-MM-dd HH:mm:ss")
 		return "('$thisPK', '$id', '$pw', '$name', '$mail', '$phoneNumber', '$role', '$dept', '${status.index}', '$companyName', '$companyNumber', '$companyAddress', '$bankAccount', '$regDateString')"
 	}
+
+	override fun toString(): String {
+		var ret = "id: ${id}, "
+//		ret += "pw: ${pw}, "
+		ret += "name: ${name}, "
+		ret += "mail: ${mail}, "
+		ret += "phoneNumber: ${phoneNumber}, "
+		ret += "role: ${role}, "
+		ret += "dept: ${dept}, "
+		ret += "status: ${status}, "
+		ret += "taxpayerImageUrl: ${taxpayerImageUrl}, "
+		ret += "companyName: ${companyName}, "
+		ret += "companyNumber: ${companyNumber}, "
+		ret += "companyAddress: ${companyAddress}, "
+		ret += "bankAccountImageUrl: ${bankAccountImageUrl}, "
+		ret += "bankAccount: ${bankAccount}"
+		return ret
+	}
 }

@@ -8,13 +8,15 @@ import org.springframework.stereotype.Repository
 import sdmed.back.model.sqlCSO.UserDataModel
 
 @Repository
-interface IUserDataRepository: JpaRepository<UserDataModel, Long> {
+interface IUserDataRepository: JpaRepository<UserDataModel, String> {
 	fun findAllByOrderByNameDesc(): List<UserDataModel>
 	fun findAllByOrderByNameDesc(pageable: Pageable): Page<UserDataModel>
-	fun findById(id: String): UserDataModel?
 	fun findAllByIdIn(ids: List<String>): List<UserDataModel>
 
 
+	@Query("SELECT * from userDataModel " +
+			"WHERE id = :id", nativeQuery = true)
+	fun selectById(id: String): UserDataModel?
 	@Query("SELECT * FROM userDataModel" +
 			"WHERE dept & :flag > 0" +
 			"ORDER BY name Asc", nativeQuery = true)
