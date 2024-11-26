@@ -45,6 +45,8 @@ dependencies {
 
 	implementation("org.apache.poi:poi-ooxml:5.2.2")
 
+	implementation("com.azure:azure-storage-blob:12.29.0")
+
 	runtimeOnly("io.jsonwebtoken:jjwt-impl:0.12.5")
 	runtimeOnly("io.jsonwebtoken:jjwt-gson:0.12.5")
 	runtimeOnly("com.microsoft.sqlserver:mssql-jdbc")
