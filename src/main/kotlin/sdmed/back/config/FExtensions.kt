@@ -24,9 +24,6 @@ object FExtensions {
 	var hospitalExcelDir: String = ""
 	var medicineExcelDir: String = ""
 
-	fun fileTransfer(excelType: FExcelParserType) {
-
-	}
 	fun folderExist(excelType: FExcelParserType) {
 		Optional.ofNullable(Files.createDirectories(fileLocation(excelType))).orElseThrow { FileUploadException() }
 	}
@@ -85,6 +82,32 @@ object FExtensions {
 			FExcelParserType.MEDICINE -> Paths.get("${medicineExcelDir}/excel_upload_sample.xlsx").toAbsolutePath().normalize()
 		}
 		return UrlResource(filePath.toUri())
+	}
+	fun getFileExt(file: MultipartFile): String {
+		val fileName = file.originalFilename ?: "unknown"
+		return fileName.substring(fileName.indexOfLast { it == '.' } + 1).lowercase(Locale.getDefault())
+	}
+	fun getMagicNumber(file: MultipartFile, byteCount: Int = 8): String {
+		file.inputStream.use { x ->
+			val ret = ByteArray(byteCount)
+			x.read(ret, 0, byteCount)
+			return ret.joinToString(" ") { y -> "%02X".format(y) }
+		}
+	}
+	fun detectFileMimeType(file: MultipartFile, byteCount: Int = 8): String {
+		val magicNumber = getMagicNumber(file, byteCount)
+		val ext = when {
+			magicNumber.startsWith("50 4B 03 04") -> "file.zip"
+			magicNumber.startsWith("50 4B 30 30 50 4B 03 04") -> "file.zip"
+			magicNumber.startsWith("25 50 44 46") -> "file.pdf"
+			magicNumber.startsWith("FF D8 FF") -> "file.jpeg"
+			magicNumber.startsWith("89 50 4E 47") -> "file.png"
+			magicNumber.startsWith("42 4D") -> "file.bmp"
+			magicNumber.startsWith("52 49 46 46") && getMagicNumber(file, 12).contains("57 45 42 50") -> "file.webp"
+			magicNumber.startsWith("66 74 79 70 68 65 69 63") -> "file.heic"
+			else -> file.originalFilename ?: "file.unknown"
+		}
+		return ContentsType.findContentType(ext)
 	}
 
 	fun regexSpecialCharRemove(data: String?) = data?.let { Regex(FConstants.REGEX_SPECIAL_CHAR_REMOVE).replace(it, "") } ?: ""

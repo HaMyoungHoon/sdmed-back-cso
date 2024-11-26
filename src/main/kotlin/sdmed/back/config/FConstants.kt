@@ -98,6 +98,7 @@ object FConstants {
 	const val MODEL_DRUG_ANCESTOR_CODE = "목록정비전코드"
 	const val MODEL_DRUG_COUNT = 13
 	const val MODEL_DRUG_INSERT_INTO = "INSERT INTO medicineModel (thisPK, serialNumber, method, classify, mainIngredientCode, kdCode, name, pharmaName, standard, unit, maxPrice, general, etc, ancestorCode, applyDate) VALUES "
+	const val MODEL_DRUG_INSERT_INTO_WITH_PHARMA = "INSERT INTO medicineModel (thisPK, serialNumber, method, classify, mainIngredientCode, kdCode, name, pharmaName, standard, unit, maxPrice, general, etc, ancestorCode, applyDate, pharma_thisPK, medicineList_thisPK) VALUES "
 
 	const val REGEX_ONLY_ALPHABET = "[^a-zA-Z0-9]"
 	const val REGEX_SPECIAL_CHAR_REMOVE = "[^가-힣a-zA-Z0-9\\s]"

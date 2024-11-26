@@ -1,5 +1,7 @@
 package sdmed.back.config
 
+import java.util.*
+
 object ContentsType {
 	const val type_aac   : String = "audio/aac"
 	const val type_abw   : String = "application/x-abiword"
@@ -17,6 +19,8 @@ object ContentsType {
 	const val type_gif   : String = "image/gif"
 	const val type_htm   : String = "text/html"
 	const val type_html  : String = "text/html"
+	const val type_heic  : String = "image/heic"
+	const val type_heif  : String = "image/heif"
 	const val type_ico   : String = "image/x-icon"
 	const val type_ics   : String = "text/calendar"
 	const val type_jar   : String = "application/java-archive"
@@ -62,4 +66,72 @@ object ContentsType {
 	const val type_3gp   : String = "video/3gpp"
 	const val type_3g2   : String = "video/3gpp2"
 	const val type_7z    : String = "application/x-7z-compressed"
+
+	fun findContentType(fileName: String) =
+		when (fileName.substring(fileName.indexOfLast { it == '.' } + 1).lowercase(Locale.getDefault())) {
+			"aac" ->    ContentsType.type_aac
+			"abw" ->    ContentsType.type_abw
+			"arc" ->    ContentsType.type_arc
+			"avi" ->    ContentsType.type_avi
+			"azw" ->    ContentsType.type_azw
+			"bin" ->    ContentsType.type_bin
+			"bz" ->     ContentsType.type_bz
+			"bz2" ->    ContentsType.type_bz2
+			"csh" ->    ContentsType.type_csh
+			"css" ->    ContentsType.type_css
+			"csv" ->    ContentsType.type_csv
+			"doc" ->    ContentsType.type_doc
+			"epub" ->   ContentsType.type_epub
+			"gif" ->    ContentsType.type_gif
+			"heic" ->   ContentsType.type_heic
+			"heif" ->   ContentsType.type_heif
+			"htm" ->    ContentsType.type_htm
+			"html" ->   ContentsType.type_html
+			"ico" ->    ContentsType.type_ico
+			"ics" ->    ContentsType.type_ics
+			"jar" ->    ContentsType.type_jar
+			"jpeg" ->   ContentsType.type_jpeg
+			"jpg" ->    ContentsType.type_jpg
+			"js" ->     ContentsType.type_js
+			"json" ->   ContentsType.type_json
+			"mid" ->    ContentsType.type_mid
+			"midi" ->   ContentsType.type_midi
+			"mpeg" ->   ContentsType.type_mpeg
+			"mpkg" ->   ContentsType.type_mpkg
+			"odp" ->    ContentsType.type_odp
+			"ods" ->    ContentsType.type_ods
+			"odt" ->    ContentsType.type_odt
+			"oga" ->    ContentsType.type_oga
+			"ogv" ->    ContentsType.type_ogv
+			"ogx" ->    ContentsType.type_ogx
+			"pdf" ->    ContentsType.type_pdf
+			"ppt" ->    ContentsType.type_ppt
+			"rar" ->    ContentsType.type_rar
+			"rtf" ->    ContentsType.type_rtf
+			"sh" ->     ContentsType.type_sh
+			"svg" ->    ContentsType.type_svg
+			"swf" ->    ContentsType.type_swf
+			"tar" ->    ContentsType.type_tar
+			"tif" ->    ContentsType.type_tif
+			"tiff" ->   ContentsType.type_tiff
+			"ttf" ->    ContentsType.type_ttf
+			"txt" ->    ContentsType.type_txt
+			"vsd" ->    ContentsType.type_vsd
+			"wav" ->    ContentsType.type_wav
+			"weba" ->   ContentsType.type_weba
+			"webm" ->   ContentsType.type_webm
+			"webp" ->   ContentsType.type_webp
+			"woff" ->   ContentsType.type_woff
+			"xhtml" ->  ContentsType.type_xhtml
+			"xls" ->    ContentsType.type_xls
+			"xlsx" ->   ContentsType.type_xlsx
+			"xlsm" ->   ContentsType.type_xlsm
+			"xml" ->    ContentsType.type_xml
+			"xul" ->    ContentsType.type_xul
+			"zip" ->    ContentsType.type_zip
+			"3gp" ->    ContentsType.type_3gp
+			"3g2" ->    ContentsType.type_3g2
+			"7z" ->     ContentsType.type_7z
+			else ->     "application/octet-stream"
+		}
 }
