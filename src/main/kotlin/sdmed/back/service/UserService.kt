@@ -90,7 +90,6 @@ class UserService {
 		data.pw = fAmhohwa.encrypt(data.pw)
 		if (data.id == "mhha") {
 			data.role = UserRole.Admin.flag
-			data.dept = UserDept.Admin.flag
 			data.status = UserStatus.Live
 		}
 		val ret = userDataRepository.save(data)
@@ -210,7 +209,7 @@ class UserService {
 	}
 	fun getUserStatusList() = UserStatus.entries
 	fun getUserRoleList() = UserRole.entries.filterNot { it in listOf(UserRole.Admin, UserRole.CsoAdmin) }
-	fun getUserDeptList() = UserDept.entries.filterNot { it in listOf(UserDept.Admin, UserDept.CsoAdmin) }
+	fun getUserDeptList() = UserDept.entries
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
 	fun userRoleModifyByID(token: String, id: String, roleList: List<UserRole>): UserDataModel {
 		isValid(token)
@@ -260,12 +259,8 @@ class UserService {
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.UserChanger))) {
 			throw AuthenticationEntryPointException()
 		}
-		var mask = UserDept.Admin.flag
-		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin))) {
-			mask = mask or UserDept.CsoAdmin.flag
-		}
 		val user = getUserDataByID(id)
-		user.dept = deptList.fold(0) { acc, x -> acc or x.flag } and mask.inv()
+		user.dept = deptList.fold(0) { acc, x -> acc or x.flag }
 		val ret = userDataRepository.save(user)
 		val stackTrace = Thread.currentThread().stackTrace
 		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "$id dept : ${user.dept}")
@@ -279,15 +274,11 @@ class UserService {
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.UserChanger))) {
 			throw AuthenticationEntryPointException()
 		}
-		var mask = UserDept.Admin.flag
-		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin))) {
-			mask = mask or UserDept.CsoAdmin.flag
-		}
 		val user = getUserDataByPK(userPK)
 		if (user.id == "mhha") {
 			throw AuthenticationEntryPointException()
 		}
-		user.dept = deptList.fold(0) { acc, x -> acc or x.flag } and mask.inv()
+		user.dept = deptList.fold(0) { acc, x -> acc or x.flag }
 		val ret = userDataRepository.save(user)
 		val stackTrace = Thread.currentThread().stackTrace
 		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "${user.id} dept : ${user.dept}")

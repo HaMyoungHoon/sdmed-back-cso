@@ -4,13 +4,11 @@ import java.util.*
 
 enum class UserDept(var flag: Int, var desc: String) {
 	None(0, "미지정"),
-	Admin(1, "슈퍼관리자"),
-	CsoAdmin(Admin.flag.shl(1), "관리자"),
-	Employee(Admin.flag.shl(2), "직원"),
-	Quitter(Admin.flag.shl(3), "퇴사자"),
-	TaxPayer(Admin.flag.shl(4), "사업자"),
-	Personal(Admin.flag.shl(5), "개인"),
-	Terminate(Admin.flag.shl(6), "계약종료");
+	Employee(1, "직원"),
+	Quitter(Employee.flag.shl(1), "퇴사자"),
+	TaxPayer(Employee.flag.shl(2), "사업자"),
+	Personal(Employee.flag.shl(3), "개인"),
+	Terminate(Employee.flag.shl(4), "계약종료");
 
 	infix fun and(rhs: UserDept) = EnumSet.of(this, rhs)
 	companion object {
