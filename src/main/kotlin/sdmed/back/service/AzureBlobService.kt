@@ -26,7 +26,7 @@ class AzureBlobService {
 
 	fun uploadTest(file: MultipartFile): String {
 		val today = FExtensions.getDateTimeString("yyyyMMdd")
-		val blobUrl = "$today/${UUID.randomUUID()}_${file.originalFilename}"
+		val blobUrl = "$today/Test?${file.originalFilename}"
 		val containerClient = blobServiceClient.createBlobContainerIfNotExists(containerName)
 		val blobClient = containerClient.getBlobClient(blobUrl)
 		blobClient.upload(file.inputStream, file.size, true)

@@ -15,22 +15,5 @@ interface IMedicineRepository: JpaRepository<MedicineModel, String> {
 	fun findAllByOrderByPharmaName(pageable: Pageable): Page<MedicineModel>
 	fun findAllByThisPKIn(medicinePK: List<String>): List<MedicineModel>
 	fun findAllByPharma(pharma: PharmaModel): List<MedicineModel>
-
-	fun findAllByApplyDate(applyDate: Date): List<MedicineModel>
-
-	@Query("SELECT * FROM medicineModel " +
-			"WHERE applyDate = :applyDate", nativeQuery = true)
-	fun selectAllByApplyDate(applyDate: String): List<MedicineModel>
-
-	@Query("WITH RankedMedicine AS (\n" +
-			"    SELECT *, ROW_NUMBER() OVER (PARTITION BY kdCode ORDER BY applyDate DESC) as RN FROM MedicineModel\n" +
-			")\n" +
-			"SELECT * FROM RankedMedicine as MedicineModel WHERE RN = 1", nativeQuery = true)
-	fun selectAllByRecentData(): List<MedicineModel>
-
-	@Query("WITH RankedMedicine AS (\n" +
-			"    SELECT *, ROW_NUMBER() OVER (PARTITION BY kdCode ORDER BY applyDate DESC) as RN FROM MedicineModel\n" +
-			")\n" +
-			"SELECT * FROM RankedMedicine as MedicineModel WHERE RN = 1 AND pharma_thisPK = :pharmaPK", nativeQuery = true)
-	fun selectAllByRecentChild(pharmaPK: String): List<MedicineModel>
+	fun findAllByKdCodeIn(kdCode: List<String>): List<MedicineModel>
 }

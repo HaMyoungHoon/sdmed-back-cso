@@ -1,5 +1,7 @@
 package sdmed.back.model.sqlCSO
 
+import com.fasterxml.jackson.annotation.JsonBackReference
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonManagedReference
 import jakarta.persistence.*
 import sdmed.back.config.FConstants
@@ -66,11 +68,12 @@ data class HospitalModel(
 	var etc2: String = "",
 	@Column(columnDefinition = "nvarchar(500)", nullable = false)
 	var imageUrl: String = "",
-	@OneToMany(fetch = FetchType.LAZY, cascade = [CascadeType.ALL], mappedBy = "hospitalModel")
-	var pharmaHos: MutableList<PharmaHosModel>? = null,
-	@OneToMany(fetch = FetchType.LAZY, cascade = [CascadeType.ALL], mappedBy = "hospitalModel")
-	var hosMedicine: MutableList<HosMedicineModel>? = null
+	@Transient
+	var pharmaList: MutableList<PharmaModel> = mutableListOf(),
 	) {
+	fun lazyHide() {
+
+	}
 	fun findHeader(data: List<String>): Boolean {
 		if (data.size < FConstants.MODEL_HOS_COUNT) {
 			return false

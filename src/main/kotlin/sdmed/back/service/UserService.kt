@@ -17,10 +17,8 @@ import sdmed.back.model.common.*
 import sdmed.back.model.common.UserDept.Companion.getFlag
 import sdmed.back.model.common.UserRole.Companion.getFlag
 import sdmed.back.model.common.UserRoles
-import sdmed.back.model.sqlCSO.LogModel
-import sdmed.back.model.sqlCSO.UserDataModel
-import sdmed.back.repository.sqlCSO.ILogRepository
-import sdmed.back.repository.sqlCSO.IUserDataRepository
+import sdmed.back.model.sqlCSO.*
+import sdmed.back.repository.sqlCSO.*
 import java.sql.Timestamp
 import java.util.*
 import java.util.stream.Collectors
@@ -29,6 +27,10 @@ import java.util.stream.Collectors
 class UserService {
 	@Autowired lateinit var jwtTokenProvider: JwtTokenProvider
 	@Autowired lateinit var userDataRepository: IUserDataRepository
+	@Autowired lateinit var hospitalRepository: IHospitalRepository
+	@Autowired lateinit var pharmaRepository: IPharmaRepository
+	@Autowired lateinit var medicineRepository: IMedicineRepository
+	@Autowired lateinit var userRelationRepository: IUserRelationRepository
 	@Autowired lateinit var logRepository: ILogRepository
 	@Autowired lateinit var fAmhohwa: FAmhohwa
 	@Autowired lateinit var excelFileParser: FExcelFileParser
@@ -55,7 +57,7 @@ class UserService {
 	}
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
 	fun signIn(id: String, pw: String): String {
-		val user = getUserData(id) ?: throw SignInFailedException()
+		val user = getUserDataByID(id) ?: throw SignInFailedException()
 		val encryptPW = fAmhohwa.encrypt(pw)
 		if (user.pw != encryptPW) {
 			throw SignInFailedException()
@@ -111,7 +113,7 @@ class UserService {
 			throw AuthenticationEntryPointException()
 		}
 
-		val user = getUserData(id) ?: throw UserNotFoundException()
+		val user = getUserDataByID(id) ?: throw UserNotFoundException()
 		user.pw = fAmhohwa.encrypt(changePW)
 		val ret = userDataRepository.save(user)
 		val stackTrace = Thread.currentThread().stackTrace
@@ -142,7 +144,7 @@ class UserService {
 			throw AuthenticationEntryPointException()
 		}
 
-		val user = getUserData(id) ?: throw UserNotFoundException()
+		val user = getUserDataByID(id) ?: throw UserNotFoundException()
 		user.status = status
 		val ret = userDataRepository.save(user)
 		val stackTrace = Thread.currentThread().stackTrace
@@ -213,12 +215,12 @@ class UserService {
 			throw AuthenticationEntryPointException()
 		}
 
-		val mother = userDataRepository.selectById(motherID)?.apply { init() }?.setChild() ?: throw UserNotFoundException()
-		val motherChild = mother.children?.map { it.id } ?: arrayListOf()
+		val mother = userDataRepository.selectById(motherID) ?: throw UserNotFoundException()
+		val motherChild = mother.children.map { it.id }
 		val childBuff = childID.toMutableList().distinct().toMutableList().apply {
 			remove(motherID)
 		}.filterNot { it in motherChild }
-		val child = userDataRepository.findAllByIdIn(childBuff).onEach { it.init(); }
+		val child = userDataRepository.findAllByIdIn(childBuff)
 		if (child.isEmpty()) {
 			return mother
 		}
@@ -237,11 +239,11 @@ class UserService {
 			throw AuthenticationEntryPointException()
 		}
 
-		val mother = userDataRepository.selectById(motherID)?.apply { init() } ?: throw UserNotFoundException()
-		val motherChild = mother.children?.map { it.id } ?: arrayListOf()
+		val mother = userDataRepository.selectById(motherID) ?: throw UserNotFoundException()
+		val motherChild = mother.children.map { it.id }
 		val childBuff = childID.toMutableList().distinct().filter { it in motherChild }
-		val child = userDataRepository.findAllByIdIn(childBuff).onEach { it.init(); it.userData = null }
-		mother.children?.removeIf { it.id in childBuff }
+		val child = userDataRepository.findAllByIdIn(childBuff)
+		mother.children.removeIf { it.id in childBuff }
 		val ret = userDataRepository.save(mother)
 		userDataRepository.saveAll(child)
 		val stackTrace = Thread.currentThread().stackTrace
@@ -292,19 +294,122 @@ class UserService {
 		logRepository.save(logModel)
 		return "count : $retCount"
 	}
-
 	private fun insertAll(data: List<UserDataModel>): Int {
-		val values: String = data.stream().map(this::renderSqlUserModel).collect(Collectors.joining(","))
-		val ret = entityManager.createNativeQuery("${FConstants.MODEL_USER_INSERT_INTO}$values").executeUpdate()
+		val values: String = data.stream().map(this::renderSqlUserPharmaModel).collect(Collectors.joining(","))
+		val sqlString = "${FConstants.MODEL_USER_INSERT_INTO}$values"
+		val ret = entityManager.createNativeQuery(sqlString).executeUpdate()
 		entityManager.flush()
 		entityManager.clear()
 		return ret
 	}
-	private fun renderSqlUserModel(data: UserDataModel): String {
-		return data.insertString()
+	private fun renderSqlUserPharmaModel(data: UserDataModel) = data.insertString()
+
+	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
+	fun userRelationModify(token: String, userPK: String, hosPharmaMedicinePairModel: List<HosPharmaMedicinePairModel>): UserDataModel {
+		isValid(token)
+		val tokenUser = getUserDataByToken(token) ?: throw AuthenticationEntryPointException()
+		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee))) {
+			throw AuthenticationEntryPointException()
+		}
+
+		val userData = getUserDataByPK(userPK) ?: throw UserNotFoundException()
+		val existHos = hospitalRepository.findAllByThisPKIn(hosPharmaMedicinePairModel.map { it.hosPK })
+		var realPair = hosPharmaMedicinePairModel.filter { x -> x.hosPK in existHos.map { y -> y.thisPK } }
+		val existPharma = pharmaRepository.findAllByThisPKIn(realPair.map { it.pharmaPK })
+		realPair = realPair.filter { x -> x.pharmaPK in existPharma.map { y -> y.thisPK } }
+		val existMedicine = medicineRepository.findAllByThisPKIn(realPair.map { it.medicinePK })
+		realPair = realPair.filter { x -> x.medicinePK in existMedicine.map { y -> y.thisPK } }
+
+		deleteRelationByUserPK(userData.thisPK)
+		if (realPair.isEmpty()) {
+			return userData
+		}
+		insertRelation(realPair.map { x -> UserHosPharmaMedicinePairModel().apply {
+			this.userPK = userData.thisPK
+			this.hosPK = x.hosPK
+			this.pharmaPK = x.pharmaPK
+			this.medicinePK = x.medicinePK
+		}})
+
+		return getUserDataWithRelationByPK(userPK) ?: throw UserNotFoundException()
+	}
+	fun deleteRelationByUserPK(userPK: String) {
+		val sqlString = "${FConstants.MODEL_USER_RELATIONS_DELETE_WHERE_USER_PK} '$userPK'"
+		entityManager.createNativeQuery(sqlString).executeUpdate()
+		entityManager.flush()
+		entityManager.clear()
+	}
+	fun insertRelation(data: List<UserHosPharmaMedicinePairModel>) {
+		val values = data.stream().map(this::renderSqlInsertRelation).collect(Collectors.joining(","))
+		val sqlString = "${FConstants.MODEL_USER_RELATIONS_INSERT_INTO}$values"
+		entityManager.createNativeQuery(sqlString).executeUpdate()
+		entityManager.flush()
+		entityManager.clear()
+	}
+	fun renderSqlInsertRelation(data: UserHosPharmaMedicinePairModel) = data.insertString()
+
+	fun getUserDataByID(id: String, childView: Boolean = false, relationView: Boolean = false, pharmaOwnMedicineView: Boolean = false): UserDataModel {
+		val ret = userDataRepository.selectById(id) ?: throw UserNotFoundException()
+		if (childView) {
+			ret.children = userDataRepository.findAllByUserData(ret).toMutableList().onEach { it.lazyHide() }
+		}
+		ret.lazyHide()
+		if (relationView) {
+			ret.hosList = mergeRel(ret.thisPK, pharmaOwnMedicineView)
+		}
+
+		return ret
+	}
+	fun getUserDataByPK(thisPK: String, childView: Boolean = false, relationView: Boolean = false, pharmaOwnMedicineView: Boolean = false): UserDataModel {
+		val ret = userDataRepository.findByThisPK(thisPK) ?: throw UserNotFoundException()
+		if (childView) {
+			ret.children = userDataRepository.findAllByUserData(ret).toMutableList().onEach { it.lazyHide() }
+		}
+		ret.lazyHide()
+		if (relationView) {
+			ret.hosList = mergeRel(ret.thisPK, pharmaOwnMedicineView)
+		}
+
+		return ret
+	}
+	fun getUserDataWithChild(id: String) = getUserDataByID(id)?.apply {
+		children = userDataRepository.findAllByUserData(this).toMutableList()
+	}
+	fun getUserDataWithRelationByPK(thisPK: String) = getUserDataByPK(thisPK)?.apply { hosList = mergeRel(thisPK) }
+	fun mergeRel(userPK: String, pharmaOwnMedicineView: Boolean = false): MutableList<HospitalModel> {
+		var ret: MutableList<HospitalModel> = mutableListOf()
+		val userRelationModel = userRelationRepository.findAllByUserPK(userPK)
+		val hosMap = hospitalRepository.findAllByThisPKIn(userRelationModel.map { it.hosPK }).onEach { it.lazyHide() }.associateBy { it.thisPK }
+		val pharmaMap = pharmaRepository.findAllByThisPKIn(userRelationModel.map { it.pharmaPK }).onEach {
+			if (!pharmaOwnMedicineView) {
+				it.ownMedicineHide()
+			}
+			it.lazyHide()
+		}.associateBy { it.thisPK }
+		val medicineMap = medicineRepository.findAllByThisPKIn(userRelationModel.map { it.medicinePK }).onEach { it.lazyHide() }.associateBy { it.thisPK }
+		for (rel in userRelationModel) {
+			val hos = hosMap[rel.hosPK] ?: continue
+			val pharma = pharmaMap[rel.pharmaPK]
+			val medicine = medicineMap[rel.medicinePK]
+			if (pharma != null) {
+				if (medicine != null) {
+					pharma.relationMedicineList.add(medicine)
+				}
+				hos.pharmaList.add(pharma)
+			}
+			ret.add(hos)
+		}
+		ret = ret.distinct().toMutableList()
+		ret.onEach { x ->
+			x.pharmaList = x.pharmaList.distinct().toMutableList()
+			x.pharmaList.onEach { y ->
+				y.relationMedicineList = y.relationMedicineList.distinct().toMutableList()
+			}
+		}
+
+		return ret
 	}
 
-	fun getUserData(id: String) = userDataRepository.selectById(id)
 	fun getUserDataByToken(token: String) = userDataRepository.selectById(jwtTokenProvider.getAllClaimsFromToken(token).subject)
 	fun isValid(token: String) {
 		if (!jwtTokenProvider.validateToken(token)) {

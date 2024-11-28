@@ -31,23 +31,23 @@ data class MedicineModel(
 	@Column(columnDefinition = "nvarchar(255)", nullable = false)
 	var unit: String = "",
 	@Column
-	var maxPrice: Int = 0,
-	@Column
 	var general: Int = 0,
 	@Column(columnDefinition = "nvarchar(500)", nullable = false)
 	var etc: String = "",
 	@Column
 	var ancestorCode: Int = 0,
-	@Column
-	var applyDate: Date = Date(),
-	@OneToMany(fetch = FetchType.LAZY, cascade = [CascadeType.ALL], mappedBy = "medicineModel")
-	var hosMedicine: MutableList<HosMedicineModel>? = null,
+	@OneToMany(fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
+	@JoinColumn
+	@JsonManagedReference(value = "medicinePriceManagedReference")
+	var medicinePriceModel: MutableList<MedicinePriceModel> = mutableListOf(),
 	@ManyToOne(fetch = FetchType.LAZY, optional = true)
 	@JoinColumn
-	@JsonBackReference
+	@JsonBackReference(value = "pharmaMedicineManagedReference")
 	var pharma: PharmaModel? = null,
 ) {
-
+	fun lazyHide() {
+		pharma = null
+	}
 	fun findHeader(data: List<String>): Boolean {
 		if (data.size < FConstants.MODEL_DRUG_COUNT) {
 			return false
@@ -79,7 +79,7 @@ data class MedicineModel(
 			null
 		}
 	}
-	fun indexSet(index: Int): String {
+	fun indexGet(index: Int): String {
 		return when (index) {
 			0 -> serialNumber.toString()
 			1 -> method
@@ -90,7 +90,7 @@ data class MedicineModel(
 			6 -> pharmaName
 			7 -> standard
 			8 -> unit
-			9 -> maxPrice.toString()
+//			9 -> maxPrice.toString()
 			10 -> general.toString()
 			11 -> etc
 			12 -> ancestorCode.toString()
@@ -108,10 +108,19 @@ data class MedicineModel(
 			6 -> pharmaName = data ?: ""
 			7 -> standard = data ?: ""
 			8 -> unit = data ?: ""
-			9 -> maxPrice = data?.toIntOrNull() ?: 0
+			9 -> medicinePriceModel.add(MedicinePriceModel().apply {
+				maxPrice = data?.toIntOrNull() ?: 0
+				medicineModel = this@MedicineModel
+			})
 			10 -> general = if (data == "일반") 0 else 1
 			11 -> etc = data ?: ""
 			12 -> ancestorCode = data?.toIntOrNull() ?: 0
+		}
+	}
+	fun childDataSet(kdCode: String, applyDate: Date) {
+		medicinePriceModel.forEach { x ->
+			x.kdCode = kdCode
+			x.applyDate = applyDate
 		}
 	}
 	fun titleGet(index: Int): String {
@@ -133,22 +142,22 @@ data class MedicineModel(
 		}
 	}
 	fun errorCondition(): Boolean {
-		if (indexSet(3).isEmpty()) {
+		if (indexGet(3).isEmpty()) {
 			return true
-		} else if (indexSet(4).isEmpty()) {
+		} else if (indexGet(4).isEmpty()) {
 			return true
-		} else if (indexSet(5).isEmpty()) {
+		} else if (indexGet(5).isEmpty()) {
 			return true
-		} else if (indexSet(6).isEmpty()) {
+		} else if (indexGet(6).isEmpty()) {
 			return true
-		} else if (indexSet(7).isEmpty()) {
+		} else if (indexGet(7).isEmpty()) {
 			return true
-		} else if (indexSet(8).isEmpty()) {
+		} else if (indexGet(8).isEmpty()) {
 			return true
 			// 0 원이 있나? 있네 시벌
 //		} else if (getIndex(9) == "0") {
 //			return true
-		} else if (indexSet(10).isEmpty()) {
+		} else if (indexGet(10).isEmpty()) {
 			return true
 //		} else if (getIndex(11).isEmpty()) {
 //			return true
@@ -160,7 +169,7 @@ data class MedicineModel(
 	fun errorString(): String {
 		val ret = StringBuilder()
 		for (i in 0 until FConstants.MODEL_DRUG_COUNT) {
-			ret.append("${titleGet(i)} : ${indexSet(i)}\n")
+			ret.append("${titleGet(i)} : ${indexGet(i)}\n")
 		}
 		return ret.toString()
 	}
@@ -174,10 +183,6 @@ data class MedicineModel(
 		val standard = FExtensions.escapeString(standard)
 		val unit = FExtensions.escapeString(unit)
 		val etc = FExtensions.escapeString(etc)
-		return if (pharma == null) {
-			"('$thisPK', '$serialNumber', '$method', '$classify', '$mainIngredientCode', '$kdCode', '$name', '$pharmaName', '$standard', '$unit', '$maxPrice', '$general', '$etc', '$ancestorCode', '${FExtensions.parseDateTimeString(applyDate, "yyyy-MM-dd")}')"
-		} else {
-			"('$thisPK', '$serialNumber', '$method', '$classify', '$mainIngredientCode', '$kdCode', '$name', '$pharmaName', '$standard', '$unit', '$maxPrice', '$general', '$etc', '$ancestorCode', '${FExtensions.parseDateTimeString(applyDate, "yyyy-MM-dd")}', '${pharma?.thisPK}', '${pharma?.thisPK}')"
-		}
+		return "('$thisPK', '$serialNumber', '$method', '$classify', '$mainIngredientCode', '$kdCode', '$name', '$pharmaName', '$standard', '$unit', '$general', '$etc', '$ancestorCode')"
 	}
 }

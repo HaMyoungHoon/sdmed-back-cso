@@ -19,8 +19,10 @@ import sdmed.back.model.common.UserRoles
 import sdmed.back.model.common.UserStatus
 import sdmed.back.model.sqlCSO.LogModel
 import sdmed.back.model.sqlCSO.MedicineModel
+import sdmed.back.model.sqlCSO.MedicinePriceModel
 import sdmed.back.model.sqlCSO.UserDataModel
 import sdmed.back.repository.sqlCSO.ILogRepository
+import sdmed.back.repository.sqlCSO.IMedicinePriceRepository
 import sdmed.back.repository.sqlCSO.IMedicineRepository
 import sdmed.back.repository.sqlCSO.IUserDataRepository
 import java.util.*
@@ -33,11 +35,12 @@ class MedicineService {
 	@Autowired lateinit var excelFileParser: FExcelFileParser
 	@Autowired lateinit var userDataRepository: IUserDataRepository
 	@Autowired lateinit var medicineRepository: IMedicineRepository
+	@Autowired lateinit var medicinePriceRepository: IMedicinePriceRepository
 	@Autowired lateinit var entityManager: EntityManager
 
 	fun getMedicine(token: String): List<MedicineModel> {
 		isValid(token)
-		return medicineRepository.selectAllByRecentData()
+		return medicineRepository.findAll()
 	}
 	fun getMedicine(token: String, page: Int, size: Int): Page<MedicineModel> {
 		isValid(token)
@@ -52,17 +55,19 @@ class MedicineService {
 		}
 
 		val excelModel = excelFileParser.medicineUploadExcelParse(tokenUser.id, applyDate, file)
-//		val already = medicineRepository.selectAllByApplyDate(FExtensions.parseDateTimeString(applyDate, "yyyy-MM-dd") ?: "").toMutableList()
-		val already = medicineRepository.selectAllByRecentData()
+		val already = medicineRepository.findAll()
+		val priceModel = excelModel.flatMap { it.medicinePriceModel }
+		val priceAlready = medicinePriceRepository.selectAllByRecentData()
 		val newData: MutableList<MedicineModel> = mutableListOf()
-		margeMedicine(already, excelModel, newData)
+		val newPriceData: MutableList<MedicinePriceModel> = mutableListOf()
+		mergeMedicine(already, excelModel, newData)
+		mergeMedicinePrice(priceAlready, priceModel, newPriceData)
 
 		var retCount = 0
-		newData.filter { it.pharma != null }.chunked(500).forEach {
-			retCount += insertAll(it, true)
-		}
-		newData.filter { it.pharma == null }.chunked(500).forEach {
-			retCount += insertAll(it)
+		newData.chunked(500).forEach { insertMedicineAll(it) }
+		newPriceData.chunked(500).forEach { retCount += insertMedicinePriceAll(it) }
+		if (retCount == 0) {
+			return "count : $retCount"
 		}
 
 		val stackTrace = Thread.currentThread().stackTrace
@@ -70,31 +75,48 @@ class MedicineService {
 		logRepository.save(logModel)
 		return "count : $retCount"
 	}
-	private fun margeMedicine(lhsList: List<MedicineModel>, rhsList: MutableList<MedicineModel>, newData: MutableList<MedicineModel>): MutableList<MedicineModel> {
-		val lhsMap = lhsList.associateBy { it.kdCode }.toMutableMap()
+	private fun mergeMedicine(lhsList: List<MedicineModel>, rhsList: MutableList<MedicineModel>, newData: MutableList<MedicineModel>) {
+		val lhsMap = lhsList.associateBy { it.kdCode }
 		for (rhs in rhsList) {
 			val lhs = lhsMap[rhs.kdCode]
+			if (lhs == null) {
+				newData.add(rhs)
+			}
+		}
+	}
+	private fun mergeMedicinePrice(lhsList: List<MedicinePriceModel>, rhsList: List<MedicinePriceModel>, newData: MutableList<MedicinePriceModel>) {
+		val lhsMap = lhsList.associateBy { it.medicineModel?.kdCode }
+		for (rhs in rhsList) {
+			val lhs = lhsMap[rhs.medicineModel?.kdCode]
 			if (lhs != null) {
 				if (lhs.maxPrice != rhs.maxPrice) {
-					rhs.pharma = lhs.pharma
+					rhs.medicineModel = lhs.medicineModel
 					newData.add(rhs)
 				}
 			} else {
 				newData.add(rhs)
 			}
 		}
-		return newData
 	}
 
-	private fun insertAll(data: List<MedicineModel>, withPharma: Boolean = false): Int {
+	private fun insertMedicineAll(data: List<MedicineModel>): Int {
 		val values: String = data.stream().map(this::renderSqlForInsertMedicineModel).collect(joining(","))
-		val sqlString = if (withPharma) "${FConstants.MODEL_DRUG_INSERT_INTO_WITH_PHARMA}$values" else "${FConstants.MODEL_DRUG_INSERT_INTO}$values"
+		val sqlString = "${FConstants.MODEL_DRUG_INSERT_INTO}$values"
 		val ret = entityManager.createNativeQuery(sqlString).executeUpdate()
 		entityManager.flush()
 		entityManager.clear()
 		return ret
 	}
 	private fun renderSqlForInsertMedicineModel(data: MedicineModel) = data.insertString()
+	private fun insertMedicinePriceAll(data: List<MedicinePriceModel>): Int {
+		val values = data.stream().map(this::renderSqlForInsertMedicinePriceModel).collect(joining(","))
+		val sqlString = "${FConstants.MODEL_DRUG_PRICE_INSERT_INTO}$values"
+		val ret = entityManager.createNativeQuery(sqlString).executeUpdate()
+		entityManager.flush()
+		entityManager.clear()
+		return ret
+	}
+	private fun renderSqlForInsertMedicinePriceModel(data: MedicinePriceModel) = data.insertString()
 	fun getUserData(id: String) = userDataRepository.selectById(id)
 	fun getUserDataByToken(token: String) = userDataRepository.selectById(jwtTokenProvider.getAllClaimsFromToken(token).subject)
 	fun isValid(token: String) {

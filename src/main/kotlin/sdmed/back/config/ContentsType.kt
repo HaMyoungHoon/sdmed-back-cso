@@ -38,6 +38,7 @@ object ContentsType {
 	const val type_oga   : String = "audio/ogg"
 	const val type_ogv   : String = "video/ogg"
 	const val type_ogx   : String = "application/ogg"
+	const val type_png   : String = "image/png"
 	const val type_pdf   : String = "application/pdf"
 	const val type_ppt   : String = "application/vnd.ms-powerpoint"
 	const val type_rar   : String = "application/x-rar-compressed"
@@ -104,6 +105,7 @@ object ContentsType {
 			"oga" ->    ContentsType.type_oga
 			"ogv" ->    ContentsType.type_ogv
 			"ogx" ->    ContentsType.type_ogx
+			"png" ->    ContentsType.type_png
 			"pdf" ->    ContentsType.type_pdf
 			"ppt" ->    ContentsType.type_ppt
 			"rar" ->    ContentsType.type_rar

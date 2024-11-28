@@ -10,13 +10,13 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import sdmed.back.advice.exception.AuthenticationEntryPointException
-import sdmed.back.advice.exception.NotValidOperationException
 import sdmed.back.advice.exception.UserNotFoundException
 import sdmed.back.config.ContentsType
 import sdmed.back.config.FConstants
 import sdmed.back.config.FExcelParserType
 import sdmed.back.config.FExtensions
 import sdmed.back.model.common.*
+import sdmed.back.model.sqlCSO.HosPharmaMedicinePairModel
 import sdmed.back.model.sqlCSO.UserDataModel
 import sdmed.back.service.AzureBlobService
 import sdmed.back.service.ResponseService
@@ -63,16 +63,28 @@ class UserController {
 		responseService.getResult(userService.tokenRefresh(token))
 	@Operation(summary = "유저 데이터 검색")
 	@GetMapping(value = ["/userData"])
-	fun getUserData(@RequestHeader(required = true) token: String, @RequestParam(required = false) id: String?): IRestResult {
+	fun getUserData(@RequestHeader(required = true) token: String,
+	                @RequestParam(required = false) id: String?,
+									@RequestParam(required = false) childView: Boolean = false,
+									@RequestParam(required = false) relationView: Boolean = false,
+									@RequestParam(required = false) pharmaOwnMedicineView: Boolean = false): IRestResult {
 		if (id == null) {
 			return responseService.getResult(userService.getUserDataByToken(token))
 		}
 
 		if (userService.haveRole(token, UserRole.Admin.toS())) {
-			return responseService.getResult(userService.getUserData(id))
+			return responseService.getResult(userService.getUserDataByID(id, childView, relationView, pharmaOwnMedicineView))
 		}
 		return responseService.getResult(userService.getUserDataByToken(token))
 	}
+	@Operation(summary = "유저-병원-제약사-약품 관계 변경")
+	@PutMapping(value = ["/userRelModify"])
+	fun putUserRelationModify(@RequestHeader(required = true) token: String,
+														@RequestParam(required = true) userPK: String,
+														@RequestBody hosPharmaMedicinePairModel: List<HosPharmaMedicinePairModel>): IRestResult {
+		return responseService.getResult(userService.userRelationModify(token, userPK, hosPharmaMedicinePairModel))
+	}
+
 	@Operation(summary = "유저 권한 변경")
 	@PutMapping(value = ["/userRoleModify"])
 	fun putUserRoleModify(@RequestHeader(required = true) token: String,
@@ -109,7 +121,7 @@ class UserController {
 		}
 
 		val today = FExtensions.getDateTimeString("yyyyMMdd")
-		val userData = userService.getUserData(id) ?: throw UserNotFoundException()
+		val userData = userService.getUserDataByID(id) ?: throw UserNotFoundException()
 		val blobUrl = azureBlobService.uploadFile(file, "${userData.id}/${today}", tokenUser.thisPK)
 		userData.bankAccountImageUrl = blobUrl
 		return responseService.getResult(userService.userDataModify(token, userData))
@@ -126,7 +138,7 @@ class UserController {
 		}
 
 		val today = FExtensions.getDateTimeString("yyyyMMdd")
-		val userData = userService.getUserData(id) ?: throw UserNotFoundException()
+		val userData = userService.getUserDataByID(id) ?: throw UserNotFoundException()
 		val blobUrl = azureBlobService.uploadFile(file, "${userData.id}/${today}", tokenUser.thisPK)
 		userData.taxpayerImageUrl = blobUrl
 		return responseService.getResult(userService.userDataModify(token, userData))

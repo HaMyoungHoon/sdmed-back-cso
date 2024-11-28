@@ -13,6 +13,7 @@ interface IPharmaRepository: JpaRepository<PharmaModel, String> {
 	fun findAllByOrderByCode(pageable: Pageable): Page<PharmaModel>
 
 	fun findByThisPK(pharmaPK: String): PharmaModel?
+	fun findAllByThisPKIn(pharmaPK: List<String>): List<PharmaModel>
 
 	fun findAllByCodeIn(codes: List<Int>): List<PharmaModel>
 

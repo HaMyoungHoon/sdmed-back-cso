@@ -93,14 +93,13 @@ class HospitalService {
 
 	private fun insertAll(data: List<HospitalModel>): Int {
 		val values: String = data.stream().map(this::renderSqlForHosModel).collect(Collectors.joining(","))
-		val ret = entityManager.createNativeQuery("${FConstants.MODEL_HOS_INSERT_INTO}$values").executeUpdate()
+		val sqlString = "${FConstants.MODEL_HOS_INSERT_INTO}$values"
+		val ret = entityManager.createNativeQuery(sqlString).executeUpdate()
 		entityManager.flush()
 		entityManager.clear()
 		return ret
 	}
-	private fun renderSqlForHosModel(data: HospitalModel): String {
-		return data.insertString()
-	}
+	private fun renderSqlForHosModel(data: HospitalModel) = data.insertString()
 	fun getUserData(id: String) = userDataRepository.selectById(id)
 	fun getUserDataByToken(token: String) = userDataRepository.selectById(jwtTokenProvider.getAllClaimsFromToken(token).subject)
 	fun isValid(token: String) {

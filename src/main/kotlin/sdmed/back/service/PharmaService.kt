@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
 import sdmed.back.advice.exception.AuthenticationEntryPointException
 import sdmed.back.advice.exception.NotValidOperationException
+import sdmed.back.advice.exception.PharmaNotFoundException
 import sdmed.back.config.FConstants
 import sdmed.back.config.FExcelFileParser
 import sdmed.back.config.jpa.CSOJPAConfig
@@ -70,8 +71,13 @@ class PharmaService {
 			ret.medicineList.addAll(if (historical) {
 				medicineRepository.findAllByPharma(it)
 			} else {
-				medicineRepository.selectAllByRecentChild(it.thisPK)
-			})
+				medicineRepository.findAllByPharma(it)
+		})
+//			ret.medicineList.addAll(if (historical) {
+//				medicineRepository.findAllByPharma(it)
+//			} else {
+//				medicineRepository.selectAllByRecentChild(it.thisPK)
+//			})
 		}
 
 		return ret
@@ -84,7 +90,7 @@ class PharmaService {
 			throw AuthenticationEntryPointException()
 		}
 
-		val ret = pharmaRepository.findByThisPK(pharmaPK) ?: throw NotValidOperationException()
+		val ret = pharmaRepository.findByThisPK(pharmaPK) ?: throw PharmaNotFoundException()
 		ret.medicineList.addAll(medicineRepository.findAllByPharma(ret))
 		val buff = medicinePKList.toMutableList().distinct().toMutableList()
 		buff.removeIf { x -> x in ret.medicineList.map { y -> y.thisPK } }
@@ -189,14 +195,13 @@ class PharmaService {
 
 	private fun insertAll(data: List<PharmaModel>): Int {
 		val values: String = data.stream().map(this::renderSqlForPharmaModel).collect(Collectors.joining(","))
-		val ret = entityManager.createNativeQuery("${FConstants.MODEL_PHARMA_INSERT_INTO}$values").executeUpdate()
+		val sqlString = "${FConstants.MODEL_PHARMA_INSERT_INTO}$values"
+		val ret = entityManager.createNativeQuery(sqlString).executeUpdate()
 		entityManager.flush()
 		entityManager.clear()
 		return ret
 	}
-	private fun renderSqlForPharmaModel(data: PharmaModel): String {
-		return data.insertString()
-	}
+	private fun renderSqlForPharmaModel(data: PharmaModel) = data.insertString()
 	fun getUserData(id: String) = userDataRepository.selectById(id)
 	fun getUserDataByToken(token: String) = userDataRepository.selectById(jwtTokenProvider.getAllClaimsFromToken(token).subject)
 	fun isValid(token: String) {

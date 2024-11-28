@@ -50,30 +50,21 @@ data class UserDataModel(
 	var regDate: Timestamp = Timestamp(Date().time),
 	@Column
 	var lastLoginDate: Timestamp? = null,
-	@OneToMany(fetch = FetchType.EAGER, cascade = [CascadeType.ALL])
+	@OneToMany(fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
 	@JoinColumn
-	@JsonManagedReference
-	var children: MutableList<UserDataModel>? = null,
+	@JsonManagedReference(value = "userDataBackReference")
+	var children: MutableList<UserDataModel> = mutableListOf(),
 	@ManyToOne(fetch = FetchType.LAZY, optional = true)
 	@JoinColumn
-	@JsonBackReference
-	@JsonIgnore
+	@JsonBackReference(value = "userDataBackReference")
 	var userData: UserDataModel? = null,
-	@OneToMany(fetch = FetchType.EAGER, cascade = [CascadeType.ALL], mappedBy = "userDataModel")
-	var userPharma: MutableList<UserPharmaModel>? = null,
+	@Transient
+	var hosList: MutableList<HospitalModel> = mutableListOf()
 ) {
-	fun setChild(): UserDataModel {
-		children?.forEach {
-			it.userData = this
-			it.setChild()
-		}
+	fun lazyHide(): UserDataModel {
+		userData = null
+		children.onEach { it.lazyHide() }
 		return this
-	}
-	fun init() {
-		userPharma = mutableListOf()
-		children?.forEach {
-			it.init()
-		}
 	}
 	fun buildData(claims: Claims): UserDataModel {
 		this.thisPK = claims[FConstants.CLAIM_INDEX].toString()
@@ -86,7 +77,7 @@ data class UserDataModel(
 	}
 	fun addChild(child: List<UserDataModel>) {
 		val childBuff = child.filterNot { isAncestorOf(it.id) }.filterNot { it.userData != null }.onEach { it.userData = this }
-		children?.addAll(childBuff)
+		children.addAll(childBuff)
 	}
 	private fun isAncestorOf(userID: String): Boolean {
 		var currentMother = this.userData

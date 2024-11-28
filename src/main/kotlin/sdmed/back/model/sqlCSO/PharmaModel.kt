@@ -62,16 +62,19 @@ data class PharmaModel(
 	var etc2: String = "",
 	@Column(columnDefinition = "nvarchar(500)", nullable = false)
 	var imageUrl: String = "",
-	@OneToMany(fetch = FetchType.LAZY, cascade = [CascadeType.ALL], mappedBy = "pharmaModel")
-	var userPharma: MutableList<UserPharmaModel>? = null,
-	@OneToMany(fetch = FetchType.LAZY, cascade = [CascadeType.ALL], mappedBy = "pharmaModel")
-	var pharmaHos: MutableList<PharmaHosModel>? = null,
 	@OneToMany(fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
 	@JoinColumn
-	@JsonManagedReference
-	var medicineList: MutableList<MedicineModel> = mutableListOf()
+	@JsonManagedReference(value = "pharmaMedicineManagedReference")
+	var medicineList: MutableList<MedicineModel> = mutableListOf(),
+	@Transient
+	var relationMedicineList: MutableList<MedicineModel> = mutableListOf(),
 	) {
-
+	fun lazyHide() {
+		medicineList.onEach { it.lazyHide() }
+	}
+	fun ownMedicineHide() {
+		medicineList = mutableListOf()
+	}
 	fun findHeader(data: List<String>): Boolean {
 		if (data.size < FConstants.MODEL_PHARMA_COUNT) {
 			return false

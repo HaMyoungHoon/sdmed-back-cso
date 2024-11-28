@@ -11,4 +11,6 @@ interface IHospitalRepository: JpaRepository<HospitalModel, String> {
 	fun findAllByOrderByCode(): List<HospitalModel>
 	fun findAllByOrderByCode(pageable: Pageable): Page<HospitalModel>
 	fun findAllByCodeIn(codes: List<Int>): List<HospitalModel>
+
+	fun findAllByThisPKIn(hosPK: List<String>): List<HospitalModel>
 }

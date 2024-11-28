@@ -107,7 +107,7 @@ class FExcelFileParser {
 			if (setRowRet == false) {
 				return@forEach
 			}
-			model.applyDate = applyDate
+			model.childDataSet(model.kdCode, applyDate)
 			ret.add(model)
 		}
 
