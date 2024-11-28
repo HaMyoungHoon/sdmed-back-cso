@@ -38,14 +38,14 @@ class PharmaService {
 
 	fun getAllPharma(token: String): List<PharmaModel> {
 		isValid(token)
-		val tokenUser = getUserDataByToken(token) ?: throw UserNotFoundException()
+		val tokenUser = getUserDataByToken(token)
 		isLive(tokenUser)
 
 		return pharmaRepository.findAllByOrderByCode()
 	}
 	fun getPagePharma(token: String, page: Int, size: Int): Page<PharmaModel> {
 		isValid(token)
-		val tokenUser = getUserDataByToken(token) ?: throw UserNotFoundException()
+		val tokenUser = getUserDataByToken(token)
 		isLive(tokenUser)
 
 		val pageable = PageRequest.of(page, size)
@@ -57,7 +57,7 @@ class PharmaService {
 	}
 	fun getPharma(token: String, pharmaPK: String, pharmaOwnMedicineView: Boolean = false): PharmaModel {
 		isValid(token)
-		val tokenUser = getUserDataByToken(token) ?: throw UserNotFoundException()
+		val tokenUser = getUserDataByToken(token)
 		isLive(tokenUser)
 
 		val ret = pharmaRepository.findByThisPK(pharmaPK)?.apply {
@@ -72,7 +72,7 @@ class PharmaService {
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
 	fun addPharmaDrugList(token: String, pharmaPK: String, medicinePKList: List<String>) {
 		isValid(token)
-		val tokenUser = getUserDataByToken(token) ?: throw UserNotFoundException()
+		val tokenUser = getUserDataByToken(token)
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.PharmaFileUploader))) {
 			throw AuthenticationEntryPointException()
 		}
@@ -103,7 +103,7 @@ class PharmaService {
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
 	fun modPharmaDrugList(token: String, pharmaPK: String, medicinePKList: List<String>) {
 		isValid(token)
-		val tokenUser = getUserDataByToken(token) ?: throw UserNotFoundException()
+		val tokenUser = getUserDataByToken(token)
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.PharmaFileUploader))) {
 			throw AuthenticationEntryPointException()
 		}
@@ -127,7 +127,7 @@ class PharmaService {
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
 	fun pharmaDataModify(token: String, pharmaData: PharmaModel): PharmaModel {
 		isValid(token)
-		val tokenUser = getUserDataByToken(token) ?: throw UserNotFoundException()
+		val tokenUser = getUserDataByToken(token)
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.PharmaFileUploader))) {
 			throw AuthenticationEntryPointException()
 		}
@@ -142,7 +142,7 @@ class PharmaService {
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
 	fun pharmaUpload(token: String, file: MultipartFile): String {
 		isValid(token)
-		val tokenUser = getUserDataByToken(token) ?: throw UserNotFoundException()
+		val tokenUser = getUserDataByToken(token)
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.PharmaFileUploader))) {
 			throw AuthenticationEntryPointException()
 		}
@@ -189,8 +189,8 @@ class PharmaService {
 		return ret
 	}
 	private fun renderSqlForPharmaModel(data: PharmaModel) = data.insertString()
-	fun getUserData(id: String) = userDataRepository.selectById(id)
-	fun getUserDataByToken(token: String) = userDataRepository.selectById(jwtTokenProvider.getAllClaimsFromToken(token).subject)
+	fun getUserData(id: String) = userDataRepository.selectById(id)?.lazyHide() ?: throw UserNotFoundException()
+	fun getUserDataByToken(token: String) = getUserData(jwtTokenProvider.getAllClaimsFromToken(token).subject)
 	fun isValid(token: String) {
 		if (!jwtTokenProvider.validateToken(token)) {
 			throw AuthenticationEntryPointException()

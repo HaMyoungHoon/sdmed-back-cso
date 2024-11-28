@@ -1,13 +1,16 @@
 package sdmed.back.model.sqlCSO
 
 import com.fasterxml.jackson.annotation.JsonBackReference
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonManagedReference
 import jakarta.persistence.*
+import org.hibernate.annotations.BatchSize
 import sdmed.back.config.FConstants
 import sdmed.back.config.FExtensions
 import java.util.*
 
 @Entity
+@BatchSize(size = 20)
 data class MedicineModel(
 	@Id
 	@Column(columnDefinition = "nvarchar(36)", updatable = false, nullable = false)
@@ -33,6 +36,9 @@ data class MedicineModel(
 	@Column
 	var general: Int = 0,
 	@Transient
+	var maxPrice: Int = 0,
+	@Transient
+	@JsonIgnore
 	var etc: String = "",
 	@Column
 	var ancestorCode: Int = 0,
@@ -47,6 +53,8 @@ data class MedicineModel(
 ) {
 	fun lazyHide() {
 		pharma = null
+		medicinePriceModel.forEach { it.medicineModel = null }
+		maxPrice = medicinePriceModel.maxByOrNull { it.applyDate }?.maxPrice ?: 0
 	}
 	fun findHeader(data: List<String>): Boolean {
 		if (data.size < FConstants.MODEL_DRUG_COUNT) {

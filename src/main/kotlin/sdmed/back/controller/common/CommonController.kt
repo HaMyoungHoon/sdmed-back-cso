@@ -27,7 +27,7 @@ class CommonController {
 
 	@Operation(summary = "language set", description = "")
 	@PostMapping(value = ["/lang"])
-	fun setLanguage(@Parameter(name = "lang") @RequestParam lang: String): IRestResult {
+	fun setLanguage(@RequestParam(required = true) lang: String): IRestResult {
 		when (lang) {
 			"ko" -> LocaleContextHolder.setDefaultLocale(Locale.KOREA)
 			"en" -> LocaleContextHolder.setDefaultLocale(Locale.ENGLISH)

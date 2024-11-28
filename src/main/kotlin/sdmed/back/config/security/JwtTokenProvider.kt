@@ -44,7 +44,7 @@ class JwtTokenProvider {
 	}
 	fun getAllClaimsFromToken(token : String): Claims = Jwts.parser().verifyWith(getSecretKey()).build().parseSignedClaims(token).payload
 	fun getUserPk(token : String): String = getAllClaimsFromToken(token).subject
-	fun getUserData(token: String): UserDataModel? = userDataRepository.selectById(getUserPk(token))
+	fun getUserData(token: String): UserDataModel? = userDataRepository.selectById(getUserPk(token))?.lazyHide()
 	fun resolveToken(req : HttpServletRequest): String? =
 		req.getHeader(authToken)
 	fun validateToken(token : String) = try {

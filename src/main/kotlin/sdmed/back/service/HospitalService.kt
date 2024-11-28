@@ -37,7 +37,7 @@ class HospitalService {
 
 	fun getAllHospital(token: String): List<HospitalModel> {
 		isValid(token)
-		val tokenUser = getUserDataByToken(token) ?: throw UserNotFoundException()
+		val tokenUser = getUserDataByToken(token)
 		isLive(tokenUser)
 
 		return hospitalRepository.findAllByOrderByCode()
@@ -45,7 +45,7 @@ class HospitalService {
 
 	fun getPageHospital(token: String, page: Int, size: Int): Page<HospitalModel> {
 		isValid(token)
-		val tokenUser = getUserDataByToken(token) ?: throw UserNotFoundException()
+		val tokenUser = getUserDataByToken(token)
 		isLive(tokenUser)
 
 		val pageable = PageRequest.of(page, size)
@@ -54,7 +54,7 @@ class HospitalService {
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
 	fun hospitalUpload(token: String, file: MultipartFile): String {
 		isValid(token)
-		val tokenUser = getUserDataByToken(token) ?: throw UserNotFoundException()
+		val tokenUser = getUserDataByToken(token)
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.HospitalFileUploader))) {
 			throw AuthenticationEntryPointException()
 		}
@@ -101,8 +101,8 @@ class HospitalService {
 		return ret
 	}
 	private fun renderSqlForHosModel(data: HospitalModel) = data.insertString()
-	fun getUserData(id: String) = userDataRepository.selectById(id)
-	fun getUserDataByToken(token: String) = userDataRepository.selectById(jwtTokenProvider.getAllClaimsFromToken(token).subject)
+	fun getUserData(id: String) = userDataRepository.selectById(id)?.lazyHide() ?: throw UserNotFoundException()
+	fun getUserDataByToken(token: String) = getUserData(jwtTokenProvider.getAllClaimsFromToken(token).subject)
 	fun isValid(token: String) {
 		if (!jwtTokenProvider.validateToken(token)) {
 			throw AuthenticationEntryPointException()

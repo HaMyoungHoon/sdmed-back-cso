@@ -41,11 +41,11 @@ class MedicineService {
 
 	fun getMedicine(token: String): List<MedicineModel> {
 		isValid(token)
-		return medicineRepository.findAll()
+		return medicineRepository.selectAll().onEach { it.lazyHide() }
 	}
 	fun getMedicine(token: String, page: Int, size: Int): Page<MedicineModel> {
 		isValid(token)
-		return medicineRepository.findAllByOrderByName(PageRequest.of(page, size))
+		return medicineRepository.findAllByOrderByName(PageRequest.of(page, size)).onEach { it.lazyHide() }
 	}
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
 	fun medicineUpload(token: String, applyDate: Date, file: MultipartFile): String {
@@ -118,7 +118,7 @@ class MedicineService {
 		return ret
 	}
 	private fun renderSqlForInsertMedicinePriceModel(data: MedicinePriceModel) = data.insertString()
-	fun getUserData(id: String) = userDataRepository.selectById(id)
+	fun getUserData(id: String) = userDataRepository.selectById(id)?.lazyHide()
 	fun getUserDataByToken(token: String) = userDataRepository.selectById(jwtTokenProvider.getAllClaimsFromToken(token).subject)
 	fun isValid(token: String) {
 		if (!jwtTokenProvider.validateToken(token)) {

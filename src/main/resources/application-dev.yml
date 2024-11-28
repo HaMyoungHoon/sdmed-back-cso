@@ -15,7 +15,7 @@ spring:
     encoding: UTF-8
 
   jackson:
-    time-zone: UTC
+    time-zone: Asia/Seoul
 
   jwt:
     secret: 65748520123456788765432165748520
