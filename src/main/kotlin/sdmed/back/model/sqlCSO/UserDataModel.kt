@@ -24,7 +24,7 @@ data class UserDataModel(
 	var pw: String = "",
 	@Column(columnDefinition = "nvarchar(255)", nullable = false)
 	var name: String = "",
-	@Column(columnDefinition = "varchar(255)", nullable = false)
+	@Column(columnDefinition = "nvarchar(255)", nullable = false)
 	var mail: String = "",
 	@Column(columnDefinition = "nvarchar(255)", nullable = false)
 	var phoneNumber: String = "",
@@ -34,17 +34,17 @@ data class UserDataModel(
 	var dept: Int = UserDept.None.flag,
 	@Column
 	var status: UserStatus = UserStatus.None,
-	@Column(columnDefinition = "varchar(500)")
+	@Column(columnDefinition = "text")
 	var taxpayerImageUrl: String = "",
-	@Column(columnDefinition = "varchar(255)", nullable = false)
+	@Column(columnDefinition = "nvarchar(255)", nullable = false)
 	var companyName: String = "",
-	@Column(columnDefinition = "varchar(255)", nullable = false)
+	@Column(columnDefinition = "nvarchar(255)", nullable = false)
 	var companyNumber: String = "",
-	@Column(columnDefinition = "varchar(255)", nullable = false)
+	@Column(columnDefinition = "nvarchar(255)", nullable = false)
 	var companyAddress: String = "",
-	@Column(columnDefinition = "varchar(500)", nullable = false)
+	@Column(columnDefinition = "text", nullable = false)
 	var bankAccountImageUrl: String = "",
-	@Column(columnDefinition = "varchar(255)", nullable = false)
+	@Column(columnDefinition = "nvarchar(255)", nullable = false)
 	var bankAccount: String = "",
 	@Column
 	var regDate: Timestamp = Timestamp(Date().time),

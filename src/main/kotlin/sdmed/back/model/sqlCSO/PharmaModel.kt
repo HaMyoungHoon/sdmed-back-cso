@@ -56,11 +56,11 @@ data class PharmaModel(
 	var openDate: Date? = null,
 	@Column
 	var closeDate: Date? = null,
-	@Column(columnDefinition = "nvarchar(500)", nullable = false)
+	@Column(columnDefinition = "text", nullable = false)
 	var etc1: String = "",
-	@Column(columnDefinition = "nvarchar(500)", nullable = false)
+	@Column(columnDefinition = "text", nullable = false)
 	var etc2: String = "",
-	@Column(columnDefinition = "nvarchar(500)", nullable = false)
+	@Column(columnDefinition = "text", nullable = false)
 	var imageUrl: String = "",
 	@OneToMany(fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
 	@JoinColumn

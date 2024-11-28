@@ -59,11 +59,11 @@ data class HospitalModel(
 	var openDate: Date? = null,
 	@Column
 	var closeDate: Date? = null,
-	@Column(columnDefinition = "nvarchar(500)", nullable = false)
+	@Column(columnDefinition = "text", nullable = false)
 	var etc1: String = "",
-	@Column(columnDefinition = "nvarchar(500)", nullable = false)
+	@Column(columnDefinition = "text", nullable = false)
 	var etc2: String = "",
-	@Column(columnDefinition = "nvarchar(500)", nullable = false)
+	@Column(columnDefinition = "text", nullable = false)
 	var imageUrl: String = "",
 	@Transient
 	var pharmaList: MutableList<PharmaModel> = mutableListOf(),
