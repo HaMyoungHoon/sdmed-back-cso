@@ -7,8 +7,9 @@ import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
+import sdmed.back.advice.exception.AccessDeniedException
 import sdmed.back.advice.exception.AuthenticationEntryPointException
-import sdmed.back.advice.exception.NotValidOperationException
+import sdmed.back.advice.exception.UserNotFoundException
 import sdmed.back.config.FConstants
 import sdmed.back.config.FExcelFileParser
 import sdmed.back.config.jpa.CSOJPAConfig
@@ -36,7 +37,7 @@ class HospitalService {
 
 	fun getAllHospital(token: String): List<HospitalModel> {
 		isValid(token)
-		val tokenUser = getUserDataByToken(token) ?: throw AuthenticationEntryPointException()
+		val tokenUser = getUserDataByToken(token) ?: throw UserNotFoundException()
 		isLive(tokenUser)
 
 		return hospitalRepository.findAllByOrderByCode()
@@ -44,7 +45,7 @@ class HospitalService {
 
 	fun getPageHospital(token: String, page: Int, size: Int): Page<HospitalModel> {
 		isValid(token)
-		val tokenUser = getUserDataByToken(token) ?: throw AuthenticationEntryPointException()
+		val tokenUser = getUserDataByToken(token) ?: throw UserNotFoundException()
 		isLive(tokenUser)
 
 		val pageable = PageRequest.of(page, size)
@@ -53,7 +54,7 @@ class HospitalService {
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
 	fun hospitalUpload(token: String, file: MultipartFile): String {
 		isValid(token)
-		val tokenUser = getUserDataByToken(token) ?: throw AuthenticationEntryPointException()
+		val tokenUser = getUserDataByToken(token) ?: throw UserNotFoundException()
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.HospitalFileUploader))) {
 			throw AuthenticationEntryPointException()
 		}
@@ -109,7 +110,7 @@ class HospitalService {
 	}
 	fun isLive(user: UserDataModel, notLiveThrow: Boolean = true): Boolean {
 		return if (user.status == UserStatus.Live) true
-		else if (notLiveThrow) throw NotValidOperationException()
+		else if (notLiveThrow) throw AccessDeniedException()
 		else false
 	}
 	fun haveRole(user: UserDataModel, targetRole: UserRoles): Boolean {

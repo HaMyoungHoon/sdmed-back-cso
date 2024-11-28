@@ -1,79 +1,107 @@
 unKnown:
-  code: "-9999"
-  msg: "an unknown error has occurred."
+  code: "-99999"
+  msg: "An unknown error occurred."
 
-userNotFound:
-  code: "-1000"
-  msg: "this member not exist."
+accessDeniedException:
+  code: "-10001"
+  msg: "Access is denied."
 
-signInFailed:
-  code: "-1001"
-  msg: "your account does not exist or password incorrect."
+authenticationEntryPointException:
+  code: "-10002"
+  msg: "Invalid access."
 
-signUpFailed:
-  code: "-1002"
-  msg: "this account is already registered."
+communicationException:
+  code: "-10003"
+  msg: "A communication error occurred."
 
-entryPoint:
-  code: "-1003"
-  msg: "you do not have permission to access this resource."
+confirmPasswordUnMatchException:
+  code: "-10004"
+  msg: "Passwords do not match."
 
-accessDenied:
-  code: "-1004"
-  msg: "a resource that can not be accessed with the privileges it has."
+fileDownloadException:
+  code: "-10005"
+  msg: "File download failed."
 
-communicationError:
-  code: "-1005"
-  msg: "an error occurred during communication."
+fileUploadException:
+  code: "-10006"
+  msg: "File upload failed."
 
-resourceNotExist:
-  code: "-1006"
-  msg: "not exist resource."
+hosDataFileUploadException:
+  code: "-10007"
+  msg: "Hospital data upload failed."
 
-notOwner:
-  code: "-1007"
-  msg: "you do not have access, or you do not own the resource."
+hospitalNotFoundException:
+  code: "-10008"
+  msg: "Hospital information not found."
 
-forbiddenWord:
-  code: "-1008"
-  msg: "forbidden words ({0}) are included in the input."
+medicineDataFileUploadException:
+  code: "-10009"
+  msg: "Medicine data upload failed."
 
-fileUpload:
-  code: "-1009"
-  msg: "file upload failed"
+medicineNotFoundException:
+  code: "-10010"
+  msg: "Medicine information not found."
 
-fileDownload:
-  code: "-1010"
-  msg: "file download failed"
+notFoundDeptException:
+  code: "-10011"
+  msg: "Department information not found."
 
 notFoundLanguage:
-  code: "-1011"
-  msg: "not ready this language"
+  code: "-10012"
+  msg: "Language setting not found."
 
-notFoundRoles:
-  code: "-1012"
-  msg: "not found this roles name"
+notFoundRolesException:
+  code: "-10013"
+  msg: "Role information not found."
 
-notFoundDept:
-  code: "-1013"
-  msg: "not found this dept name"
+notFoundSystemException:
+  code: "-10014"
+  msg: "System information not found."
 
-notFoundSystem:
-  code: "-1014"
-  msg: "not found this system name"
+notOwnerException:
+  code: "-10015"
+  msg: "Not owned data."
 
-notValidOperation:
-  code: "-1015"
-  msg: "not valid operation"
+notValidOperationException:
+  code: "-10016"
+  msg: "Invalid operation."
+
+pharmaDataFileUploadException:
+  code: "-10017"
+  msg: "Pharmaceutical data upload failed."
+
+pharmaNotFoundException:
+  code: "-10018"
+  msg: "Pharmaceutical information not found."
 
 resourceAlreadyExistException:
-  code: "-1016"
-  msg: "resource already exist"
+  code: "-10019"
+  msg: "Resource already exists."
+
+resourceNotExistException:
+  code: "-10020"
+  msg: "Resource does not exist."
+
+signInFailedException:
+  code: "-10021"
+  msg: "Sign-in failed."
+
+signUpFailedException:
+  code: "-10022"
+  msg: "Sign-up failed."
+
+signUpIDConditionException:
+  code: "-10023"
+  msg: "ID does not meet sign-up conditions."
+
+signUpPWConditionException:
+  code: "-10024"
+  msg: "Password does not meet sign-up conditions."
 
 userDataFileUploadException:
-  code: "-1017"
-  msg: "the file format is invalid"
+  code: "-10025"
+  msg: "User data upload failed."
 
-correspondentDataFileUploadException:
-  code: "-1017"
-  msg: "the file format is invalid"
+userNotFoundException:
+  code: "-10026"
+  msg: "User not found."

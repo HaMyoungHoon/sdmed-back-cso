@@ -1,79 +1,107 @@
 unKnown:
-  code: "-9999"
+  code: "-99999"
   msg: "알 수 없는 오류가 발생하였습니다."
 
-userNotFound:
-  code: "-1000"
-  msg: "존재하지 않는 회원입니다."
+accessDeniedException:
+  code: "-10001"
+  msg: "접근이 거부 되었습니다."
 
-signInFailed:
-  code: "-1001"
-  msg: "계정이 존재하지 않거나, 비밀번호가 맞지 않습니다."
+authenticationEntryPointException:
+  code: "-10002"
+  msg: "잘못 된 접근입니다."
 
-signUpFailed:
-  code: "-1002"
-  msg: "이미 등록된 계정입니다."
+communicationException:
+  code: "-10003"
+  msg: "통신 에러가 발생했습니다."
 
-entryPoint:
-  code: "-1003"
-  msg: "해당 리소스에 접근하기 위한 권한이 없습니다."
+confirmPasswordUnMatchException:
+  code: "-10004"
+  msg: "비밀번호가 다릅니다."
 
-accessDenied:
-  code: "-1004"
-  msg: "보유한 권한으로 접근할 수 없는 리소스 입니다."
+fileDownloadException:
+  code: "-10005"
+  msg: "파일 다운로드를 실패했습니다."
 
-communicationError:
-  code: "-1005"
-  msg: "통신 중 오류가 발생하였습니다."
+fileUploadException:
+  code: "-10006"
+  msg: "파일 업로드를 실패했습니다."
 
-resourceNotExist:
-  code: "-1006"
-  msg: "리소스가 존재하지 않습니다."
+hosDataFileUploadException:
+  code: "-10007"
+  msg: "병원 데이터 업로드에 실패했습니다."
 
-notOwner:
-  code: "-1007"
-  msg: "접근 권한이 없거나, 소유의 리소스가 아닙니다."
+hospitalNotFoundException:
+  code: "-10008"
+  msg: "병원 정보를 찾을 수 없습니다."
 
-forbiddenWord:
-  code: "-1008"
-  msg: "입력한 내용에 금칙어({0})가 포함되어 있습니다."
+medicineDataFileUploadException:
+  code: "-10009"
+  msg: "의약품 데이터 업로드에 실패했습니다."
 
-fileUpload:
-  code: "-1009"
-  msg: "파일 업로드에 실패했습니다."
+medicineNotFoundException:
+  code: "-10010"
+  msg: "의약품 정보를 찾을 수 없습니다."
 
-fileDownload:
-  code: "-1010"
-  msg: "파일 다운로드에 실패했습니다."
+notFoundDeptException:
+  code: "-10011"
+  msg: "부서 정보를 찾을 수 없습니다."
 
 notFoundLanguage:
-  code: "-1011"
-  msg: "해당 언어는 존재하지 않습니다."
+  code: "-10012"
+  msg: "언어 설정을 찾을 수 없습니다."
 
-notFoundRoles:
-  code: "-1012"
-  msg: "해당 권한은 존재하지 않습니다."
+notFoundRolesException:
+  code: "-10013"
+  msg: "권한 정보를 찾을 수 없습니다."
 
-notFoundDept:
-  code: "-1013"
-  msg: "해당 부서는 존재하지 않습니다."
+notFoundSystemException:
+  code: "-10014"
+  msg: "시스템 정보를 찾을 수 없습니다."
 
-notFoundSystem:
-  code: "-1014"
-  msg: "해당 시스템은 존재하지 않습니다."
+notOwnerException:
+  code: "-10015"
+  msg: "소유한 데이터가 아닙니다."
 
-notValidOperation:
-  code: "-1015"
+notValidOperationException:
+  code: "-10016"
   msg: "불가능한 수행입니다."
 
+pharmaDataFileUploadException:
+  code: "-10017"
+  msg: "제약사 데이터 업로드에 실패했습니다."
+
+pharmaNotFoundException:
+  code: "-10018"
+  msg: "제약사 정보를 찾을 수 없습니다."
+
 resourceAlreadyExistException:
-  code: "-1016"
-  msg: "리소스가 이미 존재합니다."
+  code: "-10019"
+  msg: "이미 존재하는 리소스입니다."
+
+resourceNotExistException:
+  code: "-10020"
+  msg: "리소스가 존재하지 않습니다."
+
+signInFailedException:
+  code: "-10021"
+  msg: "로그인에 실패했습니다."
+
+signUpFailedException:
+  code: "-10022"
+  msg: "회원가입에 실패했습니다."
+
+signUpIDConditionException:
+  code: "-10023"
+  msg: "아이디가 가입 조건에 맞지 않습니다."
+
+signUpPWConditionException:
+  code: "-10024"
+  msg: "비밀번호가 가입 조건에 맞지 않습니다."
 
 userDataFileUploadException:
-  code: "-1017"
-  msg: "파일 형식이 이상합니다."
+  code: "-10025"
+  msg: "유저 데이터 업로드에 실패했습니다."
 
-correspondentDataFileUploadException:
-  code: "-1017"
-  msg: "파일 형식이 이상합니다."
+userNotFoundException:
+  code: "-10026"
+  msg: "유저를 찾을 수 없습니다."

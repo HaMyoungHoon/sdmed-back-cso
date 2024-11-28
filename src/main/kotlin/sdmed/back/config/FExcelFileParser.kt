@@ -2,6 +2,9 @@ package sdmed.back.config
 
 import org.springframework.stereotype.Component
 import org.springframework.web.multipart.MultipartFile
+import sdmed.back.advice.exception.HosDataFileUploadException
+import sdmed.back.advice.exception.MedicineDataFileUploadException
+import sdmed.back.advice.exception.PharmaDataFileUploadException
 import sdmed.back.advice.exception.UserDataFileUploadException
 import sdmed.back.model.sqlCSO.*
 import java.util.*
@@ -41,7 +44,7 @@ class FExcelFileParser {
 
 		if (!PharmaModel().findHeader(excelSheetHandler.header)) {
 			FExtensions.fileDelete(copiedLocation)
-			throw UserDataFileUploadException()
+			throw PharmaDataFileUploadException()
 		}
 
 		val ret: MutableList<PharmaModel> = mutableListOf()
@@ -50,7 +53,7 @@ class FExcelFileParser {
 			val setRowRet = model.rowSet(x)
 			if (setRowRet == null) {
 				FExtensions.fileDelete(copiedLocation)
-				throw UserDataFileUploadException(model.errorString())
+				throw PharmaDataFileUploadException(model.errorString())
 			}
 			if (setRowRet == false) {
 				return@forEach
@@ -67,7 +70,7 @@ class FExcelFileParser {
 
 		if (!HospitalModel().findHeader(excelSheetHandler.header)) {
 			FExtensions.fileDelete(copiedLocation)
-			throw UserDataFileUploadException()
+			throw HosDataFileUploadException()
 		}
 
 		val ret: MutableList<HospitalModel> = mutableListOf()
@@ -76,7 +79,7 @@ class FExcelFileParser {
 			val setRowRet = model.rowSet(x)
 			if (setRowRet == null) {
 				FExtensions.fileDelete(copiedLocation)
-				throw UserDataFileUploadException(model.errorString())
+				throw HosDataFileUploadException(model.errorString())
 			}
 			if (setRowRet == false) {
 				return@forEach
@@ -93,7 +96,7 @@ class FExcelFileParser {
 
 		if (!MedicineModel().findHeader(excelSheetHandler.header)) {
 			FExtensions.fileDelete(copiedLocation)
-			throw UserDataFileUploadException()
+			throw MedicineDataFileUploadException()
 		}
 
 		val ret: MutableList<MedicineModel> = mutableListOf()
@@ -102,7 +105,7 @@ class FExcelFileParser {
 			val setRowRet = model.rowSet(x)
 			if (setRowRet == null) {
 				FExtensions.fileDelete(copiedLocation)
-				throw UserDataFileUploadException(model.errorString())
+				throw MedicineDataFileUploadException(model.errorString())
 			}
 			if (setRowRet == false) {
 				return@forEach

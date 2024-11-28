@@ -71,7 +71,7 @@ class PharmaController {
 															@PathVariable("pharmaPK") pharmaPK: String,
 															@RequestParam file: MultipartFile): IRestResult {
 		pharmaService.isValid(token)
-		val tokenUser = pharmaService.getUserDataByToken(token) ?: throw AuthenticationEntryPointException()
+		val tokenUser = pharmaService.getUserDataByToken(token) ?: throw UserNotFoundException()
 		if (!pharmaService.haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.PharmaFileUploader))) {
 			throw AuthenticationEntryPointException()
 		}

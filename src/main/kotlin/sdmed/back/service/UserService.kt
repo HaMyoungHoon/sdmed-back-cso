@@ -57,14 +57,12 @@ class UserService {
 	}
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
 	fun signIn(id: String, pw: String): String {
-		val user = getUserDataByID(id) ?: throw SignInFailedException()
+		val user = getUserDataByID(id)
 		val encryptPW = fAmhohwa.encrypt(pw)
 		if (user.pw != encryptPW) {
-			throw SignInFailedException()
+			throw ConfirmPasswordUnMatchException()
 		}
-		if (!isLive(user, false)) {
-			throw SignInFailedException()
-		}
+		isLive(user)
 
 		user.lastLoginDate = Timestamp(Date().time)
 		userDataRepository.save(user)
@@ -75,14 +73,14 @@ class UserService {
 	}
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
 	fun signUp(confirmPW: String, data: UserDataModel): UserDataModel {
-		if (data.id.length < 3 || data.pw.length < 3) {
-			throw SignUpFailedException()
+		if (data.id.length < 3) {
+			throw SignUpIDConditionException()
 		}
-		if (data.pw.isEmpty()) {
+		if (data.pw.length < 3) {
 			throw SignUpFailedException()
 		}
 		if (data.pw != confirmPW) {
-			throw SignUpFailedException()
+			throw SignUpPWConditionException()
 		}
 		val existUser = userDataRepository.selectById(data.id)
 		if (existUser != null) {
@@ -139,7 +137,7 @@ class UserService {
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
 	fun userStatusModify(token: String, id: String, status: UserStatus): UserDataModel {
 		isValid(token)
-		val tokenUser = getUserDataByToken(token) ?: throw AuthenticationEntryPointException()
+		val tokenUser = getUserDataByToken(token) ?: throw UserNotFoundException()
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.StatusChanger))) {
 			throw AuthenticationEntryPointException()
 		}
@@ -155,7 +153,7 @@ class UserService {
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
 	fun userDataModify(token: String, userData: UserDataModel): UserDataModel {
 		isValid(token)
-		val tokenUser = getUserDataByToken(token) ?: throw AuthenticationEntryPointException()
+		val tokenUser = getUserDataByToken(token) ?: throw UserNotFoundException()
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.StatusChanger))) {
 			throw AuthenticationEntryPointException()
 		}
@@ -172,7 +170,7 @@ class UserService {
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
 	fun userRoleModify(token: String, id: String, roleList: List<UserRole>): UserDataModel {
 		isValid(token)
-		val tokenUser = getUserDataByToken(token) ?: throw AuthenticationEntryPointException()
+		val tokenUser = getUserDataByToken(token) ?: throw UserNotFoundException()
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.RoleChanger))) {
 			throw AuthenticationEntryPointException()
 		}
@@ -191,7 +189,7 @@ class UserService {
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
 	fun userDeptModify(token: String, id: String, deptList: List<UserDept>): UserDataModel {
 		isValid(token)
-		val tokenUser = getUserDataByToken(token) ?: throw AuthenticationEntryPointException()
+		val tokenUser = getUserDataByToken(token) ?: throw UserNotFoundException()
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.DeptChanger))) {
 			throw AuthenticationEntryPointException()
 		}
@@ -210,7 +208,7 @@ class UserService {
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
 	fun addChild(token: String, motherID: String, childID: List<String>): UserDataModel {
 		isValid(token)
-		val tokenUser = getUserDataByToken(token) ?: throw AuthenticationEntryPointException()
+		val tokenUser = getUserDataByToken(token) ?: throw UserNotFoundException()
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.UserChildChanger))) {
 			throw AuthenticationEntryPointException()
 		}
@@ -234,7 +232,7 @@ class UserService {
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
 	fun delChild(token: String, motherID: String, childID: List<String>): UserDataModel {
 		isValid(token)
-		val tokenUser = getUserDataByToken(token) ?: throw AuthenticationEntryPointException()
+		val tokenUser = getUserDataByToken(token) ?: throw UserNotFoundException()
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.UserChildChanger))) {
 			throw AuthenticationEntryPointException()
 		}
@@ -254,7 +252,7 @@ class UserService {
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
 	fun userUpload(token: String, file: MultipartFile): String {
 		isValid(token)
-		val tokenUser = getUserDataByToken(token) ?: throw AuthenticationEntryPointException()
+		val tokenUser = getUserDataByToken(token) ?: throw UserNotFoundException()
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.UserFileUploader))) {
 			throw AuthenticationEntryPointException()
 		}
@@ -307,7 +305,7 @@ class UserService {
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
 	fun userRelationModify(token: String, userPK: String, hosPharmaMedicinePairModel: List<HosPharmaMedicinePairModel>): UserDataModel {
 		isValid(token)
-		val tokenUser = getUserDataByToken(token) ?: throw AuthenticationEntryPointException()
+		val tokenUser = getUserDataByToken(token) ?: throw UserNotFoundException()
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee))) {
 			throw AuthenticationEntryPointException()
 		}
@@ -418,7 +416,7 @@ class UserService {
 	}
 	fun isLive(user: UserDataModel, notLiveThrow: Boolean = true): Boolean {
 		return if (user.status == UserStatus.Live) true
-		else if (notLiveThrow) throw NotValidOperationException()
+		else if (notLiveThrow) throw AccessDeniedException()
 		else false
 	}
 	fun haveRole(user: UserDataModel, targetRole: UserRoles): Boolean {

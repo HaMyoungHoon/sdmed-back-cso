@@ -115,13 +115,13 @@ class UserController {
 														 @RequestParam(required = true) id: String,
 														 @RequestParam file: MultipartFile): IRestResult {
 		userService.isValid(token)
-		val tokenUser = userService.getUserDataByToken(token) ?: throw AuthenticationEntryPointException()
+		val tokenUser = userService.getUserDataByToken(token) ?: throw UserNotFoundException()
 		if (!userService.haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.StatusChanger))) {
 			throw AuthenticationEntryPointException()
 		}
 
 		val today = FExtensions.getDateTimeString("yyyyMMdd")
-		val userData = userService.getUserDataByID(id) ?: throw UserNotFoundException()
+		val userData = userService.getUserDataByID(id)
 		val blobUrl = azureBlobService.uploadFile(file, "${userData.id}/${today}", tokenUser.thisPK)
 		userData.bankAccountImageUrl = blobUrl
 		return responseService.getResult(userService.userDataModify(token, userData))
@@ -132,13 +132,13 @@ class UserController {
 	                           @RequestParam(required = true) id: String,
 	                           @RequestParam file: MultipartFile): IRestResult {
 		userService.isValid(token)
-		val tokenUser = userService.getUserDataByToken(token) ?: throw AuthenticationEntryPointException()
+		val tokenUser = userService.getUserDataByToken(token) ?: throw UserNotFoundException()
 		if (!userService.haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.StatusChanger))) {
 			throw AuthenticationEntryPointException()
 		}
 
 		val today = FExtensions.getDateTimeString("yyyyMMdd")
-		val userData = userService.getUserDataByID(id) ?: throw UserNotFoundException()
+		val userData = userService.getUserDataByID(id)
 		val blobUrl = azureBlobService.uploadFile(file, "${userData.id}/${today}", tokenUser.thisPK)
 		userData.taxpayerImageUrl = blobUrl
 		return responseService.getResult(userService.userDataModify(token, userData))

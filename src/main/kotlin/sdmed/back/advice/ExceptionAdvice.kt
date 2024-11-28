@@ -23,74 +23,136 @@ class ExceptionAdvice {
 	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
 	protected fun defaultException(req: HttpServletRequest, exception: Exception) =
 		responseService.getFailResult(getMessage("unKnown.code").toInt(), exception.message.toString())
-	@ExceptionHandler(UserNotFoundException::class)
-	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-	protected fun userNotFoundException(request: HttpServletRequest, exception: UserNotFoundException) =
-		responseService.getFailResult(getMessage("userNotFound.code").toInt(), getMessage("userNotFound.msg"))
-	@ExceptionHandler(SignInFailedException::class)
-	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-	protected fun signInFailedException(request : HttpServletRequest, exception : SignInFailedException) =
-		responseService.getFailResult(getMessage("signInFailed.code").toInt(), getMessage("signInFailed.msg"))
-	@ExceptionHandler(SignUpFailedException::class)
-	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-	protected fun signUpFailedException(request : HttpServletRequest, exception : SignUpFailedException) =
-		responseService.getFailResult(getMessage("signUpFailed.code").toInt(), getMessage("signUpFailed.msg"))
-	@ExceptionHandler(AuthenticationEntryPointException::class)
-	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-	protected fun authenticationEntryPointException(request : HttpServletRequest, exception : AuthenticationEntryPointException) =
-		responseService.getFailResult(getMessage("entryPoint.code").toInt(), getMessage("entryPoint.msg"))
+
 	@ExceptionHandler(AccessDeniedException::class)
 	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
 	protected fun accessDeniedException(request : HttpServletRequest, exception : AccessDeniedException) =
-		responseService.getFailResult(getMessage("accessDenied.code").toInt(), getMessage("accessDenied.msg"))
-	@ExceptionHandler(ResourceNotExistException::class)
+		responseService.getFailResult(getMessage("accessDeniedException.code").toInt(), "${getMessage("accessDeniedException.msg")} : ${exception.message.toString()}")
+
+	@ExceptionHandler(AuthenticationEntryPointException::class)
 	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-	protected fun resourceNotExistException(req: HttpServletRequest, exception: ResourceNotExistException) =
-		responseService.getFailResult(getMessage("resourceNotExist.code").toInt(), getMessage("resourceNotExist.msg"))
-	@ExceptionHandler(NotOwnerException::class)
+	protected fun authenticationEntryPointException(request : HttpServletRequest, exception : AuthenticationEntryPointException) =
+		responseService.getFailResult(getMessage("authenticationEntryPointException.code").toInt(), "${getMessage("authenticationEntryPointException.msg")} : ${exception.message.toString()}")
+
+	@ExceptionHandler(CommunicationException::class)
 	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-	protected fun notOwnerException(request : HttpServletRequest, exception : NotOwnerException) =
-		responseService.getFailResult(getMessage("notOwner.code").toInt(), getMessage("notOwner.msg"))
-	@ExceptionHandler(FileUploadException::class)
+	protected fun communicationException(request: HttpServletRequest, exception: CommunicationException) =
+		responseService.getFailResult(getMessage("communicationException.code").toInt(), "${getMessage("communicationException.msg")} : ${exception.message.toString()}")
+
+	@ExceptionHandler(ConfirmPasswordUnMatchException::class)
 	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-	protected fun fileUploadException(request: HttpServletRequest, exception: FileUploadException) =
-		responseService.getFailResult(getMessage("fileUpload.code").toInt(), "${getMessage("fileUpload.msg")} : ${exception.message.toString()}")
+	protected fun confirmPasswordUnMatchException(request: HttpServletRequest, exception: ConfirmPasswordUnMatchException) =
+		responseService.getFailResult(getMessage("confirmPasswordUnMatchException.code").toInt(), "${getMessage("confirmPasswordUnMatchException.msg")} : ${exception.message.toString()}")
+
 	@ExceptionHandler(FileDownloadException::class)
 	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
 	protected fun fileDownloadException(request: HttpServletRequest, exception: FileDownloadException) =
-		responseService.getFailResult(getMessage("fileDownload.code").toInt(), "${getMessage("fileDownload.msg")} : ${exception.message.toString()}")
+		responseService.getFailResult(getMessage("fileDownloadException.code").toInt(), "${getMessage("fileDownloadException.msg")} : ${exception.message.toString()}")
+
+	@ExceptionHandler(FileUploadException::class)
+	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+	protected fun fileUploadException(request: HttpServletRequest, exception: FileUploadException) =
+		responseService.getFailResult(getMessage("fileUploadException.code").toInt(), "${getMessage("fileUploadException.msg")} : ${exception.message.toString()}")
+
+	@ExceptionHandler(HosDataFileUploadException::class)
+	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+	protected fun hosDataFileUploadException(request: HttpServletRequest, exception: HosDataFileUploadException) =
+		responseService.getFailResult(getMessage("hosDataFileUploadException.code").toInt(), "${getMessage("hosDataFileUploadException.msg")} : ${exception.message.toString()}")
+
+	@ExceptionHandler(HospitalNotFoundException::class)
+	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+	protected fun hospitalNotFoundException(request: HttpServletRequest, exception: HospitalNotFoundException) =
+		responseService.getFailResult(getMessage("hospitalNotFoundException.code").toInt(), "${getMessage("hospitalNotFoundException.msg")} : ${exception.message.toString()}")
+
+	@ExceptionHandler(MedicineDataFileUploadException::class)
+	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+	protected fun medicineDataFileUploadException(request: HttpServletRequest, exception: MedicineDataFileUploadException) =
+		responseService.getFailResult(getMessage("medicineDataFileUploadException.code").toInt(), "${getMessage("medicineDataFileUploadException.msg")} : ${exception.message.toString()}")
+
+	@ExceptionHandler(MedicineNotFoundException::class)
+	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+	protected fun medicineNotFoundException(request: HttpServletRequest, exception: MedicineNotFoundException) =
+		responseService.getFailResult(getMessage("medicineNotFoundException.code").toInt(), "${getMessage("medicineNotFoundException.msg")} : ${exception.message.toString()}")
+
+	@ExceptionHandler(NotFoundDeptException::class)
+	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+	protected fun notFoundDeptException(request: HttpServletRequest, exception: NotFoundDeptException) =
+		responseService.getFailResult(getMessage("notFoundDeptException.code").toInt(), "${getMessage("notFoundDeptException.msg")} : ${exception.message.toString()}")
+
 	@ExceptionHandler(NotFoundLanguageException::class)
 	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
 	protected fun notFoundLanguageException(request: HttpServletRequest, exception: FileDownloadException) =
 		responseService.getFailResult(getMessage("notFoundLanguage.code").toInt(), "${getMessage("notFoundLanguage.msg")} : ${exception.message.toString()}")
+
 	@ExceptionHandler(NotFoundRolesException::class)
 	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
 	protected fun notFoundRolesException(request: HttpServletRequest, exception: NotFoundRolesException) =
-		responseService.getFailResult(getMessage("notFoundRoles.code").toInt(), "${getMessage("notFoundRoles.msg")} : ${exception.message.toString()}")
-	@ExceptionHandler(NotFoundDeptException::class)
-	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-	protected fun notFoundDeptException(request: HttpServletRequest, exception: NotFoundDeptException) =
-		responseService.getFailResult(getMessage("notFoundDept.code").toInt(), "${getMessage("notFoundDept.msg")} : ${exception.message.toString()}")
+		responseService.getFailResult(getMessage("notFoundRolesException.code").toInt(), "${getMessage("notFoundRolesException.msg")} : ${exception.message.toString()}")
+
 	@ExceptionHandler(NotFoundSystemException::class)
 	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
 	protected fun notFoundSystemException(request: HttpServletRequest, exception: NotFoundSystemException) =
-		responseService.getFailResult(getMessage("notFoundSystem.code").toInt(), "${getMessage("notFoundSystem.msg")} : ${exception.message.toString()}")
+		responseService.getFailResult(getMessage("notFoundSystemException.code").toInt(), "${getMessage("notFoundSystemException.msg")} : ${exception.message.toString()}")
+
+	@ExceptionHandler(NotOwnerException::class)
+	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+	protected fun notOwnerException(request : HttpServletRequest, exception : NotOwnerException) =
+		responseService.getFailResult(getMessage("notOwnerException.code").toInt(), "${getMessage("notOwnerException.msg")} : ${exception.message.toString()}")
+
 	@ExceptionHandler(NotValidOperationException::class)
 	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
 	protected fun notValidOperationException(request : HttpServletRequest, exception: NotValidOperationException) =
-		responseService.getFailResult(getMessage("notValidOperation.code").toInt(), getMessage("notValidOperation.msg"))
+		responseService.getFailResult(getMessage("notValidOperationException.code").toInt(), "${getMessage("notValidOperationException.msg")} : ${exception.message.toString()}")
+
+	@ExceptionHandler(PharmaDataFileUploadException::class)
+	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+	protected fun pharmaDataFileUploadException(request : HttpServletRequest, exception: PharmaDataFileUploadException) =
+		responseService.getFailResult(getMessage("pharmaDataFileUploadException.code").toInt(), "${getMessage("pharmaDataFileUploadException.msg")} : ${exception.message.toString()}")
+
+	@ExceptionHandler(PharmaNotFoundException::class)
+	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+	protected fun pharmaNotFoundException(request : HttpServletRequest, exception: PharmaNotFoundException) =
+		responseService.getFailResult(getMessage("pharmaNotFoundException.code").toInt(), "${getMessage("pharmaNotFoundException.msg")} : ${exception.message.toString()}")
+
 	@ExceptionHandler(ResourceAlreadyExistException::class)
 	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
 	protected fun resourceAlreadyExistException(request: HttpServletRequest, exception: ResourceAlreadyExistException) =
-		responseService.getFailResult(getMessage("resourceAlreadyExistException.code").toInt(), getMessage("resourceAlreadyExistException.msg"))
+		responseService.getFailResult(getMessage("resourceAlreadyExistException.code").toInt(), "${getMessage("resourceAlreadyExistException.msg")} : ${exception.message.toString()}")
+
+	@ExceptionHandler(ResourceNotExistException::class)
+	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+	protected fun resourceNotExistException(req: HttpServletRequest, exception: ResourceNotExistException) =
+		responseService.getFailResult(getMessage("resourceNotExistException.code").toInt(), "${getMessage("resourceNotExistException.msg")} : ${exception.message.toString()}")
+
+	@ExceptionHandler(SignInFailedException::class)
+	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+	protected fun signInFailedException(request : HttpServletRequest, exception : SignInFailedException) =
+		responseService.getFailResult(getMessage("signInFailedException.code").toInt(), "${getMessage("signInFailedException.msg")} : ${exception.message.toString()}")
+
+	@ExceptionHandler(SignUpFailedException::class)
+	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+	protected fun signUpFailedException(request : HttpServletRequest, exception : SignUpFailedException) =
+		responseService.getFailResult(getMessage("signUpFailedException.code").toInt(), "${getMessage("signUpFailedException.msg")} : ${exception.message.toString()}")
+
+	@ExceptionHandler(SignUpIDConditionException::class)
+	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+	protected fun signUpIDConditionException(request : HttpServletRequest, exception : SignUpIDConditionException) =
+		responseService.getFailResult(getMessage("signUpIDConditionException.code").toInt(), "${getMessage("signUpIDConditionException.msg")} : ${exception.message.toString()}")
+
+	@ExceptionHandler(SignUpPWConditionException::class)
+	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+	protected fun signUpPWConditionException(request : HttpServletRequest, exception : SignUpPWConditionException) =
+		responseService.getFailResult(getMessage("signUpPWConditionException.code").toInt(), "${getMessage("signUpPWConditionException.msg")} : ${exception.message.toString()}")
+
 	@ExceptionHandler(UserDataFileUploadException::class)
 	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
 	protected fun userDataFileUploadException(request: HttpServletRequest, exception: UserDataFileUploadException) =
-		responseService.getFailResult(getMessage("userDataFileUploadException.code").toInt(), "${getMessage("userDataFileUploadException.msg")} : ${exception.message.toString()}" )
-	@ExceptionHandler(CorrespondentDataFileUploadException::class)
+		responseService.getFailResult(getMessage("userDataFileUploadException.code").toInt(), "${getMessage("userDataFileUploadException.msg")} : ${exception.message.toString()}")
+
+	@ExceptionHandler(UserNotFoundException::class)
 	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-	protected fun correspondentDataFileUploadException(request: HttpServletRequest, exception: CorrespondentDataFileUploadException) =
-		responseService.getFailResult(getMessage("correspondentDataFileUploadException.code").toInt(), "${getMessage("correspondentDataFileUploadException.msg")} : ${exception.message.toString()}" )
+	protected fun userNotFoundException(request: HttpServletRequest, exception: UserNotFoundException) =
+		responseService.getFailResult(getMessage("userNotFoundException.code").toInt(), "${getMessage("userNotFoundException.msg")} : ${exception.message.toString()}")
 
 	@ExceptionHandler(AsyncRequestTimeoutException::class)
 	@ResponseStatus(HttpStatus.OK)
