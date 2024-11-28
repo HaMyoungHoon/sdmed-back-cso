@@ -97,8 +97,8 @@ object FConstants {
 	const val MODEL_DRUG_ETC = "비고"
 	const val MODEL_DRUG_ANCESTOR_CODE = "목록정비전코드"
 	const val MODEL_DRUG_COUNT = 13
-	const val MODEL_DRUG_INSERT_INTO = "INSERT INTO medicineModel (thisPK, serialNumber, method, classify, mainIngredientCode, kdCode, name, pharmaName, standard, unit, general, etc, ancestorCode) VALUES "
-	const val MODEL_DRUG_PRICE_INSERT_INTO = "INSERT INTO medicinePriceModel (thisPK, kdCode, maxPrice, applyDate, medicineModel_thisPK, medicinePriceModel_thisPK) VALUES "
+	const val MODEL_DRUG_INSERT_INTO = "INSERT INTO medicineModel (thisPK, serialNumber, method, classify, mainIngredientCode, kdCode, name, pharmaName, standard, unit, general, ancestorCode) VALUES "
+	const val MODEL_DRUG_PRICE_INSERT_INTO = "INSERT INTO medicinePriceModel (thisPK, kdCode, maxPrice, etc, applyDate, medicineModel_thisPK, medicinePriceModel_thisPK) VALUES "
 
 	const val MODEL_USER_RELATIONS_DELETE_WHERE_THIS_PK = "DELETE FROM userRelationModel WHERE thisPK = "
 	const val MODEL_USER_RELATIONS_DELETE_WHERE_THIS_PK_IN = "DELETE FROM userRelationModel WHERE thisPK IN "

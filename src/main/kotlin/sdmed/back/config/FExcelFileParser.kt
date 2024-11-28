@@ -110,7 +110,7 @@ class FExcelFileParser {
 			if (setRowRet == false) {
 				return@forEach
 			}
-			model.childDataSet(model.kdCode, applyDate)
+			model.childDataSet(model.kdCode, model.etc, applyDate)
 			ret.add(model)
 		}
 

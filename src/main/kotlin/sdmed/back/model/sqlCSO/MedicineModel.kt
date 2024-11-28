@@ -32,7 +32,7 @@ data class MedicineModel(
 	var unit: String = "",
 	@Column
 	var general: Int = 0,
-	@Column(columnDefinition = "nvarchar(500)", nullable = false)
+	@Transient
 	var etc: String = "",
 	@Column
 	var ancestorCode: Int = 0,
@@ -92,7 +92,7 @@ data class MedicineModel(
 			8 -> unit
 //			9 -> maxPrice.toString()
 			10 -> general.toString()
-			11 -> etc
+//			11 -> etc
 			12 -> ancestorCode.toString()
 			else -> ""
 		}
@@ -113,13 +113,14 @@ data class MedicineModel(
 				medicineModel = this@MedicineModel
 			})
 			10 -> general = if (data == "일반") 0 else 1
-			11 -> etc = data ?: ""
+//			11 -> etc = data ?: ""
 			12 -> ancestorCode = data?.toIntOrNull() ?: 0
 		}
 	}
-	fun childDataSet(kdCode: String, applyDate: Date) {
+	fun childDataSet(kdCode: String, etc: String, applyDate: Date) {
 		medicinePriceModel.forEach { x ->
 			x.kdCode = kdCode
+			x.etc = etc
 			x.applyDate = applyDate
 		}
 	}
@@ -182,7 +183,7 @@ data class MedicineModel(
 		val pharmaName = FExtensions.escapeString(pharmaName)
 		val standard = FExtensions.escapeString(standard)
 		val unit = FExtensions.escapeString(unit)
-		val etc = FExtensions.escapeString(etc)
-		return "('$thisPK', '$serialNumber', '$method', '$classify', '$mainIngredientCode', '$kdCode', '$name', '$pharmaName', '$standard', '$unit', '$general', '$etc', '$ancestorCode')"
+//		val etc = FExtensions.escapeString(etc)
+		return "('$thisPK', '$serialNumber', '$method', '$classify', '$mainIngredientCode', '$kdCode', '$name', '$pharmaName', '$standard', '$unit', '$general', '$ancestorCode')"
 	}
 }

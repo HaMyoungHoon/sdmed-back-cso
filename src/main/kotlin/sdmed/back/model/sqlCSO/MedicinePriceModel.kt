@@ -14,6 +14,8 @@ data class MedicinePriceModel(
 	var kdCode: String = "",
 	@Column
 	var maxPrice: Int = 0,
+	@Column(columnDefinition = "nvarchar(500)", nullable = false)
+	var etc: String = "",
 	@Column
 	var applyDate: Date = Date(),
 	@ManyToOne(fetch = FetchType.LAZY, optional = true)
@@ -23,6 +25,7 @@ data class MedicinePriceModel(
 ) {
 
 	fun insertString(): String {
-		return "('$thisPK', '$kdCode', '$maxPrice', '${FExtensions.parseDateTimeString(applyDate, "yyyy-MM-dd")}', '${medicineModel?.thisPK}', '${medicineModel?.thisPK}')"
+		val etc = FExtensions.escapeString(etc)
+		return "('$thisPK', '$kdCode', '$maxPrice', '$etc', '${FExtensions.parseDateTimeString(applyDate, "yyyy-MM-dd")}', '${medicineModel?.thisPK}', '${medicineModel?.thisPK}')"
 	}
 }
