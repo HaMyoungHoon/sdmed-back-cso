@@ -72,7 +72,7 @@ class PharmaController {
 			throw AuthenticationEntryPointException()
 		}
 
-		val pharmaData = pharmaService.getPharma(token, pharmaPK) ?: throw UserNotFoundException()
+		val pharmaData = pharmaService.getPharma(token, pharmaPK)
 		val blobUrl = azureBlobService.uploadFile(file, pharmaData.orgName, tokenUser.thisPK)
 		pharmaData.imageUrl = blobUrl
 		return responseService.getResult(pharmaService.pharmaDataModify(token, pharmaData))

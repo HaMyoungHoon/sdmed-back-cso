@@ -1,7 +1,6 @@
 package sdmed.back.model.sqlCSO
 
 import com.fasterxml.jackson.annotation.JsonBackReference
-import com.fasterxml.jackson.annotation.JsonIgnore
 import jakarta.persistence.*
 import sdmed.back.config.FExtensions
 import java.util.*
