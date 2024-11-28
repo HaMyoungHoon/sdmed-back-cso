@@ -55,14 +55,12 @@ class PharmaService {
 	fun getAllPharma(): List<PharmaModel> {
 		return pharmaRepository.findAllByOrderByCode()
 	}
-	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
 	fun getPharma(token: String, pharmaPK: String): PharmaModel? {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token) ?: throw UserNotFoundException()
 		isLive(tokenUser)
 		return pharmaRepository.findByThisPK(pharmaPK)?.apply { medicineList = mutableListOf() }
 	}
-	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
 	fun getPharmaWithDrug(token: String, pharmaPK: String, historical: Boolean = false): PharmaModel? {
 		val ret = getPharma(token, pharmaPK)
 		ret?.let {

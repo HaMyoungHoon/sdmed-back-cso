@@ -111,7 +111,7 @@ class UserService {
 			throw AuthenticationEntryPointException()
 		}
 
-		val user = getUserDataByID(id) ?: throw UserNotFoundException()
+		val user = getUserDataByID(id)
 		user.pw = fAmhohwa.encrypt(changePW)
 		val ret = userDataRepository.save(user)
 		val stackTrace = Thread.currentThread().stackTrace
@@ -142,7 +142,7 @@ class UserService {
 			throw AuthenticationEntryPointException()
 		}
 
-		val user = getUserDataByID(id) ?: throw UserNotFoundException()
+		val user = getUserDataByID(id)
 		user.status = status
 		val ret = userDataRepository.save(user)
 		val stackTrace = Thread.currentThread().stackTrace
@@ -310,7 +310,7 @@ class UserService {
 			throw AuthenticationEntryPointException()
 		}
 
-		val userData = getUserDataByPK(userPK) ?: throw UserNotFoundException()
+		val userData = getUserDataByPK(userPK)
 		val existHos = hospitalRepository.findAllByThisPKIn(hosPharmaMedicinePairModel.map { it.hosPK })
 		var realPair = hosPharmaMedicinePairModel.filter { x -> x.hosPK in existHos.map { y -> y.thisPK } }
 		val existPharma = pharmaRepository.findAllByThisPKIn(realPair.map { it.pharmaPK })
@@ -329,6 +329,9 @@ class UserService {
 			this.medicinePK = x.medicinePK
 		}})
 
+		val stackTrace = Thread.currentThread().stackTrace
+		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "${userData.id} hos-pharma-medicine relation change")
+		logRepository.save(logModel)
 		return getUserDataWithRelationByPK(userPK) ?: throw UserNotFoundException()
 	}
 	fun deleteRelationByUserPK(userPK: String) {
