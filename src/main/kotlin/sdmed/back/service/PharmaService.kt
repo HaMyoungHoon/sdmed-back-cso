@@ -73,7 +73,7 @@ class PharmaService {
 	fun addPharmaDrugList(token: String, pharmaPK: String, medicinePKList: List<String>) {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
-		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.PharmaFileUploader))) {
+		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.PharmaChanger))) {
 			throw AuthenticationEntryPointException()
 		}
 
@@ -104,7 +104,7 @@ class PharmaService {
 	fun modPharmaDrugList(token: String, pharmaPK: String, medicinePKList: List<String>) {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
-		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.PharmaFileUploader))) {
+		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.PharmaChanger))) {
 			throw AuthenticationEntryPointException()
 		}
 
@@ -128,7 +128,7 @@ class PharmaService {
 	fun pharmaDataModify(token: String, pharmaData: PharmaModel): PharmaModel {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
-		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.PharmaFileUploader))) {
+		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.PharmaChanger))) {
 			throw AuthenticationEntryPointException()
 		}
 
@@ -143,7 +143,7 @@ class PharmaService {
 	fun pharmaUpload(token: String, file: MultipartFile): String {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
-		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.PharmaFileUploader))) {
+		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.PharmaChanger))) {
 			throw AuthenticationEntryPointException()
 		}
 

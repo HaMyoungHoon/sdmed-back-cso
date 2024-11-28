@@ -51,7 +51,7 @@ class MedicineService {
 	fun medicineUpload(token: String, applyDate: Date, file: MultipartFile): String {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token) ?: throw UserNotFoundException()
-		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.MedicineFileUploader))) {
+		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.MedicineChanger))) {
 			throw AuthenticationEntryPointException()
 		}
 

@@ -9,15 +9,10 @@ enum class UserRole(var flag: Int, var desc: String) {
 	Employee(Admin.flag.shl(2), "직원"),
 	BusinessMan(Admin.flag.shl(3), "영업"),
 	PasswordChanger(Admin.flag.shl(4), "PasswordChanger"),
-	StatusChanger(Admin.flag.shl(5), "StatusChanger"),
-	RoleChanger(Admin.flag.shl(6), "RoleChanger"),
-	DeptChanger(Admin.flag.shl(7), "DeptChanger"),
-	UserChildChanger(Admin.flag.shl(8), "UserChildChanger"),
-	UserFileUploader(Admin.flag.shl(9), "UserFileUploader"),
-	CorrespondentFileUploader(Admin.flag.shl(10), "CorrespondentFileUploader"),
-	PharmaFileUploader(Admin.flag.shl(11), "PharmaFileUploader"),
-	HospitalFileUploader(Admin.flag.shl(12), "HospitalFileUploader"),
-	MedicineFileUploader(Admin.flag.shl(13), "MedicineFileUploader");
+	UserChanger(Admin.flag.shl(5), "UserChanger"),
+	HospitalChanger(Admin.flag.shl(6), "HospitalChanger"),
+	PharmaChanger(Admin.flag.shl(7), "PharmaChanger"),
+	MedicineChanger(Admin.flag.shl(8), "MedicineChanger");
 
 	infix fun and(rhs: UserRole) = EnumSet.of(this, rhs)
 	fun toS() = EnumSet.of(this)

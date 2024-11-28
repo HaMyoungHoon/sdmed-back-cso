@@ -10,7 +10,6 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import sdmed.back.advice.exception.AuthenticationEntryPointException
-import sdmed.back.advice.exception.UserNotFoundException
 import sdmed.back.config.ContentsType
 import sdmed.back.config.FConstants
 import sdmed.back.config.FExcelParserType
@@ -81,7 +80,7 @@ class UserController {
 			return responseService.getResult(userService.getUserDataByToken(token))
 		}
 
-		if (userService.haveRole(token, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.UserChildChanger, UserRole.UserFileUploader))) {
+		if (userService.haveRole(token, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.UserChanger))) {
 			return responseService.getResult(userService.getUserDataByPK(id, childView, relationView, pharmaOwnMedicineView))
 		}
 		return responseService.getResult(userService.getUserDataByPK(id, false, false, false))
@@ -93,7 +92,7 @@ class UserController {
 	                    @RequestParam(required = false) childView: Boolean = false,
 	                    @RequestParam(required = false) relationView: Boolean = false,
 	                    @RequestParam(required = false) pharmaOwnMedicineView: Boolean = false): IRestResult {
-		if (userService.haveRole(token, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee, UserRole.UserChildChanger, UserRole.UserFileUploader))) {
+		if (userService.haveRole(token, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee, UserRole.UserChanger))) {
 			return responseService.getResult(userService.getUserDataByPK(userPK, childView, relationView, pharmaOwnMedicineView))
 		}
 
@@ -166,7 +165,7 @@ class UserController {
 	                               @RequestParam file: MultipartFile): IRestResult {
 		userService.isValid(token)
 		val tokenUser = userService.getUserDataByToken(token)
-		if (!userService.haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.StatusChanger))) {
+		if (!userService.haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.UserChanger))) {
 			throw AuthenticationEntryPointException()
 		}
 
@@ -183,7 +182,7 @@ class UserController {
 	                               @RequestParam file: MultipartFile): IRestResult {
 		userService.isValid(token)
 		val tokenUser = userService.getUserDataByToken(token)
-		if (!userService.haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.StatusChanger))) {
+		if (!userService.haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.UserChanger))) {
 			throw AuthenticationEntryPointException()
 		}
 
@@ -201,7 +200,7 @@ class UserController {
 	                              @RequestParam file: MultipartFile): IRestResult {
 		userService.isValid(token)
 		val tokenUser = userService.getUserDataByToken(token)
-		if (!userService.haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.StatusChanger))) {
+		if (!userService.haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.UserChanger))) {
 			throw AuthenticationEntryPointException()
 		}
 
@@ -218,7 +217,7 @@ class UserController {
 	                              @RequestParam file: MultipartFile): IRestResult {
 		userService.isValid(token)
 		val tokenUser = userService.getUserDataByToken(token)
-		if (!userService.haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.StatusChanger))) {
+		if (!userService.haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.UserChanger))) {
 			throw AuthenticationEntryPointException()
 		}
 
