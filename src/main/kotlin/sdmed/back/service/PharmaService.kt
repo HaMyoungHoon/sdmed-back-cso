@@ -55,26 +55,17 @@ class PharmaService {
 	fun getAllPharma(): List<PharmaModel> {
 		return pharmaRepository.findAllByOrderByCode()
 	}
-	fun getPharma(token: String, pharmaPK: String): PharmaModel? {
+	fun getPharma(token: String, pharmaPK: String, pharmaOwnMedicineView: Boolean = false): PharmaModel {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token) ?: throw UserNotFoundException()
 		isLive(tokenUser)
-		return pharmaRepository.findByThisPK(pharmaPK)?.apply { medicineList = mutableListOf() }
-	}
-	fun getPharmaWithDrug(token: String, pharmaPK: String, historical: Boolean = false): PharmaModel? {
-		val ret = getPharma(token, pharmaPK)
-		ret?.let {
-			ret.medicineList.addAll(if (historical) {
-				medicineRepository.findAllByPharma(it)
-			} else {
-				medicineRepository.findAllByPharma(it)
-		})
-//			ret.medicineList.addAll(if (historical) {
-//				medicineRepository.findAllByPharma(it)
-//			} else {
-//				medicineRepository.selectAllByRecentChild(it.thisPK)
-//			})
-		}
+
+		val ret = pharmaRepository.findByThisPK(pharmaPK)?.apply {
+			if (!pharmaOwnMedicineView) {
+				ownMedicineHide()
+			}
+			lazyHide()
+		} ?: throw PharmaNotFoundException()
 
 		return ret
 	}
