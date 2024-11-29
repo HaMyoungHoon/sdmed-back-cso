@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestControllerAdvice
 import org.springframework.web.context.request.async.AsyncRequestTimeoutException
+import org.springframework.web.multipart.MultipartException
 import sdmed.back.service.ResponseService
 import sdmed.back.advice.exception.*
 
@@ -153,6 +154,11 @@ class ExceptionAdvice {
 	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
 	protected fun userNotFoundException(request: HttpServletRequest, exception: UserNotFoundException) =
 		responseService.getFailResult(getMessage("userNotFoundException.code").toInt(), "${getMessage("userNotFoundException.msg")} : ${exception.message.toString()}")
+
+	@ExceptionHandler(MultipartException::class)
+	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+	protected fun multipartException(request: HttpServletRequest, exception: MultipartException) =
+		responseService.getFailResult(getMessage("multipartException.code").toInt(), "${getMessage("multipartException.msg")} : ${exception.message.toString()}")
 
 	@ExceptionHandler(AsyncRequestTimeoutException::class)
 	@ResponseStatus(HttpStatus.OK)

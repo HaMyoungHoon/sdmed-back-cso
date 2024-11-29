@@ -98,6 +98,10 @@ class UserService {
 		logRepository.save(logModel)
 		return ret
 	}
+	fun userDataSetFamily(userData: UserDataModel) {
+		val parent = userDataRepository.selectMyParent(userData.thisPK)
+		userData.setChild(parent)
+	}
 
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
 	fun passwordChangeByID(token: String, id: String, changePW: String): UserDataModel {
@@ -107,12 +111,13 @@ class UserService {
 
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
-		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.PasswordChanger))) {
+		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.UserChanger))) {
 			throw AuthenticationEntryPointException()
 		}
 
 		val user = getUserDataByID(id)
 		user.pw = fAmhohwa.encrypt(changePW)
+		userDataSetFamily(user)
 		val ret = userDataRepository.save(user)
 		val stackTrace = Thread.currentThread().stackTrace
 		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "${user.id} password change")
@@ -127,12 +132,13 @@ class UserService {
 
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
-		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.PasswordChanger))) {
+		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.UserChanger))) {
 			throw AuthenticationEntryPointException()
 		}
 
 		val user = getUserDataByPK(userPK)
 		user.pw = fAmhohwa.encrypt(changePW)
+		userDataSetFamily(user)
 		val ret = userDataRepository.save(user)
 		val stackTrace = Thread.currentThread().stackTrace
 		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "${user.id} password change")
@@ -166,6 +172,7 @@ class UserService {
 
 		val user = getUserDataByID(id)
 		user.status = status
+		userDataSetFamily(user)
 		val ret = userDataRepository.save(user)
 		val stackTrace = Thread.currentThread().stackTrace
 		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "$id role : ${user.role}")
@@ -186,6 +193,34 @@ class UserService {
 		}
 
 		user.status = status
+		userDataSetFamily(user)
+		val ret = userDataRepository.save(user)
+		val stackTrace = Thread.currentThread().stackTrace
+		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "${user.id} role : ${user.role}")
+		logRepository.save(logModel)
+		return ret
+	}
+	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
+	fun userRoleDeptStatusModifyByPK(token: String, userPK: String, data: RoleDeptStatusModel): UserDataModel {
+		isValid(token)
+		val tokenUser = getUserDataByToken(token)
+		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.UserChanger))) {
+			throw AuthenticationEntryPointException()
+		}
+
+		val user = getUserDataByPK(userPK)
+		if (user.id == "mhha") {
+			throw AuthenticationEntryPointException()
+		}
+		var mask = UserRole.Admin.flag
+		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin))) {
+			mask = mask or UserRole.CsoAdmin.flag
+		}
+
+		user.status = data.status
+		user.role = data.roles.fold(0) { acc, x -> acc or x.flag } and mask.inv()
+		user.dept = data.depts.fold(0) { acc, x -> acc or x.flag }
+		userDataSetFamily(user)
 		val ret = userDataRepository.save(user)
 		val stackTrace = Thread.currentThread().stackTrace
 		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "${user.id} role : ${user.role}")
@@ -201,6 +236,7 @@ class UserService {
 			throw AuthenticationEntryPointException()
 		}
 
+		userDataSetFamily(userData)
 		val ret = userDataRepository.save(userData)
 		val stackTrace = Thread.currentThread().stackTrace
 		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "${userData.id} modify : $userData")
@@ -223,6 +259,7 @@ class UserService {
 		}
 		val user = getUserDataByID(id)
 		user.role = roleList.fold(0) { acc, x -> acc or x.flag } and mask.inv()
+		userDataSetFamily(user)
 		val ret = userDataRepository.save(user)
 		val stackTrace = Thread.currentThread().stackTrace
 		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "$id role : ${user.role}")
@@ -246,6 +283,7 @@ class UserService {
 		}
 
 		user.role = roleList.fold(0) { acc, x -> acc or x.flag } and mask.inv()
+		userDataSetFamily(user)
 		val ret = userDataRepository.save(user)
 		val stackTrace = Thread.currentThread().stackTrace
 		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "${user.id} role : ${user.role}")
@@ -261,6 +299,7 @@ class UserService {
 		}
 		val user = getUserDataByID(id)
 		user.dept = deptList.fold(0) { acc, x -> acc or x.flag }
+		userDataSetFamily(user)
 		val ret = userDataRepository.save(user)
 		val stackTrace = Thread.currentThread().stackTrace
 		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "$id dept : ${user.dept}")
@@ -279,6 +318,7 @@ class UserService {
 			throw AuthenticationEntryPointException()
 		}
 		user.dept = deptList.fold(0) { acc, x -> acc or x.flag }
+		userDataSetFamily(user)
 		val ret = userDataRepository.save(user)
 		val stackTrace = Thread.currentThread().stackTrace
 		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "${user.id} dept : ${user.dept}")

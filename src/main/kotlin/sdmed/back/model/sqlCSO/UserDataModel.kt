@@ -61,6 +61,10 @@ data class UserDataModel(
 	@Transient
 	var hosList: MutableList<HospitalModel> = mutableListOf()
 ) {
+	fun setChild(myParent: UserDataModel?) {
+		userData = myParent
+		children.onEach { it.setChild(this) }
+	}
 	fun lazyHide(): UserDataModel {
 		userData = null
 		children.onEach { it.lazyHide() }

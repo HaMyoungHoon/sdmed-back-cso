@@ -26,19 +26,19 @@ class HospitalController {
 
 	@Operation(summary = "병원 정보 조회")
 	@GetMapping(value = ["/all"])
-	fun getHospitalAll(@RequestHeader(required = true) token: String) =
+	fun getHospitalAll(@RequestHeader token: String) =
 		responseService.getResult(hospitalService.getAllHospital(token))
 	@Operation(summary = "병원 정보 조회")
 	@GetMapping(value = ["/all/{page}/{size}"])
-	fun getHospitalAllPage(@RequestHeader(required = true) token: String,
+	fun getHospitalAllPage(@RequestHeader token: String,
 												 @PathVariable("page") page: Int,
 												 @PathVariable("size") size: Int) =
 		responseService.getResult(hospitalService.getPageHospital(token, page, size))
 
 	@Operation(summary = "병원 데이터 엑셀 업로드")
 	@PostMapping(value = ["/dataUploadExcel"], consumes = ["multipart/form-data"])
-	fun postDataUploadExcel(@RequestHeader(required = true) token: String,
-	                        @RequestParam(required = true) file: MultipartFile) =
+	fun postDataUploadExcel(@RequestHeader token: String,
+	                        @RequestParam file: MultipartFile) =
 		responseService.getResult(hospitalService.hospitalUpload(token, file))
 
 	@Operation(summary = "병원 데이터 엑셀 샘플 다운로드")

@@ -1,3 +1,7 @@
+multipartException:
+  code: "-99998"
+  msg: "file upload failed"
+
 unKnown:
   code: "-99999"
   msg: "An unknown error occurred."

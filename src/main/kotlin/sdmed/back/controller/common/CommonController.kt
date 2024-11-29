@@ -27,7 +27,7 @@ class CommonController {
 
 	@Operation(summary = "language set", description = "")
 	@PostMapping(value = ["/lang"])
-	fun setLanguage(@RequestParam(required = true) lang: String): IRestResult {
+	fun setLanguage(@RequestParam lang: String): IRestResult {
 		when (lang) {
 			"ko" -> LocaleContextHolder.setDefaultLocale(Locale.KOREA)
 			"en" -> LocaleContextHolder.setDefaultLocale(Locale.ENGLISH)
@@ -42,5 +42,5 @@ class CommonController {
 	}
 
 //	@PostMapping(value = ["/test"], consumes = ["multipart/form-data"])
-//	fun test(@RequestParam(required = true) testFile: MultipartFile): IRestResult = responseService.getResult(azureBlobService.uploadTest(testFile))
+//	fun test(@RequestParam testFile: MultipartFile): IRestResult = responseService.getResult(azureBlobService.uploadTest(testFile))
 }

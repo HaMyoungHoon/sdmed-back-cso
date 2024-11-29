@@ -32,46 +32,46 @@ class UserController {
 
 	@Operation(summary = "유저 정보 전체")
 	@GetMapping(value = ["/all"])
-	fun getUserAll(@RequestHeader(required = true) token: String) =
+	fun getUserAll(@RequestHeader token: String) =
 		responseService.getResult(userService.getAllUser(token))
 	@Operation(summary = "유저 정보 전체")
 	@GetMapping(value = ["/all/{page}/{size}"])
-	fun getUserAllPage(@RequestHeader(required = true) token: String,
+	fun getUserAllPage(@RequestHeader token: String,
 										 @PathVariable("page") page: Int,
 										 @PathVariable("size") size: Int) =
 		responseService.getResult(userService.getAllUser(token, page, size))
 
 	@Operation(summary = "로그인")
 	@GetMapping(value = ["/signIn"])
-	fun signIn(@RequestParam(required = true) id: String,
-	           @RequestParam(required = true) pw: String): IRestResult =
+	fun signIn(@RequestParam id: String,
+	           @RequestParam pw: String): IRestResult =
 		responseService.getResult(userService.signIn(id, pw))
 	@Operation(summary = "회원가입")
 	@PostMapping(value = ["/signUp"])
-	fun signUp(@RequestParam(required = true) confirmPW: String,
+	fun signUp(@RequestParam confirmPW: String,
 	           @RequestBody data: UserDataModel) =
 		responseService.getResult(userService.signUp(confirmPW, data))
 
 	@Operation(summary = "비밀번호 변경")
 	@PutMapping(value = ["/passwordChange/id"])
-	fun putPasswordChangeByID(@RequestHeader(required = true) token: String,
-	                          @RequestParam(required = true) id: String,
-	                          @RequestParam(required = true) changePW: String) =
+	fun putPasswordChangeByID(@RequestHeader token: String,
+	                          @RequestParam id: String,
+	                          @RequestParam changePW: String) =
 		responseService.getResult(userService.passwordChangeByID(token, id, changePW))
 	@Operation(summary = "비밀번호 변경")
 	@PutMapping(value = ["/passwordChange/pk"])
-	fun putPasswordChangeByPK(@RequestHeader(required = true) token: String,
-	                          @RequestParam(required = true) userPK: String,
-	                          @RequestParam(required = true) changePW: String) =
+	fun putPasswordChangeByPK(@RequestHeader token: String,
+	                          @RequestParam userPK: String,
+	                          @RequestParam changePW: String) =
 		responseService.getResult(userService.passwordChangeByPK(token, userPK, changePW))
 
 	@Operation(summary = "로그인 토큰 새로고침")
 	@PostMapping(value = ["/tokenRefresh"])
-	fun tokenRefresh(@RequestHeader(required = true) token: String) =
+	fun tokenRefresh(@RequestHeader token: String) =
 		responseService.getResult(userService.tokenRefresh(token))
 	@Operation(summary = "유저 데이터 검색")
 	@GetMapping(value = ["/userData/id"])
-	fun getUserDataByID(@RequestHeader(required = true) token: String,
+	fun getUserDataByID(@RequestHeader token: String,
 	                    @RequestParam(required = false) id: String?,
 	                    @RequestParam(required = false) childView: Boolean = false,
 	                    @RequestParam(required = false) relationView: Boolean = false,
@@ -87,7 +87,7 @@ class UserController {
 	}
 	@Operation(summary = "유저 데이터 검색")
 	@GetMapping(value = ["/userData/pk"])
-	fun getUserDataByPK(@RequestHeader(required = true) token: String,
+	fun getUserDataByPK(@RequestHeader token: String,
 	                    @RequestParam(required = false) userPK: String,
 	                    @RequestParam(required = false) childView: Boolean = false,
 	                    @RequestParam(required = false) relationView: Boolean = false,
@@ -100,103 +100,76 @@ class UserController {
 	}
 	@Operation(summary = "유저-병원-제약사-약품 관계 변경")
 	@PutMapping(value = ["/userRelModify/pk"])
-	fun putUserRelationModifyByPK(@RequestHeader(required = true) token: String,
-	                              @RequestParam(required = true) userPK: String,
+	fun putUserRelationModifyByPK(@RequestHeader token: String,
+	                              @RequestParam userPK: String,
 	                              @RequestBody hosPharmaMedicinePairModel: List<HosPharmaMedicinePairModel>): IRestResult {
 		return responseService.getResult(userService.userRelationModify(token, userPK, hosPharmaMedicinePairModel))
 	}
 
 	@Operation(summary = "내 권한 얻기")
-	@PutMapping(value = ["/myRole"])
-	fun getMyRole(@RequestHeader(required = true) token: String) =
+	@GetMapping(value = ["/myRole"])
+	fun getMyRole(@RequestHeader token: String) =
 		responseService.getResult(userService.getUserDataByToken(token).role)
 	@Operation(summary = "유저 권한 변경")
 	@PutMapping(value = ["/userRoleModify/id"])
-	fun putUserRoleModifyByID(@RequestHeader(required = true) token: String,
-	                          @RequestParam(required = true) id: String,
-	                          @RequestBody(required = true) roles: List<UserRole>): IRestResult {
+	fun putUserRoleModifyByID(@RequestHeader token: String,
+	                          @RequestParam id: String,
+	                          @RequestBody roles: List<UserRole>): IRestResult {
 		if (id == "mhha") throw AuthenticationEntryPointException()
 		return responseService.getResult(userService.userRoleModifyByID(token, id, roles))
 	}
 	@Operation(summary = "유저 권한 변경")
 	@PutMapping(value = ["/userRoleModify/pk"])
-	fun putUserRoleModifyByPK(@RequestHeader(required = true) token: String,
-	                          @RequestParam(required = true) userPK: String,
-	                          @RequestBody(required = true) roles: List<UserRole>): IRestResult {
+	fun putUserRoleModifyByPK(@RequestHeader token: String,
+	                          @RequestParam userPK: String,
+	                          @RequestBody roles: List<UserRole>): IRestResult {
 		return responseService.getResult(userService.userRoleModifyByPK(token, userPK, roles))
 	}
 
 	@Operation(summary = "유저 부서 변경")
 	@PutMapping(value = ["/userDeptModify/id"])
-	fun putUserDeptModifyByID(@RequestHeader(required = true) token: String,
-	                      @RequestParam(required = true) id: String,
-	                      @RequestBody(required = true) depts: List<UserDept>): IRestResult {
+	fun putUserDeptModifyByID(@RequestHeader token: String,
+	                          @RequestParam id: String,
+	                          @RequestBody depts: List<UserDept>): IRestResult {
 		if (id == "mhha") throw AuthenticationEntryPointException()
 		return responseService.getResult(userService.userDeptModifyByID(token, id, depts))
 	}
 	@Operation(summary = "유저 부서 변경")
 	@PutMapping(value = ["/userDeptModify/pk"])
-	fun putUserDeptModifyByPK(@RequestHeader(required = true) token: String,
-	                          @RequestParam(required = true) userPK: String,
-	                          @RequestBody(required = true) depts: List<UserDept>): IRestResult {
+	fun putUserDeptModifyByPK(@RequestHeader token: String,
+	                          @RequestParam userPK: String,
+	                          @RequestBody depts: List<UserDept>): IRestResult {
 		return responseService.getResult(userService.userDeptModifyByPK(token, userPK, depts))
 	}
 
 	@Operation(summary = "유저 상태 변경")
 	@PutMapping(value = ["/userStatusModify/id"])
-	fun putUserStatusModifyByID(@RequestHeader(required = true) token: String,
-	                            @RequestParam(required = true) id: String,
-	                            @RequestParam(required = true) status: UserStatus): IRestResult {
+	fun putUserStatusModifyByID(@RequestHeader token: String,
+	                            @RequestParam id: String,
+	                            @RequestParam status: UserStatus): IRestResult {
 		if (id == "mhha") throw AuthenticationEntryPointException()
 		return responseService.getResult(userService.userStatusModifyByID(token, id, status))
 	}
 	@Operation(summary = "유저 상태 변경")
 	@PutMapping(value = ["/userStatusModify/pk"])
-	fun putUserStatusModifyByPK(@RequestHeader(required = true) token: String,
-	                            @RequestParam(required = true) userPK: String,
-	                            @RequestParam(required = true) status: UserStatus): IRestResult {
+	fun putUserStatusModifyByPK(@RequestHeader token: String,
+	                            @RequestParam userPK: String,
+	                            @RequestParam status: UserStatus): IRestResult {
 		return responseService.getResult(userService.userStatusModifyByPK(token, userPK, status))
 	}
 
-	@Operation(summary = "유저 계좌이미지 업로드")
-	@PutMapping(value = ["/userBankImageUpload/id"], consumes = ["multipart/form-data"])
-	fun putUserBankImageUploadByID(@RequestHeader(required = true) token: String,
-	                               @RequestParam(required = true) id: String,
-	                               @RequestParam file: MultipartFile): IRestResult {
-		userService.isValid(token)
-		val tokenUser = userService.getUserDataByToken(token)
-		if (!userService.haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.UserChanger))) {
-			throw AuthenticationEntryPointException()
-		}
-
-		val today = FExtensions.getDateTimeString("yyyyMMdd")
-		val userData = userService.getUserDataByID(id)
-		val blobUrl = azureBlobService.uploadFile(file, "${userData.id}/${today}", tokenUser.thisPK)
-		userData.bankAccountImageUrl = blobUrl
-		return responseService.getResult(userService.userDataModify(token, userData))
-	}
-	@Operation(summary = "유저 계좌이미지 업로드")
-	@PutMapping(value = ["/userBankImageUpload/pk"], consumes = ["multipart/form-data"])
-	fun putUserBankImageUploadByPK(@RequestHeader(required = true) token: String,
-	                               @RequestParam(required = true) userPK: String,
-	                               @RequestParam file: MultipartFile): IRestResult {
-		userService.isValid(token)
-		val tokenUser = userService.getUserDataByToken(token)
-		if (!userService.haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.UserChanger))) {
-			throw AuthenticationEntryPointException()
-		}
-
-		val today = FExtensions.getDateTimeString("yyyyMMdd")
-		val userData = userService.getUserDataByID(userPK)
-		val blobUrl = azureBlobService.uploadFile(file, "${userData.id}/${today}", tokenUser.thisPK)
-		userData.bankAccountImageUrl = blobUrl
-		return responseService.getResult(userService.userDataModify(token, userData))
+	@Operation(summary = "유저 권한,부서,상태 변경")
+	@PutMapping(value = ["/userRoleDeptStatusModify/pk"])
+	fun putUserRoleDeptStatusModifyByPK(@RequestHeader token: String,
+																			@RequestParam userPK: String,
+	                                    @RequestBody data: RoleDeptStatusModel): IRestResult {
+		return responseService.getResult(userService.userRoleDeptStatusModifyByPK(token, userPK, data))
 	}
 
 	@Operation(summary = "유저 사업자등록증 업로드")
 	@PutMapping(value = ["/userTaxImageUpload/id"], consumes = ["multipart/form-data"])
-	fun putUserTaxImageUploadByID(@RequestHeader(required = true) token: String,
-	                              @RequestParam(required = true) id: String,
+	fun putUserTaxImageUploadByID(@RequestHeader token: String,
+	                              @RequestParam id: String,
 	                              @RequestParam file: MultipartFile): IRestResult {
 		userService.isValid(token)
 		val tokenUser = userService.getUserDataByToken(token)
@@ -212,8 +185,8 @@ class UserController {
 	}
 	@Operation(summary = "유저 사업자등록증 업로드")
 	@PutMapping(value = ["/userTaxImageUpload/pk"], consumes = ["multipart/form-data"])
-	fun putUserTaxImageUploadByPK(@RequestHeader(required = true) token: String,
-	                              @RequestParam(required = true) userPK: String,
+	fun putUserTaxImageUploadByPK(@RequestHeader token: String,
+	                              @RequestParam userPK: String,
 	                              @RequestParam file: MultipartFile): IRestResult {
 		userService.isValid(token)
 		val tokenUser = userService.getUserDataByToken(token)
@@ -222,16 +195,51 @@ class UserController {
 		}
 
 		val today = FExtensions.getDateTimeString("yyyyMMdd")
-		val userData = userService.getUserDataByID(userPK)
+		val userData = userService.getUserDataByPK(userPK)
 		val blobUrl = azureBlobService.uploadFile(file, "${userData.id}/${today}", tokenUser.thisPK)
 		userData.taxpayerImageUrl = blobUrl
 		return responseService.getResult(userService.userDataModify(token, userData))
 	}
 
+	@Operation(summary = "유저 계좌이미지 업로드")
+	@PutMapping(value = ["/userBankImageUpload/id"], consumes = ["multipart/form-data"])
+	fun putUserBankImageUploadByID(@RequestHeader token: String,
+	                               @RequestParam id: String,
+	                               @RequestParam file: MultipartFile): IRestResult {
+		userService.isValid(token)
+		val tokenUser = userService.getUserDataByToken(token)
+		if (!userService.haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.UserChanger))) {
+			throw AuthenticationEntryPointException()
+		}
+
+		val today = FExtensions.getDateTimeString("yyyyMMdd")
+		val userData = userService.getUserDataByID(id)
+		val blobUrl = azureBlobService.uploadFile(file, "${userData.id}/${today}", tokenUser.thisPK)
+		userData.bankAccountImageUrl = blobUrl
+		return responseService.getResult(userService.userDataModify(token, userData))
+	}
+	@Operation(summary = "유저 계좌이미지 업로드")
+	@PutMapping(value = ["/userBankImageUpload/pk"], consumes = ["multipart/form-data"])
+	fun putUserBankImageUploadByPK(@RequestHeader token: String,
+	                               @RequestParam userPK: String,
+	                               @RequestParam file: MultipartFile): IRestResult {
+		userService.isValid(token)
+		val tokenUser = userService.getUserDataByToken(token)
+		if (!userService.haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.UserChanger))) {
+			throw AuthenticationEntryPointException()
+		}
+
+		val today = FExtensions.getDateTimeString("yyyyMMdd")
+		val userData = userService.getUserDataByPK(userPK)
+		val blobUrl = azureBlobService.uploadFile(file, "${userData.id}/${today}", tokenUser.thisPK)
+		userData.bankAccountImageUrl = blobUrl
+		return responseService.getResult(userService.userDataModify(token, userData))
+	}
+
 	@Operation(summary = "유저 데이터 엑셀 업로드")
 	@PostMapping(value = ["/dataUploadExcel"], consumes = ["multipart/form-data"])
-	fun postDataUploadExcel(@RequestHeader(required = true) token: String,
-	                        @RequestParam(required = true) file: MultipartFile) =
+	fun postDataUploadExcel(@RequestHeader token: String,
+	                        @RequestParam file: MultipartFile) =
 		responseService.getResult(userService.userUpload(token, file))
 
 	@Operation(summary = "유저 데이터 엑셀 샘플 다운로드")
@@ -257,14 +265,14 @@ class UserController {
 
 	@Operation(summary = "유저 child 추가")
 	@PostMapping(value = ["/addChild"])
-	fun postAddChild(@RequestHeader(required = true) token: String,
-									 @RequestParam(required = true) motherID: String,
-									 @RequestBody(required = true) childID: List<String>) =
+	fun postAddChild(@RequestHeader token: String,
+									 @RequestParam motherID: String,
+									 @RequestBody childID: List<String>) =
 		responseService.getResult(userService.addChild(token, motherID, childID))
 	@Operation(summary = "유저 child 제거")
 	@PutMapping(value = ["/delChild"])
-	fun putDelChild(@RequestHeader(required = true) token: String,
-	                @RequestParam(required = true) motherID: String,
-	                @RequestBody(required = true) childID: List<String>) =
+	fun putDelChild(@RequestHeader token: String,
+	                @RequestParam motherID: String,
+	                @RequestBody childID: List<String>) =
 		responseService.getResult(userService.delChild(token, motherID, childID))
 }

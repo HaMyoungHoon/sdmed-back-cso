@@ -26,4 +26,9 @@ interface IUserDataRepository: JpaRepository<UserDataModel, String> {
 			"WHERE role & :flag > 0" +
 			"ORDER BY name Asc", nativeQuery = true)
 	fun selectWhereRoleOrderByNameAsc(flag: Int): List<UserDataModel>
+
+	@Query("SELECT a.* FROM userDataModel a " +
+			"LEFT JOIN userDataModel b on b.children_thisPK = a.thisPK " +
+			"WHERE b.thisPK = :thisPK", nativeQuery = true)
+	fun selectMyParent(thisPK: String): UserDataModel?
 }
