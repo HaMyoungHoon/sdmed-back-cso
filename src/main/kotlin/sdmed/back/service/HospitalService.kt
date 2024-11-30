@@ -42,7 +42,6 @@ class HospitalService {
 
 		return hospitalRepository.findAllByOrderByCode()
 	}
-
 	fun getPageHospital(token: String, page: Int, size: Int): Page<HospitalModel> {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
@@ -51,6 +50,23 @@ class HospitalService {
 		val pageable = PageRequest.of(page, size)
 		return hospitalRepository.findAllByOrderByCode(pageable)
 	}
+	fun getHospitalAllSearch(token: String, searchString: String, isSearchTypeCode: Boolean = true): List<HospitalModel> {
+		if (searchString.isEmpty()) {
+			return arrayListOf()
+		}
+
+		isValid(token)
+		val tokenUser = getUserDataByToken(token)
+		isLive(tokenUser)
+		if (isSearchTypeCode) {
+			searchString.toIntOrNull()?.let { x ->
+				return hospitalRepository.selectAllByCodeContainingOrderByCode(x.toString())
+			} ?: return hospitalRepository.findAllByInnerNameContainingOrOrgNameContainingOrderByCode(searchString, searchString)
+		}
+
+		return hospitalRepository.findAllByInnerNameContainingOrOrgNameContainingOrderByCode(searchString, searchString)
+	}
+
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
 	fun hospitalUpload(token: String, file: MultipartFile): String {
 		isValid(token)

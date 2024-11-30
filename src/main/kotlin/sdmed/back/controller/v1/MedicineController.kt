@@ -40,8 +40,8 @@ class MedicineController {
 	@Operation(summary = "약제급여목록")
 	@GetMapping(value = ["/all/{page}/{size}"])
 	fun getMedicineAllPage(@RequestHeader token: String,
-										 @PathVariable("page") page: Int,
-										 @PathVariable("size") size: Int) =
+												 @PathVariable("page") page: Int,
+												 @PathVariable("size") size: Int) =
 		responseService.getResult(medicineService.getMedicine(token, page, size))
 
 	@Operation(summary = "약제급여목록및급여상한금액표 업로드")

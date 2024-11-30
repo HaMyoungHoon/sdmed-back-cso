@@ -41,7 +41,7 @@ class PharmaService {
 		val tokenUser = getUserDataByToken(token)
 		isLive(tokenUser)
 
-		return pharmaRepository.findAllByOrderByCode()
+		return pharmaRepository.findAllByOrderByCode().onEach { it.lazyHide() }
 	}
 	fun getPagePharma(token: String, page: Int, size: Int): Page<PharmaModel> {
 		isValid(token)
@@ -50,6 +50,25 @@ class PharmaService {
 
 		val pageable = PageRequest.of(page, size)
 		return pharmaRepository.findAllByOrderByCode(pageable)
+	}
+	fun getHospitalAllSearch(token: String, searchString: String, isSearchTypeCode: Boolean = true): List<PharmaModel> {
+		if (searchString.isEmpty()) {
+			return arrayListOf()
+		}
+		var ret: List<PharmaModel> = arrayListOf()
+
+		isValid(token)
+		val tokenUser = getUserDataByToken(token)
+		isLive(tokenUser)
+		if (isSearchTypeCode) {
+			ret = searchString.toIntOrNull()?.let { x ->
+				pharmaRepository.selectAllByCodeContainingOrderByCode(x.toString())
+			} ?: pharmaRepository.findAllByInnerNameContainingOrOrgNameContainingOrderByCode(searchString, searchString)
+		}
+
+		ret = pharmaRepository.findAllByInnerNameContainingOrOrgNameContainingOrderByCode(searchString, searchString)
+		ret.onEach { it.ownMedicineHide(); it.lazyHide() }
+		return ret
 	}
 
 	fun getAllPharma(): List<PharmaModel> {

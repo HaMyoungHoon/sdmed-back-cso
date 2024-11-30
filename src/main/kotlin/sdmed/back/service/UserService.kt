@@ -39,8 +39,8 @@ class UserService {
 	fun getAllUser(token: String, exceptMe: Boolean = true): List<UserDataModel> {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
-		if (haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin))) {
-			return userDataRepository.findAllByOrderByNameDesc().onEach { it.pw = "" }.toMutableList().filter { it.thisPK != tokenUser.thisPK }
+		if (haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee))) {
+			return userDataRepository.findAllByOrderByNameDesc().onEach { it.lazyHide(); it.pw = "" }.toMutableList().filter { it.thisPK != tokenUser.thisPK }
 		}
 
 		return userDataRepository.selectWhereDeptOrderByNameAsc(UserDepts.of(UserDept.TaxPayer, UserDept.Personal).getFlag()).onEach { it.pw = "" }.filter { it.thisPK != tokenUser.thisPK }
@@ -53,7 +53,7 @@ class UserService {
 		}
 
 		val pageable = PageRequest.of(page, size)
-		return userDataRepository.findAllByOrderByNameDesc(pageable).onEach { it.pw = "" }
+		return userDataRepository.findAllByOrderByNameDesc(pageable).onEach { it.lazyHide(); it.pw = "" }
 	}
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
 	fun signIn(id: String, pw: String): String {

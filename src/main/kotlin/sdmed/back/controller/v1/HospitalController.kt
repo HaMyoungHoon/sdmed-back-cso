@@ -34,6 +34,12 @@ class HospitalController {
 												 @PathVariable("page") page: Int,
 												 @PathVariable("size") size: Int) =
 		responseService.getResult(hospitalService.getPageHospital(token, page, size))
+	@Operation(summary = "병원 조회 like code, innerName, orgName")
+	@GetMapping(value = ["/all/search"])
+	fun getHospitalAllSearch(@RequestHeader token: String,
+													 @RequestParam searchString: String,
+													 @RequestParam(required = false) isSearchTypeCode: Boolean = false) =
+		responseService.getResult(hospitalService.getHospitalAllSearch(token, searchString, isSearchTypeCode))
 
 	@Operation(summary = "병원 데이터 엑셀 업로드")
 	@PostMapping(value = ["/dataUploadExcel"], consumes = ["multipart/form-data"])
