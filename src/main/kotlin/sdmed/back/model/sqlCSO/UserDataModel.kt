@@ -207,7 +207,7 @@ data class UserDataModel(
 		val companyAddress = FExtensions.escapeString(companyAddress)
 		val bankAccount = FExtensions.escapeString(bankAccount)
 		val regDateString = FExtensions.parseDateTimeString(regDate, "yyyy-MM-dd HH:mm:ss")
-		return "('$thisPK', '$id', '$pw', '$name', '$mail', '$phoneNumber', '$role', '$dept', '${status.index}', '$companyName', '$companyNumber', '$companyAddress', '$bankAccount', '$regDateString')"
+		return "('$thisPK', '$id', '$pw', '$name', '$mail', '$phoneNumber', '$role', '$dept', '${status.index}', '$companyName', '$companyNumber', '$companyAddress', '$bankAccount', '$regDateString', '')"
 	}
 
 	override fun toString(): String {

@@ -11,6 +11,7 @@ import sdmed.back.advice.exception.*
 import sdmed.back.config.FAmhohwa
 import sdmed.back.config.FConstants
 import sdmed.back.config.FExcelFileParser
+import sdmed.back.config.FExtensions
 import sdmed.back.config.jpa.CSOJPAConfig
 import sdmed.back.config.security.JwtTokenProvider
 import sdmed.back.model.common.*
@@ -207,6 +208,28 @@ class UserService {
 		}
 
 		user.status = status
+		userDataSetFamily(user)
+		val ret = userDataRepository.save(user)
+		val stackTrace = Thread.currentThread().stackTrace
+		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "${user.id} role : ${user.role}")
+		logRepository.save(logModel)
+		return ret
+	}
+	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
+	fun userNameMailPhoneModifyByPK(token: String, userPK: String, name: String, mail: String, phone: String): UserDataModel {
+		isValid(token)
+		val tokenUser = getUserDataByToken(token)
+		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.UserChanger))) {
+			throw AuthenticationEntryPointException()
+		}
+
+		val user = getUserDataByPK(userPK)
+		if (user.id == "mhha") {
+			throw AuthenticationEntryPointException()
+		}
+		user.name = FExtensions.regexSpecialCharRemove(name)
+		user.mail = FExtensions.escapeString(mail)
+		user.phoneNumber = FExtensions.escapeString(phone)
 		userDataSetFamily(user)
 		val ret = userDataRepository.save(user)
 		val stackTrace = Thread.currentThread().stackTrace

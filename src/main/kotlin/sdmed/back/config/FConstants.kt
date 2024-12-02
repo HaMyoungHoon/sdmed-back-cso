@@ -51,7 +51,7 @@ object FConstants {
 	const val MODEL_USER_COMPANY_ADDRESS = "회사주소"
 	const val MODEL_USER_BANK_ACCOUNT = "은행계좌번호"
 	const val MODEL_USER_COUNT = 12
-	const val MODEL_USER_INSERT_INTO = "INSERT INTO userDataModel (thisPK, id, pw, name, mail, phoneNumber, role, dept, status, companyName, companyNumber, companyAddress, bankAccount, regDate) VALUES "
+	const val MODEL_USER_INSERT_INTO = "INSERT INTO userDataModel (thisPK, id, pw, name, mail, phoneNumber, role, dept, status, companyName, companyNumber, companyAddress, bankAccount, regDate, bankAccountImageUrl) VALUES "
 	const val MODEL_CODE = "거래처코드"
 	const val MODEL_ORG_NAME = "사업자원어명"
 	const val MODEL_INNER_NAME = "사업자내부명"

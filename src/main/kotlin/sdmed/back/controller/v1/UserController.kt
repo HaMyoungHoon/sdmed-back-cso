@@ -85,9 +85,9 @@ class UserController {
 		}
 
 		if (userService.haveRole(token, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.UserChanger))) {
-			return responseService.getResult(userService.getUserDataByPK(id, childView, relationView, pharmaOwnMedicineView))
+			return responseService.getResult(userService.getUserDataByID(id, childView, relationView, pharmaOwnMedicineView))
 		}
-		return responseService.getResult(userService.getUserDataByPK(id, false, false, false))
+		return responseService.getResult(userService.getUserDataByToken(token))
 	}
 	@Operation(summary = "유저 데이터 검색")
 	@GetMapping(value = ["/userData/pk"])
@@ -106,9 +106,8 @@ class UserController {
 	@PutMapping(value = ["/userRelModify/pk"])
 	fun putUserRelationModifyByPK(@RequestHeader token: String,
 	                              @RequestParam userPK: String,
-	                              @RequestBody hosPharmaMedicinePairModel: List<HosPharmaMedicinePairModel>): IRestResult {
-		return responseService.getResult(userService.userRelationModify(token, userPK, hosPharmaMedicinePairModel))
-	}
+	                              @RequestBody hosPharmaMedicinePairModel: List<HosPharmaMedicinePairModel>) =
+		responseService.getResult(userService.userRelationModify(token, userPK, hosPharmaMedicinePairModel))
 
 	@Operation(summary = "내 권한 얻기")
 	@GetMapping(value = ["/myRole"])
@@ -126,9 +125,8 @@ class UserController {
 	@PutMapping(value = ["/userRoleModify/pk"])
 	fun putUserRoleModifyByPK(@RequestHeader token: String,
 	                          @RequestParam userPK: String,
-	                          @RequestBody roles: List<UserRole>): IRestResult {
-		return responseService.getResult(userService.userRoleModifyByPK(token, userPK, roles))
-	}
+	                          @RequestBody roles: List<UserRole>) =
+		responseService.getResult(userService.userRoleModifyByPK(token, userPK, roles))
 
 	@Operation(summary = "유저 부서 변경")
 	@PutMapping(value = ["/userDeptModify/id"])
@@ -142,9 +140,8 @@ class UserController {
 	@PutMapping(value = ["/userDeptModify/pk"])
 	fun putUserDeptModifyByPK(@RequestHeader token: String,
 	                          @RequestParam userPK: String,
-	                          @RequestBody depts: List<UserDept>): IRestResult {
-		return responseService.getResult(userService.userDeptModifyByPK(token, userPK, depts))
-	}
+	                          @RequestBody depts: List<UserDept>) =
+		responseService.getResult(userService.userDeptModifyByPK(token, userPK, depts))
 
 	@Operation(summary = "유저 상태 변경")
 	@PutMapping(value = ["/userStatusModify/id"])
@@ -158,17 +155,23 @@ class UserController {
 	@PutMapping(value = ["/userStatusModify/pk"])
 	fun putUserStatusModifyByPK(@RequestHeader token: String,
 	                            @RequestParam userPK: String,
-	                            @RequestParam status: UserStatus): IRestResult {
-		return responseService.getResult(userService.userStatusModifyByPK(token, userPK, status))
-	}
+	                            @RequestParam status: UserStatus) =
+		responseService.getResult(userService.userStatusModifyByPK(token, userPK, status))
 
+	@Operation(summary = "유저 이름, 메일 변경")
+	@PutMapping(value = ["/userNameMailPhoneModify/pk"])
+	fun putUserNameMailPhoneModifyByPK(@RequestHeader token: String,
+	                                   @RequestParam userPK: String,
+	                                   @RequestParam name: String,
+	                                   @RequestParam mail: String,
+																		 @RequestParam phone: String) =
+		responseService.getResult(userService.userNameMailPhoneModifyByPK(token, userPK, name, mail, phone))
 	@Operation(summary = "유저 권한,부서,상태 변경")
 	@PutMapping(value = ["/userRoleDeptStatusModify/pk"])
 	fun putUserRoleDeptStatusModifyByPK(@RequestHeader token: String,
 																			@RequestParam userPK: String,
-	                                    @RequestBody data: RoleDeptStatusModel): IRestResult {
-		return responseService.getResult(userService.userRoleDeptStatusModifyByPK(token, userPK, data))
-	}
+	                                    @RequestBody data: RoleDeptStatusModel) =
+		responseService.getResult(userService.userRoleDeptStatusModifyByPK(token, userPK, data))
 
 	@Operation(summary = "유저 사업자등록증 업로드")
 	@PutMapping(value = ["/userTaxImageUpload/id"], consumes = ["multipart/form-data"])
