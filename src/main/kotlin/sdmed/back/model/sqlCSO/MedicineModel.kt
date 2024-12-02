@@ -46,13 +46,8 @@ data class MedicineModel(
 	@JoinColumn
 	@JsonManagedReference(value = "medicinePriceManagedReference")
 	var medicinePriceModel: MutableList<MedicinePriceModel> = mutableListOf(),
-	@ManyToOne(fetch = FetchType.LAZY, optional = true)
-	@JoinColumn
-	@JsonBackReference(value = "pharmaMedicineManagedReference")
-	var pharma: PharmaModel? = null,
 ) {
 	fun lazyHide() {
-		pharma = null
 		medicinePriceModel.forEach { it.medicineModel = null }
 		maxPrice = medicinePriceModel.maxByOrNull { it.applyDate }?.maxPrice ?: 0
 	}

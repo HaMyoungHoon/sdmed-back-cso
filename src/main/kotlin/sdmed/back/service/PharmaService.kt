@@ -17,12 +17,10 @@ import sdmed.back.model.common.UserRole.Companion.getFlag
 import sdmed.back.model.common.UserRoles
 import sdmed.back.model.common.UserStatus
 import sdmed.back.model.sqlCSO.LogModel
+import sdmed.back.model.sqlCSO.PharmaMedicineRelationModel
 import sdmed.back.model.sqlCSO.PharmaModel
 import sdmed.back.model.sqlCSO.UserDataModel
-import sdmed.back.repository.sqlCSO.ILogRepository
-import sdmed.back.repository.sqlCSO.IMedicineRepository
-import sdmed.back.repository.sqlCSO.IPharmaRepository
-import sdmed.back.repository.sqlCSO.IUserDataRepository
+import sdmed.back.repository.sqlCSO.*
 import java.util.stream.Collectors
 
 @Service
@@ -33,6 +31,7 @@ class PharmaService {
 	@Autowired lateinit var userDataRepository: IUserDataRepository
 	@Autowired lateinit var pharmaRepository: IPharmaRepository
 	@Autowired lateinit var medicineRepository: IMedicineRepository
+	@Autowired lateinit var pharmaMedicineRelationRepository: IPharmaMedicineRelationRepository
 	@Autowired lateinit var entityManager: EntityManager
 
 
@@ -41,7 +40,7 @@ class PharmaService {
 		val tokenUser = getUserDataByToken(token)
 		isLive(tokenUser)
 
-		return pharmaRepository.findAllByOrderByCode().onEach { it.lazyHide() }
+		return pharmaRepository.findAllByOrderByCode()
 	}
 	fun getPagePharma(token: String, page: Int, size: Int): Page<PharmaModel> {
 		isValid(token)
@@ -51,23 +50,22 @@ class PharmaService {
 		val pageable = PageRequest.of(page, size)
 		return pharmaRepository.findAllByOrderByCode(pageable)
 	}
-	fun getHospitalAllSearch(token: String, searchString: String, isSearchTypeCode: Boolean = true): List<PharmaModel> {
+	fun getPharmaAllSearch(token: String, searchString: String, isSearchTypeCode: Boolean = true): List<PharmaModel> {
 		if (searchString.isEmpty()) {
 			return arrayListOf()
 		}
-		var ret: List<PharmaModel> = arrayListOf()
 
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
 		isLive(tokenUser)
-		if (isSearchTypeCode) {
-			ret = searchString.toIntOrNull()?.let { x ->
+		val ret: List<PharmaModel> = if (isSearchTypeCode) {
+			searchString.toIntOrNull()?.let { x ->
 				pharmaRepository.selectAllByCodeContainingOrderByCode(x.toString())
 			} ?: pharmaRepository.findAllByInnerNameContainingOrOrgNameContainingOrderByCode(searchString, searchString)
+		} else {
+			pharmaRepository.findAllByInnerNameContainingOrOrgNameContainingOrderByCode(searchString, searchString)
 		}
 
-		ret = pharmaRepository.findAllByInnerNameContainingOrOrgNameContainingOrderByCode(searchString, searchString)
-		ret.onEach { it.ownMedicineHide(); it.lazyHide() }
 		return ret
 	}
 
@@ -79,17 +77,18 @@ class PharmaService {
 		val tokenUser = getUserDataByToken(token)
 		isLive(tokenUser)
 
-		val ret = pharmaRepository.findByThisPK(pharmaPK)?.apply {
-			if (!pharmaOwnMedicineView) {
-				ownMedicineHide()
-			}
-			lazyHide()
-		} ?: throw PharmaNotFoundException()
-
+		val ret = pharmaRepository.findByThisPK(pharmaPK) ?: throw PharmaNotFoundException()
+		if (pharmaOwnMedicineView) {
+			val relation = pharmaMedicineRelationRepository.findAllByPharmaPK(pharmaPK)
+			ret.medicineList = medicineRepository.findAllByThisPKIn(relation.map { it.medicinePK }).apply {
+				onEach { it.lazyHide() }
+			}.toMutableList()
+		}
 		return ret
 	}
+
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
-	fun addPharmaDrugList(token: String, pharmaPK: String, medicinePKList: List<String>) {
+	fun modPharmaDrugList(token: String, pharmaPK: String, medicinePKList: List<String>): PharmaModel {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.PharmaChanger))) {
@@ -97,52 +96,36 @@ class PharmaService {
 		}
 
 		val ret = pharmaRepository.findByThisPK(pharmaPK) ?: throw PharmaNotFoundException()
-		ret.medicineList.addAll(medicineRepository.findAllByPharma(ret))
-		val buff = medicinePKList.toMutableList().distinct().toMutableList()
-		buff.removeIf { x -> x in ret.medicineList.map { y -> y.thisPK } }
-		if (buff.isEmpty()) {
-			return
-		}
+		val existMedicine = medicineRepository.findAllByThisPKIn(medicinePKList)
 
-		val medicineList = medicineRepository.findAllByThisPKIn(buff)
-		if (medicineList.isEmpty()) {
-			return
+		deleteRelationByPharmaPK(ret.thisPK)
+		if (existMedicine.isEmpty()) {
+			return ret
 		}
-
-		ret.medicineList.addAll(medicineList)
-		ret.medicineList = ret.medicineList.distinctBy { it.thisPK }.toMutableList().onEach { it.pharma = ret }
-		pharmaRepository.save(ret)
-		val retCount = medicineRepository.saveAll(ret.medicineList).count()
+		insertRelation(existMedicine.map { x -> PharmaMedicineRelationModel().apply {
+			this.pharmaPK = pharmaPK
+			this.medicinePK = x.thisPK
+		}})
 
 		val stackTrace = Thread.currentThread().stackTrace
-		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "add pharma ${ret.innerName} count : $retCount")
+		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "add pharma ${ret.innerName} count : ${existMedicine.count()}")
 		logRepository.save(logModel)
+		return ret
 	}
-
-	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
-	fun modPharmaDrugList(token: String, pharmaPK: String, medicinePKList: List<String>) {
-		isValid(token)
-		val tokenUser = getUserDataByToken(token)
-		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.PharmaChanger))) {
-			throw AuthenticationEntryPointException()
-		}
-
-		val ret = pharmaRepository.findByThisPK(pharmaPK) ?: throw PharmaNotFoundException()
-		val childBuff = medicineRepository.findAllByThisPKIn(medicineRepository.findAllByPharma(ret).map { it.thisPK }).onEach { it.pharma = null }
-		medicineRepository.saveAll(childBuff)
-		ret.medicineList.removeIf { x -> x.thisPK in childBuff.map { y -> y.thisPK } }
-		val buff = medicinePKList.toMutableList().distinct().toMutableList()
-		val medicineList = medicineRepository.findAllByThisPKIn(buff).onEach { it.pharma = ret }
-
-		ret.medicineList.addAll(medicineList)
-		ret.medicineList = ret.medicineList.distinctBy { it.thisPK }.toMutableList().onEach { it.pharma = ret }
-		pharmaRepository.save(ret)
-		val retCount = medicineRepository.saveAll(ret.medicineList).count()
-
-		val stackTrace = Thread.currentThread().stackTrace
-		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "add pharma ${ret.innerName} count : $retCount")
-		logRepository.save(logModel)
+	fun deleteRelationByPharmaPK(pharmaPK: String) {
+		val sqlString = "${FConstants.MODEL_PHARMA_MEDICINE_RELATIONS_DELETE_WHERE_PHARMA_PK} '${pharmaPK}'"
+		entityManager.createNativeQuery(sqlString).executeUpdate()
+		entityManager.flush()
+		entityManager.clear()
 	}
+	fun insertRelation(data: List<PharmaMedicineRelationModel>) {
+		val values = data.stream().map(this::renderSqlInsertRelation).collect(Collectors.joining(","))
+		val sqlString = "${FConstants.MODEL_PHARMA_MEDICINE_RELATIONS_INSERT_INTO}$values"
+		entityManager.createNativeQuery(sqlString).executeUpdate()
+		entityManager.flush()
+		entityManager.clear()
+	}
+	fun renderSqlInsertRelation(data: PharmaMedicineRelationModel) = data.insertString()
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
 	fun pharmaDataModify(token: String, pharmaData: PharmaModel): PharmaModel {
 		isValid(token)

@@ -40,6 +40,10 @@ class UserController {
 										 @PathVariable("page") page: Int,
 										 @PathVariable("size") size: Int) =
 		responseService.getResult(userService.getAllUser(token, page, size))
+	@Operation(summary = "영업 유저 전체")
+	@GetMapping(value = ["/all/business"])
+	fun getUserAllBusiness(@RequestHeader token: String) =
+		responseService.getResult(userService.getAllUserBusiness(token))
 
 	@Operation(summary = "로그인")
 	@GetMapping(value = ["/signIn"])

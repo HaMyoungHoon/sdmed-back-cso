@@ -15,7 +15,6 @@ interface IMedicineRepository: JpaRepository<MedicineModel, String> {
 	fun findAllByOrderByName(pageable: Pageable): Page<MedicineModel>
 	fun findAllByOrderByPharmaName(pageable: Pageable): Page<MedicineModel>
 	fun findAllByThisPKIn(medicinePK: List<String>): List<MedicineModel>
-	fun findAllByPharma(pharma: PharmaModel): List<MedicineModel>
 	fun findAllByKdCodeIn(kdCode: List<String>): List<MedicineModel>
 
 	@Query("SELECT a from MedicineModel a " +

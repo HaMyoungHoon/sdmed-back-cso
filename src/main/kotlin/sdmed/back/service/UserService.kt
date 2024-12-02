@@ -31,6 +31,7 @@ class UserService {
 	@Autowired lateinit var pharmaRepository: IPharmaRepository
 	@Autowired lateinit var medicineRepository: IMedicineRepository
 	@Autowired lateinit var userRelationRepository: IUserRelationRepository
+	@Autowired lateinit var pharmaMedicineRelationRepository: IPharmaMedicineRelationRepository
 	@Autowired lateinit var logRepository: ILogRepository
 	@Autowired lateinit var fAmhohwa: FAmhohwa
 	@Autowired lateinit var excelFileParser: FExcelFileParser
@@ -40,7 +41,20 @@ class UserService {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
 		if (haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee))) {
-			return userDataRepository.findAllByOrderByNameDesc().onEach { it.lazyHide(); it.pw = "" }.toMutableList().filter { it.thisPK != tokenUser.thisPK }
+			return userDataRepository.findAllByOrderByNameDesc().onEach { it.lazyHide(); it.pw = "" }.toMutableList().apply {
+				if (exceptMe) {
+					filter { it.thisPK != tokenUser.thisPK }
+				}
+			}
+		}
+
+		return userDataRepository.selectWhereDeptOrderByNameAsc(UserDepts.of(UserDept.TaxPayer, UserDept.Personal).getFlag()).onEach { it.pw = "" }.filter { it.thisPK != tokenUser.thisPK }
+	}
+	fun getAllUserBusiness(token: String, exceptMe: Boolean = true): List<UserDataModel> {
+		isValid(token)
+		val tokenUser = getUserDataByToken(token)
+		if (haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee))) {
+			return userDataRepository.selectByRoleAndStatusOrderByNameAsc(UserRole.BusinessMan.flag, UserStatus.Live.index).onEach { it.lazyHide(); it.pw = "" }.toMutableList().filter { it.thisPK != tokenUser.thisPK }
 		}
 
 		return userDataRepository.selectWhereDeptOrderByNameAsc(UserDepts.of(UserDept.TaxPayer, UserDept.Personal).getFlag()).onEach { it.pw = "" }.filter { it.thisPK != tokenUser.thisPK }
@@ -501,10 +515,10 @@ class UserService {
 		val userRelationModel = userRelationRepository.findAllByUserPK(userPK)
 		val hosMap = hospitalRepository.findAllByThisPKIn(userRelationModel.map { it.hosPK }).onEach { it.lazyHide() }.associateBy { it.thisPK }
 		val pharmaMap = pharmaRepository.findAllByThisPKIn(userRelationModel.map { it.pharmaPK }).onEach {
-			if (!pharmaOwnMedicineView) {
-				it.ownMedicineHide()
+			if (pharmaOwnMedicineView) {
+				val relation = pharmaMedicineRelationRepository.findAllByPharmaPK(it.thisPK)
+				it.medicineList = medicineRepository.findAllByThisPKIn(relation.map { x -> x.medicinePK }).toMutableList()
 			}
-			it.lazyHide()
 		}.associateBy { it.thisPK }
 		val medicineMap = medicineRepository.findAllByThisPKIn(userRelationModel.map { it.medicinePK }).onEach { it.lazyHide() }.associateBy { it.thisPK }
 		for (rel in userRelationModel) {

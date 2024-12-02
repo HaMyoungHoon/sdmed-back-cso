@@ -43,10 +43,10 @@ class PharmaController {
 		responseService.getResult(pharmaService.getPagePharma(token, page, size))
 	@Operation(summary = "제약사 조회 like code, innerName, orgName")
 	@GetMapping(value = ["/all/search"])
-	fun getHospitalAllSearch(@RequestHeader token: String,
+	fun getPharmaAllSearch(@RequestHeader token: String,
 													 @RequestParam searchString: String,
 													 @RequestParam(required = false) isSearchTypeCode: Boolean = false) =
-		responseService.getResult(pharmaService.getHospitalAllSearch(token, searchString, isSearchTypeCode))
+		responseService.getResult(pharmaService.getPharmaAllSearch(token, searchString, isSearchTypeCode))
 
 	@Operation(summary = "제약사 조회")
 	@GetMapping(value = ["/{pharmaPK}"])
@@ -54,12 +54,6 @@ class PharmaController {
 	              @PathVariable("pharmaPK") pharmaPK: String,
 								@RequestParam(required = false) pharmaOwnMedicineView: Boolean = false) =
 		responseService.getResult(pharmaService.getPharma(token, pharmaPK, pharmaOwnMedicineView))
-	@Operation(summary = "제약사 medicine list add")
-	@PostMapping(value = ["/{pharmaPK}/addMedicine"])
-	fun postPharmaAddMedicine(@RequestHeader token: String,
-	                          @PathVariable("pharmaPK") pharmaPK: String,
-	                          @RequestBody medicinePKList: List<String>) =
-		responseService.getResult(pharmaService.addPharmaDrugList(token, pharmaPK, medicinePKList))
 	@Operation(summary = "제약사 medicine list modify")
 	@PutMapping(value = ["/{pharmaPK}/modMedicine"])
 	fun putPharmaModMedicine(@RequestHeader token: String,

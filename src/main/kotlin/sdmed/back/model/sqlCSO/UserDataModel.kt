@@ -3,6 +3,7 @@ package sdmed.back.model.sqlCSO
 import com.fasterxml.jackson.annotation.JsonBackReference
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonManagedReference
+import com.fasterxml.jackson.annotation.JsonProperty
 import io.jsonwebtoken.Claims
 import jakarta.persistence.*
 import sdmed.back.config.FConstants
@@ -21,6 +22,7 @@ data class UserDataModel(
 	@Column(columnDefinition = "nvarchar(255)", nullable = false, updatable = false, unique = true)
 	var id: String = "",
 	@Column(columnDefinition = "nvarchar(255)", nullable = false)
+	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 	var pw: String = "",
 	@Column(columnDefinition = "nvarchar(255)", nullable = false)
 	var name: String = "",
