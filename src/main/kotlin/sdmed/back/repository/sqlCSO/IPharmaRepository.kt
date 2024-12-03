@@ -11,6 +11,7 @@ import sdmed.back.model.sqlCSO.PharmaModel
 interface IPharmaRepository: JpaRepository<PharmaModel, String> {
 	fun findAllByOrderByCode(): List<PharmaModel>
 	fun findAllByOrderByCode(pageable: Pageable): Page<PharmaModel>
+	fun findByCode(code: Int): PharmaModel?
 	fun findAllByInnerNameContainingOrOrgNameContainingOrderByCode(innerName: String, orgName: String): List<PharmaModel>
 
 	fun findByThisPK(pharmaPK: String): PharmaModel?

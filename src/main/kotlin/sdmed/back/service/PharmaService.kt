@@ -21,6 +21,7 @@ import sdmed.back.model.sqlCSO.PharmaMedicineRelationModel
 import sdmed.back.model.sqlCSO.PharmaModel
 import sdmed.back.model.sqlCSO.UserDataModel
 import sdmed.back.repository.sqlCSO.*
+import java.util.*
 import java.util.stream.Collectors
 
 @Service
@@ -72,7 +73,7 @@ class PharmaService {
 	fun getAllPharma(): List<PharmaModel> {
 		return pharmaRepository.findAllByOrderByCode()
 	}
-	fun getPharma(token: String, pharmaPK: String, pharmaOwnMedicineView: Boolean = false): PharmaModel {
+	fun getPharmaData(token: String, pharmaPK: String, pharmaOwnMedicineView: Boolean = false): PharmaModel {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
 		isLive(tokenUser)
@@ -141,6 +142,26 @@ class PharmaService {
 		return ret
 	}
 
+	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
+	fun addPharmaData(token: String, data: PharmaModel): PharmaModel {
+		isValid(token)
+		val tokenUser = getUserDataByToken(token)
+		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.PharmaChanger))) {
+			throw AuthenticationEntryPointException()
+		}
+
+		val exist = pharmaRepository.findByCode(data.code)
+		if (exist != null) {
+			throw PharmaExistException()
+		}
+
+		data.thisPK = UUID.randomUUID().toString()
+		val ret = pharmaRepository.save(data)
+		val stackTrace = Thread.currentThread().stackTrace
+		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "add pharma : ${data.thisPK}")
+		logRepository.save(logModel)
+		return ret
+	}
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
 	fun pharmaUpload(token: String, file: MultipartFile): String {
 		isValid(token)

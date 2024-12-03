@@ -109,3 +109,11 @@ userDataFileUploadException:
 userNotFoundException:
   code: "-10026"
   msg: "User not found."
+
+hospitalExistException:
+  code: "-10027"
+  msg: "already exist hospital code"
+
+pharmaExistException:
+  code: "-10027"
+  msg: "already exist pharma code"

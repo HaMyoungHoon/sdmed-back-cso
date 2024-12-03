@@ -9,7 +9,9 @@ import sdmed.back.model.sqlCSO.HospitalModel
 
 @Repository
 interface IHospitalRepository: JpaRepository<HospitalModel, String> {
+	fun findByThisPK(thisPK: String): HospitalModel?
 	fun findAllByOrderByCode(): List<HospitalModel>
+	fun findByCode(code: Int): HospitalModel?
 	fun findAllByOrderByCode(pageable: Pageable): Page<HospitalModel>
 	fun findAllByInnerNameContainingOrOrgNameContainingOrderByCode(innerName: String, orgName: String): List<HospitalModel>
 	fun findAllByCodeIn(codes: List<Int>): List<HospitalModel>

@@ -7,9 +7,7 @@ import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
-import sdmed.back.advice.exception.AccessDeniedException
-import sdmed.back.advice.exception.AuthenticationEntryPointException
-import sdmed.back.advice.exception.UserNotFoundException
+import sdmed.back.advice.exception.*
 import sdmed.back.config.FConstants
 import sdmed.back.config.FExcelFileParser
 import sdmed.back.config.jpa.CSOJPAConfig
@@ -24,6 +22,7 @@ import sdmed.back.model.sqlCSO.UserDataModel
 import sdmed.back.repository.sqlCSO.IHospitalRepository
 import sdmed.back.repository.sqlCSO.ILogRepository
 import sdmed.back.repository.sqlCSO.IUserDataRepository
+import java.util.*
 import java.util.stream.Collectors
 
 @Service
@@ -66,7 +65,34 @@ class HospitalService {
 
 		return hospitalRepository.findAllByInnerNameContainingOrOrgNameContainingOrderByCode(searchString, searchString)
 	}
+	fun getHospitalData(token: String, thisPK: String): HospitalModel {
+		isValid(token)
+		val tokenUser = getUserDataByToken(token)
+		isLive(tokenUser)
 
+		return hospitalRepository.findByThisPK(thisPK) ?: throw HospitalNotFoundException()
+	}
+
+	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
+	fun addHospitalData(token: String, data: HospitalModel): HospitalModel {
+		isValid(token)
+		val tokenUser = getUserDataByToken(token)
+		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.HospitalChanger))) {
+			throw AuthenticationEntryPointException()
+		}
+
+		val exist = hospitalRepository.findByCode(data.code)
+		if (exist != null) {
+			throw HospitalExistException()
+		}
+		data.thisPK = UUID.randomUUID().toString()
+
+		val ret = hospitalRepository.save(data)
+		val stackTrace = Thread.currentThread().stackTrace
+		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "add hospital : ${data.thisPK}")
+		logRepository.save(logModel)
+		return ret
+	}
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
 	fun hospitalUpload(token: String, file: MultipartFile): String {
 		isValid(token)
@@ -114,6 +140,23 @@ class HospitalService {
 		val ret = entityManager.createNativeQuery(sqlString).executeUpdate()
 		entityManager.flush()
 		entityManager.clear()
+		return ret
+	}
+
+	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
+	fun hospitalDataModify(token: String, data: HospitalModel): HospitalModel {
+		isValid(token)
+		val tokenUser = getUserDataByToken(token)
+		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.HospitalChanger))) {
+			throw AuthenticationEntryPointException()
+		}
+
+		hospitalRepository.findByThisPK(data.thisPK) ?: throw HospitalNotFoundException()
+		val ret = hospitalRepository.save(data)
+
+		val stackTrace = Thread.currentThread().stackTrace
+		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "hospital modify")
+		logRepository.save(logModel)
 		return ret
 	}
 	private fun renderSqlForHosModel(data: HospitalModel) = data.insertString()
