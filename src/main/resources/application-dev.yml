@@ -61,7 +61,8 @@ file:
   pharmaExcelDir: C:/FTP/STORAGE/EXCEL/PHARMA
   hospitalExcelDir: C:/FTP/STORAGE/EXCEL/HOSPITAL
   medicineExcelDir: C:/FTP/STORAGE/EXCEL/MEDICINE
-
+  medicineIngredientExcelDir: C:/FTP/STORAGE/EXCEL/MEDICINE_INGREDIENT
+  medicinePriceExcelDir: C:/FTP/STORAGE/EXCEL/MEDICINE_PRICE
 
 str:
   version: 1.0.0
