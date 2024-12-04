@@ -1,23 +1,26 @@
 package sdmed.back.model.sqlCSO
 
-import jakarta.persistence.*
+import com.fasterxml.jackson.annotation.JsonIgnore
+import jakarta.persistence.Column
+import jakarta.persistence.Entity
+import jakarta.persistence.Id
+import jakarta.persistence.Transient
 import sdmed.back.config.FConstants
 import sdmed.back.config.FExtensions
 import java.util.*
 
 @Entity
-data class MedicinePriceModel(
+data class MedicineIngredientModel(
 	@Id
 	@Column(columnDefinition = "nvarchar(36)", updatable = false, nullable = false)
 	var thisPK: String = UUID.randomUUID().toString(),
-	@Column
-	var kdCode: Int = 0,
-	@Column
-	var maxPrice: Int = 0,
+	@Column(columnDefinition = "nvarchar(255)", unique = true)
+	var mainIngredientCode: String = "",
 	@Column(columnDefinition = "text")
-	var ancestorCode: String = "",
-	@Column
-	var applyDate: Date = Date(),
+	var mainIngredientName: String = "",
+	@JsonIgnore
+	@Transient
+	var name: String = ""
 ) {
 	fun findHeader(data: List<String>): Boolean {
 		if (data.size < FConstants.MODEL_MEDICINE_PRICE_COUNT) {
@@ -51,9 +54,9 @@ data class MedicinePriceModel(
 	}
 	fun indexSet(data: String?, index: Int) {
 		when (index) {
-			4 -> kdCode = data?.toIntOrNull() ?: 0
-			9 -> maxPrice = data?.toIntOrNull() ?: 0
-			12 -> ancestorCode = data ?: ""
+			3 -> mainIngredientCode = data ?: ""
+			4 -> mainIngredientName = data ?: ""
+			5 -> name = data ?: ""
 		}
 	}
 	fun titleGet(index: Int): String {
@@ -75,17 +78,21 @@ data class MedicinePriceModel(
 		}
 	}
 	fun errorCondition(): Boolean {
-		if (kdCode == 0) {
+		if (mainIngredientCode.isBlank()) {
+			return true
+		} else if(mainIngredientName.isBlank()) {
+			return true
+		} else if (name.isNotEmpty()) {
 			return true
 		}
 
 		return false
 	}
-	fun errorString() = "${FConstants.MODEL_MEDICINE_PRICE_KD_CODE} : ${kdCode}\n${FConstants.MODEL_MEDICINE_PRICE_MAX_PRICE} : ${maxPrice}"
+	fun errorString() = "${FConstants.MODEL_MEDICINE_PRICE_KD_CODE} : ${mainIngredientCode}\n${FConstants.MODEL_MEDICINE_PRICE_MAX_PRICE} : ${mainIngredientName}"
 
 	fun insertString(): String {
-		val ancestorCode = FExtensions.escapeString(ancestorCode)
-		val applyDate = FExtensions.parseDateTimeString(applyDate, "yyyy-MM-dd")
-		return "('$thisPK', '$kdCode', '$maxPrice', '$ancestorCode', '$applyDate')"
+		val mainIngredientCode = FExtensions.escapeString(mainIngredientCode)
+		val mainIngredientName = FExtensions.escapeString(mainIngredientName)
+		return "('$thisPK', '${mainIngredientCode}', '${mainIngredientName}')"
 	}
 }

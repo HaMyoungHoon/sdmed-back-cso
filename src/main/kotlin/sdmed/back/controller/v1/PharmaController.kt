@@ -44,8 +44,8 @@ class PharmaController {
 	@Operation(summary = "제약사 조회 like code, innerName, orgName")
 	@GetMapping(value = ["/all/search"])
 	fun getPharmaAllSearch(@RequestHeader token: String,
-													 @RequestParam searchString: String,
-													 @RequestParam(required = false) isSearchTypeCode: Boolean = false) =
+	                       @RequestParam searchString: String,
+	                       @RequestParam(required = false) isSearchTypeCode: Boolean = false) =
 		responseService.getResult(pharmaService.getPharmaAllSearch(token, searchString, isSearchTypeCode))
 
 	@Operation(summary = "제약사 조회")

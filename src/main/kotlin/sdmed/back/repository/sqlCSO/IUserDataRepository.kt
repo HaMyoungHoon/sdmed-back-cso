@@ -15,7 +15,7 @@ interface IUserDataRepository: JpaRepository<UserDataModel, String> {
 	fun findByThisPK(thisPK: String): UserDataModel?
 	fun findAllByUserData(userDataModel: UserDataModel): List<UserDataModel>
 
-	@Query("SELECT * from userDataModel " +
+	@Query("SELECT * FROM userDataModel " +
 			"WHERE id = :id", nativeQuery = true)
 	fun selectById(id: String): UserDataModel?
 	@Query("SELECT * FROM userDataModel" +

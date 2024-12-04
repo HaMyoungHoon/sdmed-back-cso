@@ -1,66 +1,48 @@
 package sdmed.back.model.sqlCSO
 
-import com.fasterxml.jackson.annotation.JsonBackReference
-import com.fasterxml.jackson.annotation.JsonIgnore
-import com.fasterxml.jackson.annotation.JsonManagedReference
 import jakarta.persistence.*
-import org.hibernate.annotations.BatchSize
 import sdmed.back.config.FConstants
 import sdmed.back.config.FExtensions
+import sdmed.back.model.common.*
 import java.util.*
 
 @Entity
-@BatchSize(size = 20)
 data class MedicineModel(
 	@Id
 	@Column(columnDefinition = "nvarchar(36)", updatable = false, nullable = false)
 	var thisPK: String = UUID.randomUUID().toString(),
-	@Column
-	var serialNumber: Int = 0,
-	@Column(columnDefinition = "nvarchar(100)", nullable = false)
-	var method: String = "",
-	@Column(columnDefinition = "nvarchar(100)", nullable = false)
-	var classify: String = "",
-	@Column(columnDefinition = "nvarchar(100)", nullable = false)
+	@Column(nullable = false, unique = true)
+	var code: Int = 0,
+	@Column(columnDefinition = "nvarchar(255)")
 	var mainIngredientCode: String = "",
-	@Column(columnDefinition = "nvarchar(100)", nullable = false)
-	var kdCode: String = "",
-	@Column(columnDefinition = "nvarchar(255)", nullable = false)
-	var name: String = "",
-	@Column(columnDefinition = "nvarchar(255)", nullable = false)
-	var pharmaName: String = "",
-	@Column(columnDefinition = "nvarchar(255)", nullable = false)
-	var standard: String = "",
-	@Column(columnDefinition = "nvarchar(255)", nullable = false)
-	var unit: String = "",
 	@Column
-	var general: Int = 0,
+	var kdCode: Int = 0,
+	@Column
+	var standardCode: Int = 0,
+	@Column(columnDefinition = "text")
+	var pharma: String = "",
+	@Column(columnDefinition = "text")
+	var name: String = "",
+	@Column
+	var customPrice: Int = 0,
 	@Transient
 	var maxPrice: Int = 0,
 	@Transient
-	@JsonIgnore
-	var etc: String = "",
-	@Column
-	var ancestorCode: Int = 0,
-	@OneToMany(fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
-	@JoinColumn
-	@JsonManagedReference(value = "medicinePriceManagedReference")
+	var medicineSubModel: MedicineSubModel = MedicineSubModel(),
+	@Transient
+	var medicineIngredientModel: MedicineIngredientModel = MedicineIngredientModel(),
+	@Transient
 	var medicinePriceModel: MutableList<MedicinePriceModel> = mutableListOf(),
 ) {
-	fun lazyHide() {
-		medicinePriceModel.forEach { it.medicineModel = null }
-		maxPrice = medicinePriceModel.maxByOrNull { it.applyDate }?.maxPrice ?: 0
-	}
 	fun findHeader(data: List<String>): Boolean {
-		if (data.size < FConstants.MODEL_DRUG_COUNT) {
+		if (data.size < FConstants.MODEL_MEDICINE_COUNT) {
 			return false
 		}
 
-		if (data[0] != titleGet(0) || data[1] != titleGet(1) || data[2] != titleGet(2) || data[3] != titleGet(3) ||
-			data[4] != titleGet(4) || data[5] != titleGet(5) ||	data[6] != titleGet(6) || data[7] != titleGet(7) ||
-			data[8] != titleGet(8) || data[9] != titleGet(9) || data[10] != titleGet(10) || data[11] != titleGet(11) ||
-			data[12] != titleGet(12)) {
-			return false
+		for (index in 0 until FConstants.MODEL_MEDICINE_COUNT) {
+			if (data[index] != titleGet(index)) {
+				return false
+			}
 		}
 
 		return true
@@ -82,111 +64,74 @@ data class MedicineModel(
 			null
 		}
 	}
-	fun indexGet(index: Int): String {
-		return when (index) {
-			0 -> serialNumber.toString()
-			1 -> method
-			2 -> classify
-			3 -> mainIngredientCode
-			4 -> kdCode
-			5 -> name
-			6 -> pharmaName
-			7 -> standard
-			8 -> unit
-//			9 -> maxPrice.toString()
-			10 -> general.toString()
-//			11 -> etc
-			12 -> ancestorCode.toString()
-			else -> ""
-		}
-	}
 	fun indexSet(data: String?, index: Int) {
 		when (index) {
-			0 -> serialNumber = data?.toIntOrNull() ?: 0
-			1 -> method = data ?: ""
-			2 -> classify = data ?: ""
-			3 -> mainIngredientCode = data ?: ""
-			4 -> kdCode = data ?: ""
+			0 -> {
+				code = data?.toIntOrNull() ?: 0
+				medicineSubModel.code = code
+			}
+			1 -> mainIngredientCode = data ?: ""
+			2 -> kdCode = data?.toIntOrNull() ?: 0
+			3 -> standardCode = data?.toIntOrNull() ?: 0
+			4 -> pharma = data ?: ""
 			5 -> name = data ?: ""
-			6 -> pharmaName = data ?: ""
-			7 -> standard = data ?: ""
-			8 -> unit = data ?: ""
-			9 -> medicinePriceModel.add(MedicinePriceModel().apply {
-				maxPrice = data?.toIntOrNull() ?: 0
-				medicineModel = this@MedicineModel
-			})
-			10 -> general = if (data == "일반") 0 else 1
-//			11 -> etc = data ?: ""
-			12 -> ancestorCode = data?.toIntOrNull() ?: 0
-		}
-	}
-	fun childDataSet(kdCode: String, etc: String, applyDate: Date) {
-		medicinePriceModel.forEach { x ->
-			x.kdCode = kdCode
-			x.etc = etc
-			x.applyDate = applyDate
+			6 -> medicineSubModel.standard = data ?: ""
+			7 -> medicineSubModel.accountUnit = data?.toDoubleOrNull() ?: 0.0
+			8 -> customPrice = data?.toIntOrNull() ?: 0
+			9 -> medicineSubModel.medicineType = MedicineType.parseString(data)
+			10 -> medicineSubModel.medicineMethod = MedicineMethod.parseString(data)
+			11 -> medicineSubModel.medicineCategory = MedicineCategory.parseString(data)
+			12 -> medicineSubModel.medicineGroup = MedicineGroup.parseString(data)
+			13 -> medicineSubModel.medicineDiv = MedicineDiv.parseString(data)
+			14 -> medicineSubModel.medicineRank = MedicineRank.parseString(data)
+			15 -> medicineSubModel.medicineStorageTemp = MedicineStorageTemp.parseString(data)
+			16 -> medicineSubModel.medicineStorageBox = MedicineStorageBox.parseString(data)
+			17 -> medicineSubModel.packageUnit = data?.toIntOrNull() ?: 0
+			18 -> medicineSubModel.unit = data ?: ""
+			19 -> medicineSubModel.etc1 = data ?: ""
+			20 -> medicineSubModel.etc2 = data ?: ""
 		}
 	}
 	fun titleGet(index: Int): String {
 		return when (index) {
-			0 -> FConstants.MODEL_DRUG_INDEX
-			1 -> FConstants.MODEL_DRUG_METHOD
-			2 -> FConstants.MODEL_DRUG_CLASSIFY
-			3 -> FConstants.MODEL_DRUG_INGREDIENT_CODE
-			4 -> FConstants.MODEL_DRUG_KD_CODE
-			5 -> FConstants.MODEL_DRUG_NAME
-			6 -> FConstants.MODEL_DRUG_PHARMA_NAME
-			7 -> FConstants.MODEL_DRUG_STANDARD
-			8 -> FConstants.MODEL_DRUG_UNIT
-			9 -> FConstants.MODEL_DRUG_MAX_PRICE
-			10 -> FConstants.MODEL_DRUG_GENERAL
-			11 -> FConstants.MODEL_DRUG_ETC
-			12 -> FConstants.MODEL_DRUG_ANCESTOR_CODE
+			0 -> FConstants.MODEL_MEDICINE_CODE
+			1 -> FConstants.MODEL_MEDICINE_MAIN_INGREDIENT_CODE
+			2 -> FConstants.MODEL_MEDICINE_KD_CODE
+			3 -> FConstants.MODEL_MEDICINE_STANDARD_CODE
+			4 -> FConstants.MODEL_MEDICINE_PHARMA
+			5 -> FConstants.MODEL_MEDICINE_NAME
+			6 -> FConstants.MODEL_MEDICINE_STANDARD
+			7 -> FConstants.MODEL_MEDICINE_ACCOUNT_UNIT
+			8 -> FConstants.MODEL_MEDICINE_CUSTOM_PRICE
+			9 -> FConstants.MODEL_MEDICINE_TYPE
+			10 -> FConstants.MODEL_MEDICINE_METHOD
+			11 -> FConstants.MODEL_MEDICINE_CATEGORY
+			12 -> FConstants.MODEL_MEDICINE_GROUP
+			13 -> FConstants.MODEL_MEDICINE_DIV
+			14 -> FConstants.MODEL_MEDICINE_RANK
+			15 -> FConstants.MODEL_MEDICINE_STORAGE_TEMP
+			16 -> FConstants.MODEL_MEDICINE_STORAGE_BOX
+			17 -> FConstants.MODEL_MEDICINE_PACKAGE_UNIT
+			18 -> FConstants.MODEL_MEDICINE_UNIT
+			19 -> FConstants.MODEL_MEDICINE_ETC1
+			20 -> FConstants.MODEL_MEDICINE_ETC2
 			else -> ""
 		}
 	}
 	fun errorCondition(): Boolean {
-		if (indexGet(3).isEmpty()) {
+		if (code == 0) {
 			return true
-		} else if (indexGet(4).isEmpty()) {
+		} else if (name.isBlank()) {
 			return true
-		} else if (indexGet(5).isEmpty()) {
-			return true
-		} else if (indexGet(6).isEmpty()) {
-			return true
-		} else if (indexGet(7).isEmpty()) {
-			return true
-		} else if (indexGet(8).isEmpty()) {
-			return true
-			// 0 원이 있나? 있네 시벌
-//		} else if (getIndex(9) == "0") {
-//			return true
-		} else if (indexGet(10).isEmpty()) {
-			return true
-//		} else if (getIndex(11).isEmpty()) {
-//			return true
-//		} else if (getIndex(12) == "0") {
-//			return true
 		}
 		return false
 	}
-	fun errorString(): String {
-		val ret = StringBuilder()
-		for (i in 0 until FConstants.MODEL_DRUG_COUNT) {
-			ret.append("${titleGet(i)} : ${indexGet(i)}\n")
-		}
-		return ret.toString()
-	}
+	fun errorString() = "${FConstants.MODEL_MEDICINE_CODE} : ${code}\n${FConstants.MODEL_MEDICINE_NAME} : ${name}"
 	fun insertString(): String {
-		val method = FExtensions.escapeString(method)
-		val classify = FExtensions.escapeString(classify)
 		val mainIngredientCode = FExtensions.escapeString(mainIngredientCode)
-		val kdCode = FExtensions.escapeString(kdCode)
+		val pharmaName = FExtensions.escapeString(pharma)
 		val name = FExtensions.escapeString(name)
-		val pharmaName = FExtensions.escapeString(pharmaName)
-		val standard = FExtensions.escapeString(standard)
-		val unit = FExtensions.escapeString(unit)
-//		val etc = FExtensions.escapeString(etc)
-		return "('$thisPK', '$serialNumber', '$method', '$classify', '$mainIngredientCode', '$kdCode', '$name', '$pharmaName', '$standard', '$unit', '$general', '$ancestorCode')"
+		return "('$thisPK', '$code', '$mainIngredientCode', '$kdCode', '$standardCode', '$pharmaName', '$name', '$customPrice')"
 	}
+	fun insertSubString() = medicineSubModel.insertString()
 }

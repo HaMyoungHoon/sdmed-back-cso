@@ -81,9 +81,7 @@ class PharmaService {
 		val ret = pharmaRepository.findByThisPK(pharmaPK) ?: throw PharmaNotFoundException()
 		if (pharmaOwnMedicineView) {
 			val relation = pharmaMedicineRelationRepository.findAllByPharmaPK(pharmaPK)
-			ret.medicineList = medicineRepository.findAllByThisPKIn(relation.map { it.medicinePK }).apply {
-				onEach { it.lazyHide() }
-			}.toMutableList()
+			ret.medicineList = medicineRepository.findAllByThisPKIn(relation.map { it.medicinePK }).toMutableList()
 		}
 		return ret
 	}

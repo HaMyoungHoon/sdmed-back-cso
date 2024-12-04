@@ -9,7 +9,7 @@ import java.util.*
 @Repository
 interface IMedicinePriceRepository: JpaRepository<MedicinePriceModel, String> {
 	fun findAllByApplyDate(applyDate: Date): List<MedicinePriceModel>
-	fun findAllByKdCodeIn(kdCode: List<String>): List<MedicinePriceModel>
+	fun findAllByKdCodeIn(kdCode: List<Int>): List<MedicinePriceModel>
 
 	@Query("WITH RankedMedicinePrice AS (\n" +
 			"    SELECT *, ROW_NUMBER() OVER (PARTITION BY kdCode ORDER BY applyDate DESC) as RN FROM medicinePriceModel\n" +

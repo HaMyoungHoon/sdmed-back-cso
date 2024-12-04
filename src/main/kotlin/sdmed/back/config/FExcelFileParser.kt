@@ -89,7 +89,7 @@ class FExcelFileParser {
 
 		return ret
 	}
-	fun medicineUploadExcelParse(uploaderID: String, applyDate: Date, file: MultipartFile): MutableList<MedicineModel> {
+	fun medicineUploadExcelParse(uploaderID: String, file: MultipartFile): MutableList<MedicineModel> {
 		FExtensions.folderExist(FExcelParserType.MEDICINE)
 		val copiedLocation = FExtensions.fileCopy(file, FExcelParserType.MEDICINE, uploaderID)
 		val excelSheetHandler = ExcelSheetHandler.readExcel(copiedLocation.toFile())
@@ -110,7 +110,59 @@ class FExcelFileParser {
 			if (setRowRet == false) {
 				return@forEach
 			}
-			model.childDataSet(model.kdCode, model.etc, applyDate)
+			ret.add(model)
+		}
+
+		return ret
+	}
+	fun medicineIngredientUploadExcelParse(uploaderID: String, file: MultipartFile): MutableList<MedicineIngredientModel> {
+		FExtensions.folderExist(FExcelParserType.MEDICINE_INGREDIENT)
+		val copiedLocation = FExtensions.fileCopy(file, FExcelParserType.MEDICINE_INGREDIENT, uploaderID)
+		val excelSheetHandler = ExcelSheetHandler.readExcel(copiedLocation.toFile())
+
+		if (!MedicineIngredientModel().findHeader(excelSheetHandler.header)) {
+			FExtensions.fileDelete(copiedLocation)
+			throw MedicineDataFileUploadException()
+		}
+
+		val ret: MutableList<MedicineIngredientModel> = mutableListOf()
+		excelSheetHandler.rows.forEach { x ->
+			val model = MedicineIngredientModel()
+			val setRowRet = model.rowSet(x)
+			if (setRowRet == null) {
+				FExtensions.fileDelete(copiedLocation)
+				throw MedicineDataFileUploadException(model.errorString())
+			}
+			if (setRowRet == false) {
+				return@forEach
+			}
+			ret.add(model)
+		}
+
+		return ret
+	}
+	fun medicinePriceUploadExcelParse(uploaderID: String, applyDate: Date, file: MultipartFile): MutableList<MedicinePriceModel> {
+		FExtensions.folderExist(FExcelParserType.MEDICINE_PRICE)
+		val copiedLocation = FExtensions.fileCopy(file, FExcelParserType.MEDICINE_PRICE, uploaderID)
+		val excelSheetHandler = ExcelSheetHandler.readExcel(copiedLocation.toFile())
+
+		if (!MedicinePriceModel().findHeader(excelSheetHandler.header)) {
+			FExtensions.fileDelete(copiedLocation)
+			throw MedicineDataFileUploadException()
+		}
+
+		val ret: MutableList<MedicinePriceModel> = mutableListOf()
+		excelSheetHandler.rows.forEach { x ->
+			val model = MedicinePriceModel()
+			val setRowRet = model.rowSet(x)
+			if (setRowRet == null) {
+				FExtensions.fileDelete(copiedLocation)
+				throw MedicineDataFileUploadException(model.errorString())
+			}
+			if (setRowRet == false) {
+				return@forEach
+			}
+			model.applyDate = applyDate
 			ret.add(model)
 		}
 

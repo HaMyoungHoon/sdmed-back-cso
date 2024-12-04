@@ -11,13 +11,13 @@ import java.util.Date
 
 @Repository
 interface IMedicineRepository: JpaRepository<MedicineModel, String> {
-	fun findAllByOrderByName(): List<MedicineModel>
-	fun findAllByOrderByName(pageable: Pageable): Page<MedicineModel>
-	fun findAllByOrderByPharmaName(pageable: Pageable): Page<MedicineModel>
+	fun findAllByOrderByCode(): List<MedicineModel>
 	fun findAllByThisPKIn(medicinePK: List<String>): List<MedicineModel>
-	fun findAllByKdCodeIn(kdCode: List<String>): List<MedicineModel>
+	fun findAllByCodeIn(code: List<Int>): List<MedicineModel>
+	fun findAllByNameContainingOrPharmaContaining(name: String, pharma: String): List<MedicineModel>
 
-	@Query("SELECT a from MedicineModel a " +
-			"LEFT JOIN FETCH a.medicinePriceModel ")
-	fun selectAll(): List<MedicineModel>
+	@Query("SELECT a FROM MedicineModel a " +
+			"WHERE a.code LIKE %:code% OR a.kdCode LIKE %:kdCode% " +
+			"ORDER BY a.code", nativeQuery = true)
+	fun selectAllByCodeLikeOrKdCodeLike(code: Int, kdCode: Int): List<MedicineModel>
 }

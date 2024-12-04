@@ -35,23 +35,34 @@ class MedicineController {
 
 	@Operation(summary = "약제급여목록")
 	@GetMapping(value = ["/all"])
-	fun getMedicineAll(@RequestHeader token: String) =
-		responseService.getResult(medicineService.getMedicine(token))
-	@Operation(summary = "약제급여목록")
-	@GetMapping(value = ["/all/{page}/{size}"])
-	fun getMedicineAllPage(@RequestHeader token: String,
-												 @PathVariable("page") page: Int,
-												 @PathVariable("size") size: Int) =
-		responseService.getResult(medicineService.getMedicine(token, page, size))
+	fun getMedicineAll(@RequestHeader token: String,
+										 @RequestParam(required = false) withPrice: Boolean = false) =
+		responseService.getResult(medicineService.getMedicine(token, withPrice))
+	@Operation(summary = "약품 검색")
+	@GetMapping(value = ["/all/search"])
+	fun getMedicineAllSearch(@RequestHeader token: String,
+													 @RequestParam searchString: String,
+													 @RequestParam(required = false) isSearchTypeCode: Boolean = false) =
+		responseService.getResult(medicineService.getMedicineSearch(token, searchString, isSearchTypeCode))
 
-	@Operation(summary = "약제급여목록및급여상한금액표 업로드")
+	@Operation(summary = "약품 목록 업로드")
 	@PostMapping(value = ["/dataUploadExcel"], consumes = ["multipart/form-data"])
 	fun postDataUploadExcel(@RequestHeader token: String,
-													@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) applyDate: Date,
 													@RequestParam file: MultipartFile) =
-		responseService.getResult(medicineService.medicineUpload(token, applyDate, file))
+		responseService.getResult(medicineService.medicineUpload(token, file))
+	@Operation(summary = "약제급여목록및급여상한금액표 업로드")
+	@PostMapping(value = ["/priceDataUploadExcel"], consumes = ["multipart/form-data"])
+	fun postPriceDataUploadExcel(@RequestHeader token: String,
+	                             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) applyDate: Date,
+	                             @RequestParam file: MultipartFile) =
+		responseService.getResult(medicineService.medicinePriceUpload(token, applyDate, file))
+	@Operation(summary = "약제급여목록및급여상한금액표 주성분 업로드")
+	@PostMapping(value = ["/ingredientDataUploadExcel"], consumes = ["multipart/form-data"])
+	fun postIngredientDataUploadExcel(@RequestHeader token: String,
+	                                  @RequestParam file: MultipartFile) =
+		responseService.getResult(medicineService.medicineIngredientUpload(token, file))
 
-	@Operation(summary = "약제급여목록및급여상한금액표 엑셀 샘플 다운로드")
+	@Operation(summary = "약품 목록 엑셀 샘플 다운로드")
 	@GetMapping(value = ["/sampleDownloadExcel"])
 	fun getSampleDownloadExcel(): ResponseEntity<Resource> {
 		val ret = FExtensions.sampleFileDownload(FExcelParserType.MEDICINE)

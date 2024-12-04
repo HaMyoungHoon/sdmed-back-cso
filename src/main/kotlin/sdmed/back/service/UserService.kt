@@ -31,6 +31,8 @@ class UserService {
 	@Autowired lateinit var hospitalRepository: IHospitalRepository
 	@Autowired lateinit var pharmaRepository: IPharmaRepository
 	@Autowired lateinit var medicineRepository: IMedicineRepository
+	@Autowired lateinit var medicineSubRepository: IMedicineSubRepository
+	@Autowired lateinit var medicineIngredientRepository: IMedicineIngredientRepository
 	@Autowired lateinit var userRelationRepository: IUserRelationRepository
 	@Autowired lateinit var pharmaMedicineRelationRepository: IPharmaMedicineRelationRepository
 	@Autowired lateinit var logRepository: ILogRepository
@@ -508,6 +510,7 @@ class UserService {
 	}
 	fun renderSqlInsertRelation(data: UserHosPharmaMedicinePairModel) = data.insertString()
 
+	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
 	fun getUserDataByID(id: String, childView: Boolean = false, relationView: Boolean = false, pharmaOwnMedicineView: Boolean = false): UserDataModel {
 		val ret = userDataRepository.selectById(id) ?: throw UserNotFoundException()
 		if (childView) {
@@ -520,6 +523,7 @@ class UserService {
 
 		return ret
 	}
+	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
 	fun getUserDataByPK(thisPK: String, childView: Boolean = false, relationView: Boolean = false, pharmaOwnMedicineView: Boolean = false): UserDataModel {
 		val ret = userDataRepository.findByThisPK(thisPK) ?: throw UserNotFoundException()
 		if (childView) {
@@ -532,6 +536,7 @@ class UserService {
 
 		return ret
 	}
+	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
 	fun getUserDataWithRelationByPK(thisPK: String) = getUserDataByPK(thisPK).apply { hosList = mergeRel(thisPK) }
 	fun mergeRel(userPK: String, pharmaOwnMedicineView: Boolean = false): MutableList<HospitalModel> {
 		var ret: MutableList<HospitalModel> = mutableListOf()
@@ -543,7 +548,11 @@ class UserService {
 				it.medicineList = medicineRepository.findAllByThisPKIn(relation.map { x -> x.medicinePK }).toMutableList()
 			}
 		}.associateBy { it.thisPK }
-		val medicineMap = medicineRepository.findAllByThisPKIn(userRelationModel.map { it.medicinePK }).onEach { it.lazyHide() }.associateBy { it.thisPK }
+		val medicineBuff = medicineRepository.findAllByThisPKIn(userRelationModel.map { it.medicinePK })
+		val sub = medicineSubRepository.findALlByCodeInOrderByCode(medicineBuff.map { it.code })
+		val ingredient = medicineIngredientRepository.findAllByMainIngredientCodeIn(medicineBuff.map { it.mainIngredientCode })
+		medicineMerge(medicineBuff, sub, ingredient)
+		val medicineMap = medicineBuff.associateBy { it.thisPK }
 		for (rel in userRelationModel) {
 			val hos = hosMap[rel.hosPK] ?: continue
 			val pharma = pharmaMap[rel.pharmaPK]
@@ -565,6 +574,17 @@ class UserService {
 		}
 
 		return ret
+	}
+
+	fun medicineMerge(mother: List<MedicineModel>, sub: List<MedicineSubModel>, ingredient: List<MedicineIngredientModel>) {
+		val subMap = sub.associateBy { it.code }
+		mother.map { x ->
+			subMap[x.code]?.let { y -> x.medicineSubModel = y }
+		}
+		val ingredientMap = ingredient.associateBy { it.mainIngredientCode }
+		mother.map { x ->
+			ingredientMap[x.mainIngredientCode]?.let { y -> x.medicineIngredientModel = y }
+		}
 	}
 
 	fun getUserDataByToken(token: String) = getUserDataByID(jwtTokenProvider.getAllClaimsFromToken(token).subject)

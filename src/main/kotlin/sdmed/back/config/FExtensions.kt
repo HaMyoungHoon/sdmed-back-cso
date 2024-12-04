@@ -23,6 +23,8 @@ object FExtensions {
 	var pharmaExcelDir: String = ""
 	var hospitalExcelDir: String = ""
 	var medicineExcelDir: String = ""
+	var medicineIngredientExcelDir: String = ""
+	var medicinePriceExcelDir: String = ""
 
 	fun folderExist(excelType: FExcelParserType) {
 		Optional.ofNullable(Files.createDirectories(fileLocation(excelType))).orElseThrow { FileUploadException() }
@@ -33,6 +35,8 @@ object FExtensions {
 			FExcelParserType.PHARMA -> pharmaExcelDir
 			FExcelParserType.HOSPITAL -> hospitalExcelDir
 			FExcelParserType.MEDICINE -> medicineExcelDir
+			FExcelParserType.MEDICINE_INGREDIENT -> medicineIngredientExcelDir
+			FExcelParserType.MEDICINE_PRICE -> medicinePriceExcelDir
 		}
 		return if (withTime) {
 			Paths.get("${ret}/${getDateTimeString("yyyy-MM-dd")}").toAbsolutePath().normalize()
@@ -80,6 +84,8 @@ object FExtensions {
 			FExcelParserType.PHARMA -> Paths.get("${pharmaExcelDir}/excel_upload_sample.xlsx").toAbsolutePath().normalize()
 			FExcelParserType.HOSPITAL -> Paths.get("${hospitalExcelDir}/excel_upload_sample.xlsx").toAbsolutePath().normalize()
 			FExcelParserType.MEDICINE -> Paths.get("${medicineExcelDir}/excel_upload_sample.xlsx").toAbsolutePath().normalize()
+			FExcelParserType.MEDICINE_INGREDIENT -> Paths.get("${medicineIngredientExcelDir}/excel_upload_sample.xlsx").toAbsolutePath().normalize()
+			FExcelParserType.MEDICINE_PRICE -> Paths.get("${medicinePriceExcelDir}/excel_upload_sample.xlsx").toAbsolutePath().normalize()
 		}
 		return UrlResource(filePath.toUri())
 	}
@@ -112,5 +118,5 @@ object FExtensions {
 
 	fun regexSpecialCharRemove(data: String?) = data?.let { Regex(FConstants.REGEX_SPECIAL_CHAR_REMOVE).replace(it, "") } ?: ""
 	fun regexOnlyAlphabet(data: String?) = data?.let { Regex(FConstants.REGEX_ONLY_ALPHABET).replace(it, "") } ?: ""
-	fun escapeString(data: String?) = data?.let { it.replace(Regex(FConstants.REGEX_ESCAPE_SQL)) { x -> ""} } ?: ""
+	fun escapeString(data: String?) = data?.let { it.replace(Regex(FConstants.REGEX_ESCAPE_SQL)) { "" } } ?: ""
 }

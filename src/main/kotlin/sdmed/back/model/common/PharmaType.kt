@@ -1,4 +1,4 @@
-package sdmed.back.model.sqlCSO
+package sdmed.back.model.common
 
 enum class PharmaType(var index: Int, var desc: String) {
 	None(0, "미지정"),

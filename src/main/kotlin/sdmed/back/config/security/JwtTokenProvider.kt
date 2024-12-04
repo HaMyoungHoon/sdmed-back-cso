@@ -34,11 +34,7 @@ class JwtTokenProvider {
 	fun createToken(user: UserDataModel, validTime: Long = tokenValidMS): String {
 		val now = Date()
 		return Jwts.builder().claims(Jwts.claims().subject(user.id).apply {
-			this.add(FConstants.CLAIM_INDEX, user.thisPK.toString())
-			this.add(FConstants.CLAIM_ID, user.id)
 			this.add(FConstants.CLAIM_NAME, user.name)
-			this.add(FConstants.CLAIM_ROLE, user.role.toString())
-			this.add(FConstants.CLAIM_DEPT, user.dept.toString())
 			this.add(FConstants.CLAIM_STATUS, user.status)
 		}.build()).expiration(Date(now.time + validTime)).signWith(getSignKey()).compact()
 	}
