@@ -13,6 +13,8 @@ class UtilConfiguration {
 	@Value(value = "\${file.pharmaExcelDir}") var pharmaExcelDir: String = ""
 	@Value(value = "\${file.hospitalExcelDir}") var hospitalExcelDir: String = ""
 	@Value(value = "\${file.medicineExcelDir}") var medicineExcelDir: String = ""
+	@Value(value = "\${file.medicineIngredientExcelDir}") var medicineIngredientExcelDir: String = ""
+	@Value(value = "\${file.medicinePriceExcelDir}") var medicinePriceExcelDir: String = ""
 
 	@PostConstruct
 	fun init() {
@@ -23,5 +25,7 @@ class UtilConfiguration {
 		FExtensions.pharmaExcelDir = pharmaExcelDir
 		FExtensions.hospitalExcelDir = hospitalExcelDir
 		FExtensions.medicineExcelDir = medicineExcelDir
+		FExtensions.medicineIngredientExcelDir = medicineIngredientExcelDir
+		FExtensions.medicinePriceExcelDir = medicinePriceExcelDir
 	}
 }
