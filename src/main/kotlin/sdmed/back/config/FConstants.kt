@@ -76,7 +76,7 @@ object FConstants {
 	const val MODEL_ETC1 = "비고1"
 	const val MODEL_ETC2 = "비고2"
 	const val MODEL_PHARMA_COUNT = 23
-	const val MODEL_PHARMA_INSERT_INTO = "INSERT INTO pharmaModel (thisPK, code, orgName, innerName, ownerName, taxpayerNumber, phoneNumber, faxNumber, zipCode, address, addressDetail, businessType, businessItem, billType, pharmaType, pharmaGroup, contractType, deliveryDiv, mail, mobilePhone, openDate, closeDate, etc1, etc2, imageUrl) VALUES "
+	const val MODEL_PHARMA_INSERT_INTO = "INSERT INTO pharmaModel (thisPK, code, orgName, innerName, ownerName, taxpayerNumber, phoneNumber, faxNumber, zipCode, address, addressDetail, businessType, businessItem, billType, pharmaType, pharmaGroup, contractType, deliveryDiv, mail, mobilePhone, openDate, closeDate, etc1, etc2, imageUrl, inVisible) VALUES "
 
 	const val MODEL_PHARMA_MEDICINE_RELATIONS_DELETE_WHERE_PHARMA_PK = "DELETE FROM pharmaMedicineRelationModel WHERE pharmaPK = "
 	const val MODEL_PHARMA_MEDICINE_RELATIONS_INSERT_INTO = "INSERT INTO pharmaMedicineRelationModel (thisPK, pharmaPK, medicinePK) VALUES "
@@ -84,7 +84,7 @@ object FConstants {
 	const val MODEL_LICENSE_NUMBER = "면허번호"
 	const val MODEL_NURSING_HOME_NUMBER = "요양기관번호"
 	const val MODEL_HOS_COUNT = 23
-	const val MODEL_HOS_INSERT_INTO = "INSERT INTO hospitalModel (thisPK, code, orgName, innerName, ownerName, taxpayerNumber, phoneNumber, faxNumber, zipCode, address, addressDetail, businessType, businessItem, billType, licenseNumber, nursingHomeNumber, contractType, deliveryDiv, mail, mobilePhone, openDate, closeDate, etc1, etc2, imageUrl) VALUES "
+	const val MODEL_HOS_INSERT_INTO = "INSERT INTO hospitalModel (thisPK, code, orgName, innerName, ownerName, taxpayerNumber, phoneNumber, faxNumber, zipCode, address, addressDetail, businessType, businessItem, billType, licenseNumber, nursingHomeNumber, contractType, deliveryDiv, mail, mobilePhone, openDate, closeDate, etc1, etc2, imageUrl, inVisible) VALUES "
 
 	const val MODEL_MEDICINE_CODE = "코드"
 	const val MODEL_MEDICINE_MAIN_INGREDIENT_CODE = "주성분코드"
@@ -108,7 +108,7 @@ object FConstants {
 	const val MODEL_MEDICINE_ETC1 = "비고1"
 	const val MODEL_MEDICINE_ETC2 = "비고2"
 	const val MODEL_MEDICINE_COUNT = 21
-	const val MODEL_MEDICINE_INSERT_INTO = "INSERT INTO MedicineModel (thisPK, code, mainIngredientCode, kdCode, standardCode, pharma, name, customPrice) VALUES "
+	const val MODEL_MEDICINE_INSERT_INTO = "INSERT INTO MedicineModel (thisPK, code, mainIngredientCode, kdCode, standardCode, pharma, name, customPrice, inVisible) VALUES "
 	const val MODEL_MEDICINE_SUB_INSERT_INTO = "INSERT INTO MedicineSubModel (thisPK, code, standard, accountUnit, " +
 			"medicineType, medicineMethod, medicineCategory, medicineGroup, medicineDiv, medicineRank, medicineStorageTemp, medicineStorageBox, " +
 			"packageUnit, unit, etc1, etc2) VALUES "

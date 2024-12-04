@@ -39,15 +39,7 @@ class HospitalService {
 		val tokenUser = getUserDataByToken(token)
 		isLive(tokenUser)
 
-		return hospitalRepository.findAllByOrderByCode()
-	}
-	fun getPageHospital(token: String, page: Int, size: Int): Page<HospitalModel> {
-		isValid(token)
-		val tokenUser = getUserDataByToken(token)
-		isLive(tokenUser)
-
-		val pageable = PageRequest.of(page, size)
-		return hospitalRepository.findAllByOrderByCode(pageable)
+		return hospitalRepository.selectAllByInVisibleOrderByCode()
 	}
 	fun getHospitalAllSearch(token: String, searchString: String, isSearchTypeCode: Boolean = true): List<HospitalModel> {
 		if (searchString.isEmpty()) {
@@ -60,10 +52,10 @@ class HospitalService {
 		if (isSearchTypeCode) {
 			searchString.toIntOrNull()?.let { x ->
 				return hospitalRepository.selectAllByCodeContainingOrderByCode(x.toString())
-			} ?: return hospitalRepository.findAllByInnerNameContainingOrOrgNameContainingOrderByCode(searchString, searchString)
+			} ?: return hospitalRepository.selectAllByInnerNameContainingOrOrgNameContainingOrderByCode(searchString, searchString)
 		}
 
-		return hospitalRepository.findAllByInnerNameContainingOrOrgNameContainingOrderByCode(searchString, searchString)
+		return hospitalRepository.selectAllByInnerNameContainingOrOrgNameContainingOrderByCode(searchString, searchString)
 	}
 	fun getHospitalData(token: String, thisPK: String): HospitalModel {
 		isValid(token)

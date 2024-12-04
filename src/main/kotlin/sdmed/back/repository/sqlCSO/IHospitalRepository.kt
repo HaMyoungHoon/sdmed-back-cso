@@ -10,15 +10,22 @@ import sdmed.back.model.sqlCSO.HospitalModel
 @Repository
 interface IHospitalRepository: JpaRepository<HospitalModel, String> {
 	fun findByThisPK(thisPK: String): HospitalModel?
-	fun findAllByOrderByCode(): List<HospitalModel>
 	fun findByCode(code: Int): HospitalModel?
-	fun findAllByOrderByCode(pageable: Pageable): Page<HospitalModel>
-	fun findAllByInnerNameContainingOrOrgNameContainingOrderByCode(innerName: String, orgName: String): List<HospitalModel>
+	fun findAllByThisPKIn(thisPK: List<String>): List<HospitalModel>
 	fun findAllByCodeIn(codes: List<Int>): List<HospitalModel>
 
-	fun findAllByThisPKIn(hosPK: List<String>): List<HospitalModel>
+	@Query("SELECT * FROM HospitalModel " +
+			"WHERE inVisible = :inVisible AND code LIKE %:code% " +
+			"ORDER BY code ASC", nativeQuery = true)
+	fun selectAllByCodeContainingOrderByCode(code: String, inVisible: Boolean = false): List<HospitalModel>
 
-	@Query("SELECT * FROM hospitalModel " +
-		"WHERE code LIKE %:code%", nativeQuery = true)
-	fun selectAllByCodeContainingOrderByCode(code: String): List<HospitalModel>
+	@Query("SELECT a FROM HospitalModel a " +
+			"WHERE a.inVisible = :inVisible AND (a.innerName LIKE %:innerName% OR a.orgName LIKE %:orgName%) " +
+			"ORDER BY a.code ASC")
+	fun selectAllByInnerNameContainingOrOrgNameContainingOrderByCode(innerName: String, orgName: String, inVisible: Boolean = false): List<HospitalModel>
+
+	@Query("SELECT a FROM HospitalModel a " +
+			"WHERE a.inVisible = :inVisible " +
+			"ORDER BY a.code ASC")
+	fun selectAllByInVisibleOrderByCode(inVisible: Boolean = false): List<HospitalModel>
 }

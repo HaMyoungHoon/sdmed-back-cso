@@ -9,22 +9,23 @@ import sdmed.back.model.sqlCSO.PharmaModel
 
 @Repository
 interface IPharmaRepository: JpaRepository<PharmaModel, String> {
-	fun findAllByOrderByCode(): List<PharmaModel>
-	fun findAllByOrderByCode(pageable: Pageable): Page<PharmaModel>
+	fun findByThisPK(thisPK: String): PharmaModel?
 	fun findByCode(code: Int): PharmaModel?
-	fun findAllByInnerNameContainingOrOrgNameContainingOrderByCode(innerName: String, orgName: String): List<PharmaModel>
-
-	fun findByThisPK(pharmaPK: String): PharmaModel?
-	fun findAllByThisPKIn(pharmaPK: List<String>): List<PharmaModel>
-
+	fun findAllByThisPKIn(thisPK: List<String>): List<PharmaModel>
 	fun findAllByCodeIn(codes: List<Int>): List<PharmaModel>
 
-	@Query("SELECT * FROM pharmaModel " +
-			"WHERE thisPK = :pharmaPK", nativeQuery = true)
-	fun selectByThisPK(pharmaPK: String): PharmaModel?
+	@Query("SELECT * FROM HospitalModel " +
+			"WHERE inVisible = :inVisible AND code LIKE %:code% " +
+			"ORDER BY code ASC", nativeQuery = true)
+	fun selectAllByCodeContainingOrderByCode(code: String, inVisible: Boolean = false): List<PharmaModel>
 
+	@Query("SELECT a FROM HospitalModel a " +
+			"WHERE a.inVisible = :inVisible AND (a.innerName LIKE %:innerName% OR a.orgNAme LIKE %:orgName%) " +
+			"ORDER BY a.code ASC")
+	fun selectAllByInnerNameContainingOrOrgNameContainingOrderByCode(innerName: String, orgName: String, inVisible: Boolean = false): List<PharmaModel>
 
-	@Query("SELECT * FROM hospitalModel " +
-		"WHERE code LIKE %:code%", nativeQuery = true)
-	fun selectAllByCodeContainingOrderByCode(code: String): List<PharmaModel>
+	@Query("SELECT a FROM HospitalModel a " +
+			"WHERE a.inVisible = :inVisible " +
+			"ORDER BY a.code ASC")
+	fun selectAllByInvisibleOrderByCode(inVisible: Boolean = false): List<PharmaModel>
 }

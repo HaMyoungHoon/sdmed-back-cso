@@ -35,12 +35,6 @@ class HospitalController {
 	@GetMapping(value = ["/all"])
 	fun getHospitalAll(@RequestHeader token: String) =
 		responseService.getResult(hospitalService.getAllHospital(token))
-	@Operation(summary = "병원 정보 조회")
-	@GetMapping(value = ["/all/{page}/{size}"])
-	fun getHospitalAllPage(@RequestHeader token: String,
-												 @PathVariable("page") page: Int,
-												 @PathVariable("size") size: Int) =
-		responseService.getResult(hospitalService.getPageHospital(token, page, size))
 	@Operation(summary = "병원 조회 like code, innerName, orgName")
 	@GetMapping(value = ["/all/search"])
 	fun getHospitalAllSearch(@RequestHeader token: String,

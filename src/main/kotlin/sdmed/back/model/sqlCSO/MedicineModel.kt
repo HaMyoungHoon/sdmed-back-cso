@@ -25,6 +25,8 @@ data class MedicineModel(
 	var name: String = "",
 	@Column
 	var customPrice: Int = 0,
+	@Column(columnDefinition = "boolean default false", nullable = false)
+	var inVisible: Boolean = false,
 	@Transient
 	var maxPrice: Int = 0,
 	@Transient
@@ -134,7 +136,7 @@ data class MedicineModel(
 		val mainIngredientCode = FExtensions.escapeString(mainIngredientCode)
 		val pharmaName = FExtensions.escapeString(pharma)
 		val name = FExtensions.escapeString(name)
-		return "('$thisPK', '$code', '$mainIngredientCode', '$kdCode', '$standardCode', '$pharmaName', '$name', '$customPrice')"
+		return "('$thisPK', '$code', '$mainIngredientCode', '$kdCode', '$standardCode', '$pharmaName', '$name', '$customPrice', '$inVisible')"
 	}
 	fun insertSubString() = medicineSubModel.insertString()
 }

@@ -35,12 +35,6 @@ class PharmaController {
 	@GetMapping(value = ["/all"])
 	fun getPharmaAll(@RequestHeader token: String) =
 		responseService.getResult(pharmaService.getAllPharma(token))
-	@Operation(summary = "제약사 정보 조회")
-	@GetMapping(value = ["/all/{page}/{size}"])
-	fun getPharmaAllPage(@RequestHeader token: String,
-	                     @PathVariable("page") page: Int,
-	                     @PathVariable("size") size: Int) =
-		responseService.getResult(pharmaService.getPagePharma(token, page, size))
 	@Operation(summary = "제약사 조회 like code, innerName, orgName")
 	@GetMapping(value = ["/all/search"])
 	fun getPharmaAllSearch(@RequestHeader token: String,

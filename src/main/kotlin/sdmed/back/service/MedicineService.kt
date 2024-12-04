@@ -59,9 +59,9 @@ class MedicineService {
 		val ret = if (isSearchTypeCode) {
 			searchString.toIntOrNull()?.let { x ->
 				medicineRepository.selectAllByCodeLikeOrKdCodeLike(x, x)
-			} ?: medicineRepository.findAllByNameContainingOrPharmaContaining(searchString, searchString)
+			} ?: medicineRepository.selectAllByNameContainingOrPharmaContaining(searchString, searchString)
 		} else {
-			medicineRepository.findAllByNameContainingOrPharmaContaining(searchString, searchString)
+			medicineRepository.selectAllByNameContainingOrPharmaContaining(searchString, searchString)
 		}
 		val sub = medicineSubRepository.findALlByCodeInOrderByCode(ret.map { it.code })
 		val ingredient = medicineIngredientRepository.findAllByMainIngredientCodeIn(ret.map { it.mainIngredientCode })

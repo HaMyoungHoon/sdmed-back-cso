@@ -41,15 +41,7 @@ class PharmaService {
 		val tokenUser = getUserDataByToken(token)
 		isLive(tokenUser)
 
-		return pharmaRepository.findAllByOrderByCode()
-	}
-	fun getPagePharma(token: String, page: Int, size: Int): Page<PharmaModel> {
-		isValid(token)
-		val tokenUser = getUserDataByToken(token)
-		isLive(tokenUser)
-
-		val pageable = PageRequest.of(page, size)
-		return pharmaRepository.findAllByOrderByCode(pageable)
+		return pharmaRepository.selectAllByInvisibleOrderByCode()
 	}
 	fun getPharmaAllSearch(token: String, searchString: String, isSearchTypeCode: Boolean = true): List<PharmaModel> {
 		if (searchString.isEmpty()) {
@@ -62,17 +54,14 @@ class PharmaService {
 		val ret: List<PharmaModel> = if (isSearchTypeCode) {
 			searchString.toIntOrNull()?.let { x ->
 				pharmaRepository.selectAllByCodeContainingOrderByCode(x.toString())
-			} ?: pharmaRepository.findAllByInnerNameContainingOrOrgNameContainingOrderByCode(searchString, searchString)
+			} ?: pharmaRepository.selectAllByInnerNameContainingOrOrgNameContainingOrderByCode(searchString, searchString)
 		} else {
-			pharmaRepository.findAllByInnerNameContainingOrOrgNameContainingOrderByCode(searchString, searchString)
+			pharmaRepository.selectAllByInnerNameContainingOrOrgNameContainingOrderByCode(searchString, searchString)
 		}
 
 		return ret
 	}
 
-	fun getAllPharma(): List<PharmaModel> {
-		return pharmaRepository.findAllByOrderByCode()
-	}
 	fun getPharmaData(token: String, pharmaPK: String, pharmaOwnMedicineView: Boolean = false): PharmaModel {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
