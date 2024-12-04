@@ -4,8 +4,10 @@ spring:
 
   datasource:
     sql-cso:
-      driver-class-name: com.mysql.jdbc.Driver
-      jdbc-url: jdbc:mysql://db.mhha.kr:33066/cso
+#      driver-class-name: com.mysql.jdbc.Driver
+#      jdbc-url: jdbc:mysql://db.mhha.kr:33066/cso
+      driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+      jdbc-url: jdbc:sqlserver://db.mhha.kr:14333;encrypt=true;trustServerCertificate=true
       username: cso
       password: 1234
 
