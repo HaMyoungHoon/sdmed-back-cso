@@ -20,7 +20,7 @@ interface IPharmaRepository: JpaRepository<PharmaModel, String> {
 	fun selectAllByCodeContainingOrderByCode(code: String, inVisible: Boolean = false): List<PharmaModel>
 
 	@Query("SELECT a FROM HospitalModel a " +
-			"WHERE a.inVisible = :inVisible AND (a.innerName LIKE %:innerName% OR a.orgNAme LIKE %:orgName%) " +
+			"WHERE a.inVisible = :inVisible AND (a.innerName LIKE %:innerName% OR a.orgName LIKE %:orgName%) " +
 			"ORDER BY a.code ASC")
 	fun selectAllByInnerNameContainingOrOrgNameContainingOrderByCode(innerName: String, orgName: String, inVisible: Boolean = false): List<PharmaModel>
 

@@ -25,7 +25,7 @@ data class MedicineModel(
 	var name: String = "",
 	@Column
 	var customPrice: Int = 0,
-	@Column(columnDefinition = "boolean default false", nullable = false)
+	@Column(columnDefinition = "bit default 0", nullable = false)
 	var inVisible: Boolean = false,
 	@Transient
 	var maxPrice: Int = 0,

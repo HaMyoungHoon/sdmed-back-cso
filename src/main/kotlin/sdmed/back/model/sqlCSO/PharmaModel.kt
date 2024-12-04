@@ -61,7 +61,7 @@ data class PharmaModel(
 	var etc2: String = "",
 	@Column(columnDefinition = "text", nullable = false)
 	var imageUrl: String = "",
-	@Column(columnDefinition = "boolean default false", nullable = false)
+	@Column(columnDefinition = "bit default 0", nullable = false)
 	var inVisible: Boolean = false,
 	@Transient
 	var medicineList: MutableList<MedicineModel> = mutableListOf(),
