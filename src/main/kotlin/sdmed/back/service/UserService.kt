@@ -44,23 +44,23 @@ class UserService {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
 		if (haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee))) {
-			return userDataRepository.findAllByOrderByNameDesc().onEach { it.lazyHide(); it.pw = "" }.toMutableList().apply {
+			return userDataRepository.findAllByOrderByNameDesc().onEach { it.lazyHide() }.toMutableList().apply {
 				if (exceptMe) {
 					filter { it.thisPK != tokenUser.thisPK }
 				}
 			}
 		}
 
-		return userDataRepository.selectWhereDeptOrderByNameAsc(UserDepts.of(UserDept.TaxPayer, UserDept.Personal).getFlag()).onEach { it.pw = "" }.filter { it.thisPK != tokenUser.thisPK }
+		return userDataRepository.selectWhereDeptOrderByNameAsc(UserDepts.of(UserDept.TaxPayer, UserDept.Personal).getFlag()).filter { it.thisPK != tokenUser.thisPK }
 	}
 	fun getAllUserBusiness(token: String, exceptMe: Boolean = true): List<UserDataModel> {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
 		if (haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee))) {
-			return userDataRepository.selectByRoleAndStatusOrderByNameAsc(UserRole.BusinessMan.flag, UserStatus.Live.index).onEach { it.lazyHide(); it.pw = "" }.toMutableList().filter { it.thisPK != tokenUser.thisPK }
+			return userDataRepository.selectByRoleAndStatusOrderByNameAsc(UserRole.BusinessMan.flag, UserStatus.Live.index).onEach { it.lazyHide() }.toMutableList().filter { it.thisPK != tokenUser.thisPK }
 		}
 
-		return userDataRepository.selectWhereDeptOrderByNameAsc(UserDepts.of(UserDept.TaxPayer, UserDept.Personal).getFlag()).onEach { it.pw = "" }.filter { it.thisPK != tokenUser.thisPK }
+		return userDataRepository.selectWhereDeptOrderByNameAsc(UserDepts.of(UserDept.TaxPayer, UserDept.Personal).getFlag()).filter { it.thisPK != tokenUser.thisPK }
 	}
 	fun getAllUser(token: String, page: Int, size: Int): Page<UserDataModel> {
 		isValid(token)
@@ -70,7 +70,7 @@ class UserService {
 		}
 
 		val pageable = PageRequest.of(page, size)
-		return userDataRepository.findAllByOrderByNameDesc(pageable).onEach { it.lazyHide(); it.pw = "" }
+		return userDataRepository.findAllByOrderByNameDesc(pageable).onEach { it.lazyHide() }
 	}
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
 	fun signIn(id: String, pw: String): String {
