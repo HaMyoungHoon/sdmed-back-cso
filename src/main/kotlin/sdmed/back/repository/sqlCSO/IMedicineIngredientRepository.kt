@@ -6,6 +6,7 @@ import sdmed.back.model.sqlCSO.MedicineIngredientModel
 
 @Repository
 interface IMedicineIngredientRepository: JpaRepository<MedicineIngredientModel, String> {
+	fun findByMainIngredientCode(mainIngredientCode: String): MedicineIngredientModel?
 	fun findAllByOrderByMainIngredientCode(): List<MedicineIngredientModel>
 	fun findAllByMainIngredientCodeIn(mainIngredientCode: List<String>): List<MedicineIngredientModel>
 }

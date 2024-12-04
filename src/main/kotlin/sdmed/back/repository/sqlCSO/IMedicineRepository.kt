@@ -11,6 +11,7 @@ import java.util.Date
 
 @Repository
 interface IMedicineRepository: JpaRepository<MedicineModel, String> {
+	fun findByThisPK(thisPK: String): MedicineModel?
 	fun findAllByOrderByCode(): List<MedicineModel>
 	fun findAllByThisPKIn(medicinePK: List<String>): List<MedicineModel>
 	fun findAllByCodeIn(code: List<Int>): List<MedicineModel>

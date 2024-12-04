@@ -6,6 +6,7 @@ import sdmed.back.model.sqlCSO.MedicineSubModel
 
 @Repository
 interface IMedicineSubRepository: JpaRepository<MedicineSubModel, String> {
+	fun findByCode(code: Int): MedicineSubModel?
 	fun findAllByOrderByCode(): List<MedicineSubModel>
 	fun findALlByCodeInOrderByCode(code: List<Int>): List<MedicineSubModel>
 }

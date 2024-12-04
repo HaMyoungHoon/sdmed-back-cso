@@ -4,11 +4,11 @@ import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.stereotype.Repository
 import sdmed.back.model.sqlCSO.MedicinePriceModel
-import java.util.*
 
 @Repository
 interface IMedicinePriceRepository: JpaRepository<MedicinePriceModel, String> {
-	fun findAllByApplyDate(applyDate: Date): List<MedicinePriceModel>
+	fun findAllByOrderByApplyDateDesc(): List<MedicinePriceModel>
+	fun findAllByKdCodeOrderByApplyDateDesc(kdCode: Int): List<MedicinePriceModel>
 	fun findAllByKdCodeIn(kdCode: List<Int>): List<MedicinePriceModel>
 
 	@Query("WITH RankedMedicinePrice AS (\n" +

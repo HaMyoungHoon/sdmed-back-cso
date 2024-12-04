@@ -34,6 +34,9 @@ data class MedicineModel(
 	@Transient
 	var medicinePriceModel: MutableList<MedicinePriceModel> = mutableListOf(),
 ) {
+	fun init() {
+		maxPrice = medicinePriceModel.maxByOrNull { it.applyDate }?.maxPrice ?: customPrice
+	}
 	fun findHeader(data: List<String>): Boolean {
 		if (data.size < FConstants.MODEL_MEDICINE_COUNT) {
 			return false

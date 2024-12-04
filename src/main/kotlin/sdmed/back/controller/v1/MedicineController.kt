@@ -10,7 +10,6 @@ import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.CrossOrigin
 import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
@@ -36,14 +35,19 @@ class MedicineController {
 	@Operation(summary = "약제급여목록")
 	@GetMapping(value = ["/all"])
 	fun getMedicineAll(@RequestHeader token: String,
-										 @RequestParam(required = false) withPrice: Boolean = false) =
-		responseService.getResult(medicineService.getMedicine(token, withPrice))
+										 @RequestParam(required = false) withAllPrice: Boolean = false) =
+		responseService.getResult(medicineService.getMedicine(token, withAllPrice))
 	@Operation(summary = "약품 검색")
 	@GetMapping(value = ["/all/search"])
 	fun getMedicineAllSearch(@RequestHeader token: String,
 													 @RequestParam searchString: String,
 													 @RequestParam(required = false) isSearchTypeCode: Boolean = false) =
 		responseService.getResult(medicineService.getMedicineSearch(token, searchString, isSearchTypeCode))
+	@Operation(summary = "약품 가격 목록 검색")
+	@GetMapping(value = ["/price"])
+	fun getMedicinePriceList(@RequestHeader token: String,
+													 @RequestParam kdCode: Int) =
+		responseService.getResult(medicineService.getMedicinePriceList(token, kdCode))
 
 	@Operation(summary = "약품 목록 업로드")
 	@PostMapping(value = ["/dataUploadExcel"], consumes = ["multipart/form-data"])

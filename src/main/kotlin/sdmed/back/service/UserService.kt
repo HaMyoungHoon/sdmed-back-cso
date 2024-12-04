@@ -218,7 +218,7 @@ class UserService {
 		return ret
 	}
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
-	fun userNameMailPhoneModifyByPK(token: String, userPK: String, name: String, mail: String, phone: String): UserDataModel {
+	fun userNameMailPhoneModifyByPK(token: String, userPK: String, name: String, mail: String, phoneNumber: String): UserDataModel {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.UserChanger))) {
@@ -231,7 +231,7 @@ class UserService {
 		}
 		user.name = FExtensions.regexSpecialCharRemove(name)
 		user.mail = FExtensions.escapeString(mail)
-		user.phoneNumber = FExtensions.escapeString(phone)
+		user.phoneNumber = FExtensions.escapeString(phoneNumber)
 		userDataSetFamily(user)
 		val ret = userDataRepository.save(user)
 		val stackTrace = Thread.currentThread().stackTrace

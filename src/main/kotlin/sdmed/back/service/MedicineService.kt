@@ -2,13 +2,12 @@ package sdmed.back.service
 
 import jakarta.persistence.EntityManager
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.data.domain.Page
-import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
 import sdmed.back.advice.exception.AccessDeniedException
 import sdmed.back.advice.exception.AuthenticationEntryPointException
+import sdmed.back.advice.exception.MedicineNotFoundException
 import sdmed.back.advice.exception.UserNotFoundException
 import sdmed.back.config.FConstants
 import sdmed.back.config.FExcelFileParser
@@ -35,17 +34,20 @@ class MedicineService {
 	@Autowired lateinit var medicinePriceRepository: IMedicinePriceRepository
 	@Autowired lateinit var entityManager: EntityManager
 
-	fun getMedicine(token: String, withPrice: Boolean = false): List<MedicineModel> {
+	fun getMedicine(token: String, withAllPrice: Boolean = false): List<MedicineModel> {
 		isValid(token)
 		val ret = medicineRepository.findAllByOrderByCode()
 		val sub = medicineSubRepository.findAllByOrderByCode()
 		val ingredient = medicineIngredientRepository.findAllByOrderByMainIngredientCode()
 		medicineMerge(ret, sub, ingredient)
-		if (withPrice) {
+		if (withAllPrice) {
+			val allPrice = medicinePriceRepository.findAllByOrderByApplyDateDesc()
+			medicinePriceMerge(ret, allPrice)
+		} else {
 			val recentPrice = medicinePriceRepository.selectAllByRecentData()
 			medicinePriceMerge(ret, recentPrice)
 		}
-
+		ret.onEach { it.init() }
 		return ret
 	}
 	fun getMedicineSearch(token: String, searchString: String, isSearchTypeCode: Boolean = true): List<MedicineModel> {
@@ -66,7 +68,25 @@ class MedicineService {
 		medicineMerge(ret, sub, ingredient)
 		return ret
 	}
-	fun medicineMerge(mother: List<MedicineModel>, sub: List<MedicineSubModel>, ingredient: List<MedicineIngredientModel>) {
+	fun getMedicinePriceList(token: String, kdCode: Int): List<MedicinePriceModel> {
+		isValid(token)
+		return medicinePriceRepository.findAllByKdCodeOrderByApplyDateDesc(kdCode)
+	}
+	fun getMedicineData(token: String, thisPK: String, withAllPrice: Boolean = false): MedicineModel {
+		isValid(token)
+
+		val ret = medicineRepository.findByThisPK(thisPK) ?: throw MedicineNotFoundException()
+		medicineSubRepository.findByCode(ret.code)?.let { ret.medicineSubModel = it }
+		medicineIngredientRepository.findByMainIngredientCode(ret.mainIngredientCode)?.let { ret.medicineIngredientModel = it }
+		ret.medicinePriceModel = if (withAllPrice) {
+			medicinePriceRepository.findAllByKdCodeOrderByApplyDateDesc(ret.kdCode).toMutableList()
+		} else {
+			medicinePriceRepository.findAllByKdCodeOrderByApplyDateDesc(ret.kdCode).toMutableList()
+		}
+		ret.init()
+		return ret
+	}
+	private fun medicineMerge(mother: List<MedicineModel>, sub: List<MedicineSubModel>, ingredient: List<MedicineIngredientModel>) {
 		val subMap = sub.associateBy { it.code }
 		mother.map { x ->
 			subMap[x.code]?.let { y -> x.medicineSubModel = y }
@@ -76,7 +96,7 @@ class MedicineService {
 			ingredientMap[x.mainIngredientCode]?.let { y -> x.medicineIngredientModel = y }
 		}
 	}
-	fun medicinePriceMerge(mother: List<MedicineModel>, price: List<MedicinePriceModel>) {
+	private fun medicinePriceMerge(mother: List<MedicineModel>, price: List<MedicinePriceModel>) {
 		val priceMap = price.groupBy { it.kdCode }
 		mother.map { x ->
 			priceMap[x.kdCode]?.let { y -> x.medicinePriceModel = y.toMutableList() }

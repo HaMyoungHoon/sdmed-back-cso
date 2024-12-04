@@ -164,8 +164,8 @@ class UserController {
 	                                   @RequestParam userPK: String,
 	                                   @RequestParam name: String,
 	                                   @RequestParam mail: String,
-																		 @RequestParam phone: String) =
-		responseService.getResult(userService.userNameMailPhoneModifyByPK(token, userPK, name, mail, phone))
+																		 @RequestParam phoneNumber: String) =
+		responseService.getResult(userService.userNameMailPhoneModifyByPK(token, userPK, name, mail, phoneNumber))
 	@Operation(summary = "유저 권한,부서,상태 변경")
 	@PutMapping(value = ["/userRoleDeptStatusModify/pk"])
 	fun putUserRoleDeptStatusModifyByPK(@RequestHeader token: String,
