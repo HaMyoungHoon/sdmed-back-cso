@@ -14,17 +14,17 @@ interface IPharmaRepository: JpaRepository<PharmaModel, String> {
 	fun findAllByThisPKIn(thisPK: List<String>): List<PharmaModel>
 	fun findAllByCodeIn(codes: List<Int>): List<PharmaModel>
 
-	@Query("SELECT * FROM HospitalModel " +
+	@Query("SELECT * FROM PharmaModel " +
 			"WHERE inVisible = :inVisible AND code LIKE %:code% " +
 			"ORDER BY code ASC", nativeQuery = true)
 	fun selectAllByCodeContainingOrderByCode(code: String, inVisible: Boolean = false): List<PharmaModel>
 
-	@Query("SELECT a FROM HospitalModel a " +
+	@Query("SELECT a FROM PharmaModel a " +
 			"WHERE a.inVisible = :inVisible AND (a.innerName LIKE %:innerName% OR a.orgName LIKE %:orgName%) " +
 			"ORDER BY a.code ASC")
 	fun selectAllByInnerNameContainingOrOrgNameContainingOrderByCode(innerName: String, orgName: String, inVisible: Boolean = false): List<PharmaModel>
 
-	@Query("SELECT a FROM HospitalModel a " +
+	@Query("SELECT a FROM PharmaModel a " +
 			"WHERE a.inVisible = :inVisible " +
 			"ORDER BY a.code ASC")
 	fun selectAllByInvisibleOrderByCode(inVisible: Boolean = false): List<PharmaModel>
