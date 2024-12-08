@@ -170,6 +170,11 @@ class ExceptionAdvice {
 	protected fun pharmaExistException(request: HttpServletRequest, exception: PharmaExistException) =
 		responseService.getFailResult(getMessage("pharmaExistException.code").toInt(), getMessageMerge("pharmaExistException.msg", exception.message))
 
+	@ExceptionHandler(MedicineExistException::class)
+	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+	protected fun medicineExistException(request: HttpServletRequest, exception: MedicineExistException) =
+		responseService.getFailResult(getMessage("medicineExistException.code").toInt(), getMessageMerge("medicineExistException.msg", exception.message))
+
 	@ExceptionHandler(AsyncRequestTimeoutException::class)
 	@ResponseStatus(HttpStatus.OK)
 	protected fun asyncRequestTimeoutException(request: HttpServletRequest, exception: AsyncRequestTimeoutException): AsyncContext =

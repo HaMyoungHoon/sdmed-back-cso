@@ -117,3 +117,7 @@ hospitalExistException:
 pharmaExistException:
   code: "-10027"
   msg: "이미 존재하는 제약사 코드 입니다."
+
+medicineExistException:
+  code: "-10028"
+  msg: "이미 존재하는 약품 코드 입니다."

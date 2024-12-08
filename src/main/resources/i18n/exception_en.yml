@@ -117,3 +117,7 @@ hospitalExistException:
 pharmaExistException:
   code: "-10027"
   msg: "already exist pharma code"
+
+medicineExistException:
+  code: "-10028"
+  msg: "already exist medicine code"

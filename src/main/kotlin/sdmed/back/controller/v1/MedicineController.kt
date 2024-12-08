@@ -36,7 +36,7 @@ class MedicineController {
 	@GetMapping(value = ["/all"])
 	fun getMedicineAll(@RequestHeader token: String,
 										 @RequestParam(required = false) withAllPrice: Boolean = false) =
-		responseService.getResult(medicineService.getMedicine(token, withAllPrice))
+		responseService.getResult(medicineService.getAllMedicine(token, withAllPrice))
 	@Operation(summary = "약품 검색")
 	@GetMapping(value = ["/all/search"])
 	fun getMedicineAllSearch(@RequestHeader token: String,

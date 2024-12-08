@@ -5,10 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
-import sdmed.back.advice.exception.AccessDeniedException
-import sdmed.back.advice.exception.AuthenticationEntryPointException
-import sdmed.back.advice.exception.MedicineNotFoundException
-import sdmed.back.advice.exception.UserNotFoundException
+import sdmed.back.advice.exception.*
 import sdmed.back.config.FConstants
 import sdmed.back.config.FExcelFileParser
 import sdmed.back.config.jpa.CSOJPAConfig
@@ -34,7 +31,7 @@ class MedicineService {
 	@Autowired lateinit var medicinePriceRepository: IMedicinePriceRepository
 	@Autowired lateinit var entityManager: EntityManager
 
-	fun getMedicine(token: String, withAllPrice: Boolean = false): List<MedicineModel> {
+	fun getAllMedicine(token: String, withAllPrice: Boolean = false): List<MedicineModel> {
 		isValid(token)
 		val ret = medicineRepository.findAllByOrderByCode()
 		val sub = medicineSubRepository.findAllByOrderByCode()
@@ -101,6 +98,40 @@ class MedicineService {
 		mother.map { x ->
 			priceMap[x.kdCode]?.let { y -> x.medicinePriceModel = y.toMutableList() }
 		}
+	}
+	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
+	fun medicineDataModify(token: String, data: MedicineModel): MedicineModel {
+		isValid(token)
+		val tokenUser = getUserDataByToken(token)
+		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.MedicineChanger))) {
+			throw AuthenticationEntryPointException()
+		}
+
+		val ret = medicineRepository.save(data)
+		val stackTrace = Thread.currentThread().stackTrace
+		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "${data.name} modify")
+		logRepository.save(logModel)
+		return ret
+	}
+	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
+	fun addMedicineData(token: String, data: MedicineModel): MedicineModel {
+		isValid(token)
+		val tokenUser = getUserDataByToken(token)
+		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.MedicineChanger))) {
+			throw AuthenticationEntryPointException()
+		}
+
+		val exist = medicineRepository.findByCode(data.code)
+		if (exist != null) {
+			throw MedicineExistException()
+		}
+
+		data.thisPK = UUID.randomUUID().toString()
+		val ret = medicineRepository.save(data)
+		val stackTrace = Thread.currentThread().stackTrace
+		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "add medicine : ${data.thisPK}")
+		logRepository.save(logModel)
+		return ret
 	}
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
 	fun medicineUpload(token: String, file: MultipartFile): String {
@@ -237,8 +268,8 @@ class MedicineService {
 	private fun renderSqlForInsertMedicineSubModel(data: MedicineSubModel) = data.insertString()
 	private fun renderSqlForInsertMedicineIngredientModel(data: MedicineIngredientModel) = data.insertString()
 	private fun renderSqlForInsertMedicinePriceModel(data: MedicinePriceModel) = data.insertString()
-	fun getUserData(id: String) = userDataRepository.selectById(id)?.lazyHide()
-	fun getUserDataByToken(token: String) = userDataRepository.selectById(jwtTokenProvider.getAllClaimsFromToken(token).subject)
+	fun getUserData(id: String) = userDataRepository.selectById(id)?.lazyHide() ?: throw UserNotFoundException()
+	fun getUserDataByToken(token: String) = getUserData(jwtTokenProvider.getAllClaimsFromToken(token).subject)
 	fun isValid(token: String) {
 		if (!jwtTokenProvider.validateToken(token)) {
 			throw AuthenticationEntryPointException()
