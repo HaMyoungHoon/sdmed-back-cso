@@ -36,6 +36,10 @@ data class MedicineModel(
 	@Transient
 	var medicinePriceModel: MutableList<MedicinePriceModel> = mutableListOf(),
 ) {
+	fun genSub() {
+		medicineSubModel.thisPK = UUID.randomUUID().toString()
+		medicineSubModel.code = code
+	}
 	fun init() {
 		maxPrice = medicinePriceModel.maxByOrNull { it.applyDate }?.maxPrice ?: customPrice
 	}

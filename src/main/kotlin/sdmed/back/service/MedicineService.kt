@@ -133,6 +133,7 @@ class MedicineService {
 
 		data.thisPK = UUID.randomUUID().toString()
 		val ret = medicineRepository.save(data)
+		data.genSub()
 		medicineSubRepository.save(data.medicineSubModel)
 		val stackTrace = Thread.currentThread().stackTrace
 		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "add medicine : ${data.thisPK}")
