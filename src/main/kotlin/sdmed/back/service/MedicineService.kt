@@ -136,7 +136,7 @@ class MedicineService {
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
 	fun medicineUpload(token: String, file: MultipartFile): String {
 		isValid(token)
-		val tokenUser = getUserDataByToken(token) ?: throw UserNotFoundException()
+		val tokenUser = getUserDataByToken(token)
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.MedicineChanger))) {
 			throw AuthenticationEntryPointException()
 		}
@@ -163,7 +163,7 @@ class MedicineService {
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
 	fun medicinePriceUpload(token: String, applyDate: Date, file: MultipartFile): String {
 		isValid(token)
-		val tokenUser = getUserDataByToken(token) ?: throw UserNotFoundException()
+		val tokenUser = getUserDataByToken(token)
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.MedicineChanger))) {
 			throw AuthenticationEntryPointException()
 		}
@@ -190,7 +190,7 @@ class MedicineService {
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
 	fun medicineIngredientUpload(token: String, file: MultipartFile): String {
 		isValid(token)
-		val tokenUser = getUserDataByToken(token) ?: throw UserNotFoundException()
+		val tokenUser = getUserDataByToken(token)
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.MedicineChanger))) {
 			throw AuthenticationEntryPointException()
 		}
