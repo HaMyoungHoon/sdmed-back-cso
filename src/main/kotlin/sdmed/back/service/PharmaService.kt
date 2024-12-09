@@ -2,8 +2,6 @@ package sdmed.back.service
 
 import jakarta.persistence.EntityManager
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.data.domain.Page
-import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
@@ -16,10 +14,7 @@ import sdmed.back.model.common.UserRole
 import sdmed.back.model.common.UserRole.Companion.getFlag
 import sdmed.back.model.common.UserRoles
 import sdmed.back.model.common.UserStatus
-import sdmed.back.model.sqlCSO.LogModel
-import sdmed.back.model.sqlCSO.PharmaMedicineRelationModel
-import sdmed.back.model.sqlCSO.PharmaModel
-import sdmed.back.model.sqlCSO.UserDataModel
+import sdmed.back.model.sqlCSO.*
 import sdmed.back.repository.sqlCSO.*
 import java.util.*
 import java.util.stream.Collectors
@@ -188,6 +183,59 @@ class PharmaService {
 		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "add pharma count : $retCount")
 		logRepository.save(logModel)
 		return "count : $retCount"
+	}
+	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
+	fun pharmaMedicineUpload(token: String, file: MultipartFile): String {
+		isValid(token)
+		val tokenUser = getUserDataByToken(token)
+		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.PharmaChanger))) {
+			throw AuthenticationEntryPointException()
+		}
+
+		var pharmaMedicineParseModel = excelFileParser.pharmaMedicineUploadExcelParse(tokenUser.id, file)
+		val existPharma: MutableList<PharmaModel> = mutableListOf()
+		pharmaMedicineParseModel.chunked(500).forEach { x -> existPharma.addAll(pharmaRepository.findAllByCodeIn(x.map { y -> y.pharmaCode })) }
+		pharmaMedicineParseModel = pharmaMedicineParseModel.filter { x -> x.pharmaCode in existPharma.map { y -> y.code } }.toMutableList()
+		if (pharmaMedicineParseModel.isEmpty()) {
+			return "count : 0"
+		}
+
+		val existMedicine: MutableList<MedicineModel> = mutableListOf()
+		pharmaMedicineParseModel.chunked(500).forEach { x -> existMedicine.addAll(medicineRepository.findAllByCodeIn(x.flatMap { y -> y.medicineCodeList })) }
+		pharmaMedicineParseModel = pharmaMedicineParseModel.map { x ->
+			val filteredMedicineCodeList = x.medicineCodeList.filter { y -> y in existMedicine.map { z -> z.code }.toSet() }
+			x.copy(medicineCodeList = filteredMedicineCodeList.toMutableList())
+		}.filter { x -> x.medicineCodeList.isNotEmpty() }.toMutableList()
+		if (pharmaMedicineParseModel.isEmpty()) {
+			return "count : 0"
+		}
+
+		val already: MutableList<PharmaMedicineRelationModel> = mutableListOf()
+		existPharma.chunked(500).forEach { x -> already.addAll(pharmaMedicineRelationRepository.findAllByPharmaPKIn(x.map { y -> y.thisPK })) }
+		existMedicine.removeIf { it.thisPK in already.map { it.medicinePK } }
+
+		val pharmaMap = existPharma.associateBy({it.code}, {it.thisPK})
+		val medicineMap = existMedicine.associateBy({it.code}, {it.thisPK})
+		val pharmaMedicineRelationModel: MutableList<PharmaMedicineRelationModel> = mutableListOf()
+		pharmaMedicineParseModel.flatMap { x ->
+			val pharmaPK = pharmaMap[x.pharmaCode] ?: ""
+			x.medicineCodeList.map { y ->
+				val medicinePK = medicineMap[y]
+				if (pharmaPK.isNotEmpty() && medicinePK != null) {
+					pharmaMedicineRelationModel.add(PharmaMedicineRelationModel().apply {
+						this.pharmaPK = pharmaPK
+						this.medicinePK = medicinePK
+					})
+				}
+			}
+		}
+
+		pharmaMedicineRelationModel.chunked(500).forEach { insertRelation(it) }
+
+		val stackTrace = Thread.currentThread().stackTrace
+		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "add pharma count : ${pharmaMedicineRelationModel.count()}")
+		logRepository.save(logModel)
+		return "count : ${pharmaMedicineRelationModel.count()}"
 	}
 
 	private fun insertAll(data: List<PharmaModel>): Int {

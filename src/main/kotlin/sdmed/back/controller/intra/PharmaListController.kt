@@ -61,7 +61,7 @@ class PharmaListController {
 	@Operation(summary = "엑셀 샘플 다운로드")
 	@GetMapping(value = ["/file/sample"])
 	fun getExcelSample(): ResponseEntity<Resource> =
-		FExtensions.sampleFileDownload(FExcelParserType.HOSPITAL).let { x ->
+		FExtensions.sampleFileDownload(FExcelParserType.PHARMA).let { x ->
 			ResponseEntity.ok()
 				.contentType(MediaType.parseMediaType(ContentsType.type_xlsx))
 				.contentLength(x.file.length())
@@ -106,4 +106,20 @@ class PharmaListController {
 									@RequestParam searchString: String,
 									@RequestParam(required = false) isSearchTypeCode: Boolean = false) =
 		responseService.getResult(medicineService.getMedicineSearch(token, searchString, isSearchTypeCode))
+
+	@Operation(summary = "제약사-약품 엑셀 샘플 다운로드")
+	@GetMapping(value = ["/file/sample/pharmaMedicine"])
+	fun getPharmaMedicineExcelSample(): ResponseEntity<Resource> =
+		FExtensions.sampleFileDownload(FExcelParserType.PHARMA_MEDICINE).let { x ->
+			ResponseEntity.ok()
+				.contentType(MediaType.parseMediaType(ContentsType.type_xlsx))
+				.contentLength(x.file.length())
+				.header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=\"pharma-medicine_excel_upload_sample.xlsx\"")
+				.body(x)
+		}
+	@Operation(summary = "제약사-약품 엑셀 파일 업로드")
+	@PostMapping(value = ["/file/excel/pharmaMedicine"], consumes = ["multipart/form-data"])
+	fun postPharmaMedicineExcel(@RequestHeader token: String,
+	                            @RequestParam file: MultipartFile) =
+		responseService.getResult(pharmaService.pharmaMedicineUpload(token, file))
 }

@@ -135,6 +135,10 @@ object FConstants {
 	const val MODEL_USER_RELATIONS_DELETE_WHERE_USER_PK = "DELETE FROM userRelationModel WHERE userPK = "
 	const val MODEL_USER_RELATIONS_INSERT_INTO = "INSERT INTO userRelationModel (thisPK, userPK, hosPK, pharmaPK, medicinePK) VALUES "
 
+	const val MODEL_PHARMA_MEDICINE_PARSE_PHARMA_CODE = "제약사코드"
+	const val MODEL_PHARMA_MEDICINE_PARSE_MEDICINE_CODE = "약품코드"
+	const val MODEL_PHARMA_MEDICINE_PARSE_COUNT = 2
+
 	const val REGEX_ONLY_ALPHABET = "[^a-zA-Z0-9]"
 	const val REGEX_SPECIAL_CHAR_REMOVE = "[^가-힣a-zA-Z0-9\\s]"
 	const val REGEX_ESCAPE_SQL = "(['\"])"

@@ -3,6 +3,7 @@ package sdmed.back.config
 enum class FExcelParserType {
 	USER,
 	PHARMA,
+	PHARMA_MEDICINE,
 	HOSPITAL,
 	MEDICINE,
 	MEDICINE_INGREDIENT,

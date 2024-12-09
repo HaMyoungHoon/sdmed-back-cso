@@ -17,7 +17,7 @@ import sdmed.back.model.sqlCSO.MedicineModel
 import sdmed.back.service.MedicineService
 import sdmed.back.service.ResponseService
 
-@Tag(name = "MedicineListController")
+@Tag(name = "약품목록")
 @RestController
 @RequestMapping(value = ["/intra/medicineList"])
 @CrossOrigin(origins = [FConstants.HTTP_MHHA, FConstants.HTTPS_MHHA], allowedHeaders = ["*"])
