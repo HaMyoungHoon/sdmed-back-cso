@@ -36,6 +36,11 @@ class MedicineListController {
 	            @PathVariable thisPK: String) =
 		responseService.getResult(medicineService.getMedicineData(token, thisPK))
 
+	@Operation(summary = "주성분코드 리스트")
+	@GetMapping(value = ["/list/mainIngredient"])
+	fun getMainIngredientList(@RequestHeader token: String) =
+		responseService.getResult(medicineService.getMainIngredientList(token))
+
 	@Operation(summary = "엑셀 파일 업로드")
 	@PostMapping(value = ["/file/excel"], consumes = ["multipart/form-data"])
 	fun postExcel(@RequestHeader token: String,

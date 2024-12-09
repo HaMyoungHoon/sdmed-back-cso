@@ -33,7 +33,7 @@ class MedicineService {
 
 	fun getAllMedicine(token: String, withAllPrice: Boolean = false): List<MedicineModel> {
 		isValid(token)
-		val ret = medicineRepository.findAllByOrderByCode()
+		val ret = medicineRepository.selectAllByInVisibleOrderByCode()
 		val sub = medicineSubRepository.findAllByOrderByCode()
 		val ingredient = medicineIngredientRepository.findAllByOrderByMainIngredientCode()
 		medicineMerge(ret, sub, ingredient)
@@ -83,6 +83,10 @@ class MedicineService {
 		ret.init()
 		return ret
 	}
+	fun getMainIngredientList(token: String): List<MedicineIngredientModel> {
+		isValid(token)
+		return medicineIngredientRepository.findAll()
+	}
 	private fun medicineMerge(mother: List<MedicineModel>, sub: List<MedicineSubModel>, ingredient: List<MedicineIngredientModel>) {
 		val subMap = sub.associateBy { it.code }
 		mother.map { x ->
@@ -108,6 +112,7 @@ class MedicineService {
 		}
 
 		val ret = medicineRepository.save(data)
+		medicineSubRepository.save(data.medicineSubModel)
 		val stackTrace = Thread.currentThread().stackTrace
 		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "${data.name} modify")
 		logRepository.save(logModel)
@@ -128,6 +133,7 @@ class MedicineService {
 
 		data.thisPK = UUID.randomUUID().toString()
 		val ret = medicineRepository.save(data)
+		medicineSubRepository.save(data.medicineSubModel)
 		val stackTrace = Thread.currentThread().stackTrace
 		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "add medicine : ${data.thisPK}")
 		logRepository.save(logModel)

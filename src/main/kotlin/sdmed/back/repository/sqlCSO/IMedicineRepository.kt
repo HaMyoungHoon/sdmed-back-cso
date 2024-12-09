@@ -22,4 +22,9 @@ interface IMedicineRepository: JpaRepository<MedicineModel, String> {
 			"WHERE a.inVisible = :inVisible AND (a.name LIKE %:name% OR a.pharma LIKE %:pharma%) " +
 			"ORDER BY a.code ASC")
 	fun selectAllByNameContainingOrPharmaContaining(name: String, pharma: String, inVisible: Boolean = false): List<MedicineModel>
+
+	@Query("SELECT a FROM MedicineModel a " +
+			"WHERE a.inVisible = :inVisible " +
+			"ORDER BY a.code ASC")
+	fun selectAllByInVisibleOrderByCode(inVisible: Boolean = false): List<MedicineModel>
 }
