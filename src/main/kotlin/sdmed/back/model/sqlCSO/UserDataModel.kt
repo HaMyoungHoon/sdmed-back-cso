@@ -74,10 +74,7 @@ data class UserDataModel(
 	}
 	fun buildData(claims: Claims): UserDataModel {
 		this.thisPK = claims[FConstants.CLAIM_INDEX].toString()
-		this.id = claims[FConstants.CLAIM_ID].toString()
 		this.name = claims[FConstants.CLAIM_NAME].toString()
-		this.role = claims[FConstants.CLAIM_ROLE].toString().toInt()
-		this.dept = claims[FConstants.CLAIM_DEPT].toString().toInt()
 		this.status = UserStatus.valueOf(claims[FConstants.CLAIM_STATUS].toString())
 		return this
 	}
