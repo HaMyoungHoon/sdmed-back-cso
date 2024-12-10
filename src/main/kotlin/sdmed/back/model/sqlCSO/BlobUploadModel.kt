@@ -19,4 +19,9 @@ data class BlobUploadModel(
 	@Column(columnDefinition = "nvarchar(100)")
 	var mimeType: String = ""
 	) {
+
+	fun newSave(): BlobUploadModel {
+		thisPK = UUID.randomUUID().toString()
+		return this
+	}
 }
