@@ -41,6 +41,10 @@ class UserInfoController {
 							@RequestParam(required = false) relationView: Boolean = false,
 							@RequestParam(required = false) pharmaOwnMedicineView: Boolean = false) =
 		responseService.getResult(userService.getUserData(token, thisPK, childView, relationView, pharmaOwnMedicineView))
+	@Operation(summary = "영업 유저 전체")
+	@GetMapping(value = ["/all/business"])
+	fun getUserAllBusiness(@RequestHeader token: String) =
+		responseService.getResult(userService.getAllUserBusiness(token))
 
 	@Operation(summary = "유저 데이터 엑셀 업로드")
 	@PostMapping(value = ["/file/excel"], consumes = ["multipart/form-data"])
@@ -75,7 +79,7 @@ class UserInfoController {
 		responseService.getResult(userService.userRoleDeptStatusModifyByPK(token, userPK, data))
 
 	@Operation(summary = "유저 세금계산서 이미지 url 변경")
-	@PutMapping(value = ["/taxImage/{thisPK}"])
+	@PutMapping(value = ["/file/{thisPK}/taxImage"])
 	fun putUserTaxImageUrl(@RequestHeader token: String,
 												 @PathVariable thisPK: String,
 												 @RequestBody blobModel: BlobUploadModel): IRestResult {
@@ -84,7 +88,7 @@ class UserInfoController {
 		return responseService.getResult(ret)
 	}
 	@Operation(summary = "유저 통장 이미지 url 변경")
-	@PutMapping(value = ["/bankImage/{thisPK}"])
+	@PutMapping(value = ["/file/{thisPK}/bankImage"])
 	fun putUserBankImageUrl(@RequestHeader token: String,
 	                        @PathVariable thisPK: String,
 	                        @RequestBody blobModel: BlobUploadModel): IRestResult {

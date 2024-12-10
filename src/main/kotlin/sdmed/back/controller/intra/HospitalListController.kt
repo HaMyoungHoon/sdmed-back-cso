@@ -17,6 +17,7 @@ import sdmed.back.config.FExtensions
 import sdmed.back.model.common.IRestResult
 import sdmed.back.model.common.UserRole
 import sdmed.back.model.common.UserRoles
+import sdmed.back.model.sqlCSO.BlobUploadModel
 import sdmed.back.model.sqlCSO.HospitalModel
 import sdmed.back.service.AzureBlobService
 import sdmed.back.service.HospitalService
@@ -86,6 +87,22 @@ class HospitalListController {
 		val hospitalData = hospitalService.getHospitalData(token, thisPK)
 		val blobUrl = azureBlobService.uploadFile(file, "hospital/$today", tokenUser.thisPK)
 		hospitalData.imageUrl = blobUrl
+		return responseService.getResult(hospitalService.hospitalDataModify(token, hospitalData))
+	}
+	@Operation(summary = "병원 사업자 등록증 업로드")
+	@PutMapping(value = ["/file/{thisPK}/image"])
+	fun putImage(@RequestHeader token: String,
+	             @PathVariable thisPK: String,
+	             @RequestBody blobModel: BlobUploadModel): IRestResult {
+		hospitalService.isValid(token)
+		val tokenUser = hospitalService.getUserDataByToken(token)
+		if (!hospitalService.haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.HospitalChanger))) {
+			throw AuthenticationEntryPointException()
+		}
+
+		val hospitalData = hospitalService.getHospitalData(token, thisPK)
+		azureBlobService.blobUploadSave(blobModel.newSave())
+		hospitalData.imageUrl = blobModel.blobUrl
 		return responseService.getResult(hospitalService.hospitalDataModify(token, hospitalData))
 	}
 }

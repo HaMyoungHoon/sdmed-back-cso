@@ -17,6 +17,7 @@ import sdmed.back.config.FExtensions
 import sdmed.back.model.common.IRestResult
 import sdmed.back.model.common.UserRole
 import sdmed.back.model.common.UserRoles
+import sdmed.back.model.sqlCSO.BlobUploadModel
 import sdmed.back.model.sqlCSO.PharmaModel
 import sdmed.back.service.AzureBlobService
 import sdmed.back.service.MedicineService
@@ -122,4 +123,21 @@ class PharmaListController {
 	fun postPharmaMedicineExcel(@RequestHeader token: String,
 	                            @RequestParam file: MultipartFile) =
 		responseService.getResult(pharmaService.pharmaMedicineUpload(token, file))
+
+	@Operation(summary = "제약사 사업자 등록증 업로드")
+	@PutMapping(value = ["/file/{thisPK}/image"])
+	fun putImage(@RequestHeader token: String,
+	             @PathVariable thisPK: String,
+	             @RequestBody blobModel: BlobUploadModel): IRestResult {
+		pharmaService.isValid(token)
+		val tokenUser = pharmaService.getUserDataByToken(token)
+		if (!pharmaService.haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.PharmaChanger))) {
+			throw AuthenticationEntryPointException()
+		}
+
+		val pharmaData = pharmaService.getPharmaData(token, thisPK)
+		azureBlobService.blobUploadSave(blobModel.newSave())
+		pharmaData.imageUrl = blobModel.blobUrl
+		return responseService.getResult(pharmaService.pharmaDataModify(token, pharmaData))
+	}
 }
