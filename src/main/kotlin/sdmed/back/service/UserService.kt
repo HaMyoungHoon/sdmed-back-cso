@@ -44,14 +44,22 @@ class UserService {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
 		if (haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee))) {
-			return userDataRepository.findAllByOrderByNameDesc().onEach { it.lazyHide() }.toMutableList().apply {
+				return userDataRepository.findAllByOrderByNameDesc().onEach { it.lazyHide() }.toMutableList().run {
 				if (exceptMe) {
 					filter { it.thisPK != tokenUser.thisPK }
+				} else {
+					this
 				}
 			}
 		}
 
-		return userDataRepository.selectWhereDeptOrderByNameAsc(UserDepts.of(UserDept.TaxPayer, UserDept.Personal).getFlag()).filter { it.thisPK != tokenUser.thisPK }
+		return userDataRepository.selectWhereDeptOrderByNameAsc(UserDepts.of(UserDept.TaxPayer, UserDept.Personal).getFlag()).run {
+			if (exceptMe) {
+				filter { it.thisPK != tokenUser.thisPK }
+			} else {
+				this
+			}
+		}
 	}
 	fun getAllUserBusiness(token: String, exceptMe: Boolean = true): List<UserDataModel> {
 		isValid(token)
@@ -72,6 +80,47 @@ class UserService {
 		val pageable = PageRequest.of(page, size)
 		return userDataRepository.findAllByOrderByNameDesc(pageable).onEach { it.lazyHide() }
 	}
+	fun getUserData(token: String, userPK: String, childView: Boolean = false, relationView: Boolean = false, pharmaOwnMedicineView: Boolean = false): UserDataModel {
+		isValid(token)
+		val tokenUser = getUserDataByToken(token)
+		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.UserChanger))) {
+			throw AuthenticationEntryPointException()
+		}
+		if (userPK.isBlank()) {
+			return getUserDataByPK(tokenUser.thisPK, childView, relationView, pharmaOwnMedicineView)
+		}
+		return getUserDataByPK(userPK, childView, relationView, pharmaOwnMedicineView)
+	}
+	fun getUserDataByID(id: String, childView: Boolean = false, relationView: Boolean = false, pharmaOwnMedicineView: Boolean = false): UserDataModel {
+		val ret = userDataRepository.selectById(id) ?: throw UserNotFoundException()
+		if (childView) {
+			ret.children = userDataRepository.findAllByUserData(ret).toMutableList().onEach { it.lazyHide() }
+		}
+		ret.lazyHide()
+		if (relationView) {
+			ret.hosList = mergeRel(ret.thisPK, pharmaOwnMedicineView)
+		}
+
+		return ret
+	}
+	fun getUserDataByPK(thisPK: String, childView: Boolean = false, relationView: Boolean = false, pharmaOwnMedicineView: Boolean = false): UserDataModel {
+		val ret = userDataRepository.findByThisPK(thisPK) ?: throw UserNotFoundException()
+		if (childView) {
+			ret.children = userDataRepository.findAllByUserData(ret).toMutableList().onEach { it.lazyHide() }
+		}
+		ret.lazyHide()
+		if (relationView) {
+			ret.hosList = mergeRel(ret.thisPK, pharmaOwnMedicineView)
+		}
+
+		return ret
+	}
+	fun getUserDataWithRelationByPK(thisPK: String) = getUserDataByPK(thisPK).apply { hosList = mergeRel(thisPK) }
+	fun getUserDataByToken(token: String) = getUserDataByID(jwtTokenProvider.getAllClaimsFromToken(token).subject)
+	fun getUserStatusList() = UserStatus.entries
+	fun getUserRoleList() = UserRole.entries.filterNot { it in listOf(UserRole.Admin, UserRole.CsoAdmin) }
+	fun getUserDeptList() = UserDept.entries
+
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
 	fun signIn(id: String, pw: String): String {
 		val user = getUserDataByID(id)
@@ -155,6 +204,31 @@ class UserService {
 
 		val user = getUserDataByPK(userPK)
 		user.pw = fAmhohwa.encrypt(changePW)
+		userDataSetFamily(user)
+		val ret = userDataRepository.save(user)
+		val stackTrace = Thread.currentThread().stackTrace
+		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "${user.id} password change")
+		logRepository.save(logModel)
+		return ret
+	}
+	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
+	fun passwordChange(token: String, currentPW: String, afterPW: String, confirmPW: String): UserDataModel {
+		val tokenUser = getUserDataByToken(token)
+		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.UserChanger))) {
+			throw AuthenticationEntryPointException()
+		}
+		if (tokenUser.pw != fAmhohwa.encrypt(currentPW)) {
+			throw CurrentPWNotMatchException()
+		}
+		if (afterPW.length < 4) {
+			throw SignUpPWConditionException()
+		}
+		if (afterPW != confirmPW) {
+			throw ConfirmPasswordUnMatchException()
+		}
+
+		val user = getUserDataByPK(tokenUser.thisPK)
+		user.pw = fAmhohwa.encrypt(afterPW)
 		userDataSetFamily(user)
 		val ret = userDataRepository.save(user)
 		val stackTrace = Thread.currentThread().stackTrace
@@ -282,9 +356,6 @@ class UserService {
 		logRepository.save(logModel)
 		return ret
 	}
-	fun getUserStatusList() = UserStatus.entries
-	fun getUserRoleList() = UserRole.entries.filterNot { it in listOf(UserRole.Admin, UserRole.CsoAdmin) }
-	fun getUserDeptList() = UserDept.entries
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
 	fun userRoleModifyByID(token: String, id: String, roleList: List<UserRole>): UserDataModel {
 		isValid(token)
@@ -361,6 +432,39 @@ class UserService {
 		val ret = userDataRepository.save(user)
 		val stackTrace = Thread.currentThread().stackTrace
 		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "${user.id} dept : ${user.dept}")
+		logRepository.save(logModel)
+		return ret
+	}
+
+	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
+	fun userTaxImageUrlModify(token: String, userPK: String, url: String): UserDataModel {
+		isValid(token)
+		val tokenUser = getUserDataByToken(token)
+		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.UserChanger))) {
+			throw AuthenticationEntryPointException()
+		}
+		val user = getUserDataByPK(userPK)
+		user.taxpayerImageUrl = url
+		userDataSetFamily(user)
+		val ret = userDataRepository.save(user)
+		val stackTrace = Thread.currentThread().stackTrace
+		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "${user.id} taxImage : ${user.taxpayerImageUrl}")
+		logRepository.save(logModel)
+		return ret
+	}
+	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
+	fun userBankImageUrlModify(token: String, userPK: String, url: String): UserDataModel {
+		isValid(token)
+		val tokenUser = getUserDataByToken(token)
+		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.UserChanger))) {
+			throw AuthenticationEntryPointException()
+		}
+		val user = getUserDataByPK(userPK)
+		user.bankAccountImageUrl = url
+		userDataSetFamily(user)
+		val ret = userDataRepository.save(user)
+		val stackTrace = Thread.currentThread().stackTrace
+		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "${user.id} bankImage : ${user.bankAccountImageUrl}")
 		logRepository.save(logModel)
 		return ret
 	}
@@ -510,34 +614,6 @@ class UserService {
 	}
 	fun renderSqlInsertRelation(data: UserHosPharmaMedicinePairModel) = data.insertString()
 
-	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
-	fun getUserDataByID(id: String, childView: Boolean = false, relationView: Boolean = false, pharmaOwnMedicineView: Boolean = false): UserDataModel {
-		val ret = userDataRepository.selectById(id) ?: throw UserNotFoundException()
-		if (childView) {
-			ret.children = userDataRepository.findAllByUserData(ret).toMutableList().onEach { it.lazyHide() }
-		}
-		ret.lazyHide()
-		if (relationView) {
-			ret.hosList = mergeRel(ret.thisPK, pharmaOwnMedicineView)
-		}
-
-		return ret
-	}
-	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
-	fun getUserDataByPK(thisPK: String, childView: Boolean = false, relationView: Boolean = false, pharmaOwnMedicineView: Boolean = false): UserDataModel {
-		val ret = userDataRepository.findByThisPK(thisPK) ?: throw UserNotFoundException()
-		if (childView) {
-			ret.children = userDataRepository.findAllByUserData(ret).toMutableList().onEach { it.lazyHide() }
-		}
-		ret.lazyHide()
-		if (relationView) {
-			ret.hosList = mergeRel(ret.thisPK, pharmaOwnMedicineView)
-		}
-
-		return ret
-	}
-	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
-	fun getUserDataWithRelationByPK(thisPK: String) = getUserDataByPK(thisPK).apply { hosList = mergeRel(thisPK) }
 	fun mergeRel(userPK: String, pharmaOwnMedicineView: Boolean = false): MutableList<HospitalModel> {
 		var ret: MutableList<HospitalModel> = mutableListOf()
 		val userRelationModel = userRelationRepository.findAllByUserPK(userPK)
@@ -587,7 +663,6 @@ class UserService {
 		}
 	}
 
-	fun getUserDataByToken(token: String) = getUserDataByID(jwtTokenProvider.getAllClaimsFromToken(token).subject)
 	fun isValid(token: String) {
 		if (!jwtTokenProvider.validateToken(token)) {
 			throw AuthenticationEntryPointException()
