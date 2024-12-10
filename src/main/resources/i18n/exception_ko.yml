@@ -121,3 +121,7 @@ pharmaExistException:
 medicineExistException:
   code: "-10028"
   msg: "이미 존재하는 약품 코드 입니다."
+
+currentPWNotMatchException:
+  code: "-10029"
+  msg: "비밀번호가 일치하지 않습니다."

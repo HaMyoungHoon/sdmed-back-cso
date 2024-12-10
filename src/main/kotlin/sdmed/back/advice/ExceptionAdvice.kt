@@ -175,6 +175,11 @@ class ExceptionAdvice {
 	protected fun medicineExistException(request: HttpServletRequest, exception: MedicineExistException) =
 		responseService.getFailResult(getMessage("medicineExistException.code").toInt(), getMessageMerge("medicineExistException.msg", exception.message))
 
+	@ExceptionHandler(CurrentPWNotMatchException::class)
+	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+	protected fun currentPWNotMatchException(request: HttpServletRequest, exception: CurrentPWNotMatchException) =
+		responseService.getFailResult(getMessage("currentPWNotMatchException.code").toInt(), getMessageMerge("currentPWNotMatchException.msg", exception.message))
+
 	@ExceptionHandler(AsyncRequestTimeoutException::class)
 	@ResponseStatus(HttpStatus.OK)
 	protected fun asyncRequestTimeoutException(request: HttpServletRequest, exception: AsyncRequestTimeoutException): AsyncContext =

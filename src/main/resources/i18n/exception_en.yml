@@ -121,3 +121,7 @@ pharmaExistException:
 medicineExistException:
   code: "-10028"
   msg: "already exist medicine code"
+
+currentPWNotMatchException:
+  code: "-10029"
+  msg: "password not match"
