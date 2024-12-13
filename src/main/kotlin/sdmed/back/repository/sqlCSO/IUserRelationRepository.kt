@@ -2,7 +2,7 @@ package sdmed.back.repository.sqlCSO
 
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
-import sdmed.back.model.sqlCSO.UserRelationModel
+import sdmed.back.model.sqlCSO.user.UserRelationModel
 
 @Repository
 interface IUserRelationRepository: JpaRepository<UserRelationModel, String> {

@@ -51,7 +51,10 @@ object FConstants {
 	const val MODEL_USER_COMPANY_ADDRESS = "회사주소"
 	const val MODEL_USER_BANK_ACCOUNT = "은행계좌번호"
 	const val MODEL_USER_COUNT = 12
-	const val MODEL_USER_INSERT_INTO = "INSERT INTO userDataModel (thisPK, id, pw, name, mail, phoneNumber, role, dept, status, companyName, companyNumber, companyAddress, bankAccount, regDate, bankAccountImageUrl) VALUES "
+	const val MODEL_USER_INSERT_INTO = "INSERT INTO UserDataModel (thisPK, id, pw, name, mail, phoneNumber, role, dept, status, companyName, companyNumber, companyAddress, bankAccount, regDate, bankAccountImageUrl) VALUES "
+	const val MODEL_USER_CHILD_INSERT_INTO = "INSERT INTO UserChildPKModel (thisPK, motherPK, childPK) VALUES "
+	const val MODEL_USER_CHILD_DELETE_BY_MOTHER_PK = "DELETE FROM UserChildPKModel WHERE motherPK =  "
+
 	const val MODEL_CODE = "거래처코드"
 	const val MODEL_ORG_NAME = "사업자원어명"
 	const val MODEL_INNER_NAME = "사업자내부명"
@@ -76,15 +79,15 @@ object FConstants {
 	const val MODEL_ETC1 = "비고1"
 	const val MODEL_ETC2 = "비고2"
 	const val MODEL_PHARMA_COUNT = 23
-	const val MODEL_PHARMA_INSERT_INTO = "INSERT INTO pharmaModel (thisPK, code, orgName, innerName, ownerName, taxpayerNumber, phoneNumber, faxNumber, zipCode, address, addressDetail, businessType, businessItem, billType, pharmaType, pharmaGroup, contractType, deliveryDiv, mail, mobilePhone, openDate, closeDate, etc1, etc2, imageUrl, inVisible) VALUES "
+	const val MODEL_PHARMA_INSERT_INTO = "INSERT INTO PharmaModel (thisPK, code, orgName, innerName, ownerName, taxpayerNumber, phoneNumber, faxNumber, zipCode, address, addressDetail, businessType, businessItem, billType, pharmaType, pharmaGroup, contractType, deliveryDiv, mail, mobilePhone, openDate, closeDate, etc1, etc2, imageUrl, inVisible) VALUES "
 
-	const val MODEL_PHARMA_MEDICINE_RELATIONS_DELETE_WHERE_PHARMA_PK = "DELETE FROM pharmaMedicineRelationModel WHERE pharmaPK = "
-	const val MODEL_PHARMA_MEDICINE_RELATIONS_INSERT_INTO = "INSERT INTO pharmaMedicineRelationModel (thisPK, pharmaPK, medicinePK) VALUES "
+	const val MODEL_PHARMA_MEDICINE_RELATIONS_DELETE_WHERE_PHARMA_PK = "DELETE FROM PharmaMedicineRelationModel WHERE pharmaPK = "
+	const val MODEL_PHARMA_MEDICINE_RELATIONS_INSERT_INTO = "INSERT INTO PharmaMedicineRelationModel (thisPK, pharmaPK, medicinePK) VALUES "
 
 	const val MODEL_LICENSE_NUMBER = "면허번호"
 	const val MODEL_NURSING_HOME_NUMBER = "요양기관번호"
 	const val MODEL_HOS_COUNT = 23
-	const val MODEL_HOS_INSERT_INTO = "INSERT INTO hospitalModel (thisPK, code, orgName, innerName, ownerName, taxpayerNumber, phoneNumber, faxNumber, zipCode, address, addressDetail, businessType, businessItem, billType, licenseNumber, nursingHomeNumber, contractType, deliveryDiv, mail, mobilePhone, openDate, closeDate, etc1, etc2, imageUrl, inVisible) VALUES "
+	const val MODEL_HOS_INSERT_INTO = "INSERT INTO HospitalModel (thisPK, code, orgName, innerName, ownerName, taxpayerNumber, phoneNumber, faxNumber, zipCode, address, addressDetail, businessType, businessItem, billType, licenseNumber, nursingHomeNumber, contractType, deliveryDiv, mail, mobilePhone, openDate, closeDate, etc1, etc2, imageUrl, inVisible) VALUES "
 
 	const val MODEL_MEDICINE_CODE = "코드"
 	const val MODEL_MEDICINE_MAIN_INGREDIENT_CODE = "주성분코드"
@@ -130,10 +133,8 @@ object FConstants {
 	const val MODEL_MEDICINE_PRICE_INSERT_INTO = "INSERT INTO MedicinePriceModel (thisPK, kdCode, maxPrice, ancestorCode, applyDate) VALUES "
 	const val MODEL_MEDICINE_INGREDIENT_INSERT_INTO = "INSERT INTO MedicineIngredientModel (thisPK, mainIngredientCode, mainIngredientName) VALUES "
 
-	const val MODEL_USER_RELATIONS_DELETE_WHERE_THIS_PK = "DELETE FROM userRelationModel WHERE thisPK = "
-	const val MODEL_USER_RELATIONS_DELETE_WHERE_THIS_PK_IN = "DELETE FROM userRelationModel WHERE thisPK IN "
-	const val MODEL_USER_RELATIONS_DELETE_WHERE_USER_PK = "DELETE FROM userRelationModel WHERE userPK = "
-	const val MODEL_USER_RELATIONS_INSERT_INTO = "INSERT INTO userRelationModel (thisPK, userPK, hosPK, pharmaPK, medicinePK) VALUES "
+	const val MODEL_USER_RELATIONS_DELETE_WHERE_USER_PK = "DELETE FROM UserRelationModel WHERE userPK = "
+	const val MODEL_USER_RELATIONS_INSERT_INTO = "INSERT INTO UserRelationModel (thisPK, userPK, hosPK, pharmaPK, medicinePK) VALUES "
 
 	const val MODEL_PHARMA_MEDICINE_PARSE_PHARMA_CODE = "제약사코드"
 	const val MODEL_PHARMA_MEDICINE_PARSE_MEDICINE_CODE = "약품코드"

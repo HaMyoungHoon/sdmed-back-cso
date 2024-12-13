@@ -8,26 +8,36 @@ import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.web.bind.annotation.*
 import sdmed.back.advice.exception.AuthenticationEntryPointException
 import sdmed.back.advice.exception.NotFoundLanguageException
-import sdmed.back.config.FConstants
+import sdmed.back.config.FControllerBase
 import sdmed.back.model.common.IRestResult
-import sdmed.back.model.common.UserRole
-import sdmed.back.model.common.UserRoles
-import sdmed.back.service.AzureBlobService
-import sdmed.back.service.ResponseService
+import sdmed.back.model.common.user.UserRole
+import sdmed.back.model.common.user.UserRoles
+import sdmed.back.model.sqlCSO.user.UserDataModel
 import sdmed.back.service.UserService
 import java.util.*
 
 @Tag(name = "CommonController")
 @RestController
 @RequestMapping(value = ["/common"])
-@CrossOrigin(origins = [FConstants.HTTP_MHHA, FConstants.HTTPS_MHHA], allowedHeaders = ["*"])
-class CommonController {
-	@Autowired lateinit var azureBlobService: AzureBlobService
-	@Autowired lateinit var responseService: ResponseService
+class CommonController: FControllerBase() {
 	@Autowired lateinit var userService: UserService
 	@Value(value = "\${str.version}") lateinit var strVersion: String
 	@Value(value = "\${str.profile}") lateinit var strprofile: String
 
+	@Operation(summary = "로그인")
+	@GetMapping(value = ["/signIn"])
+	fun signIn(@RequestParam id: String,
+	           @RequestParam pw: String): IRestResult =
+		responseService.getResult(userService.signIn(id, pw))
+	@Operation(summary = "회원가입")
+	@PostMapping(value = ["/signUp"])
+	fun signUp(@RequestParam confirmPW: String,
+	           @RequestBody data: UserDataModel) =
+		responseService.getResult(userService.signUp(confirmPW, data))
+	@Operation(summary = "로그인 토큰 새로고침")
+	@PostMapping(value = ["/tokenRefresh"])
+	fun tokenRefresh(@RequestHeader token: String) =
+		responseService.getResult(userService.tokenRefresh(token))
 	@Operation(summary = "language set", description = "")
 	@PostMapping(value = ["/lang"])
 	fun setLanguage(@RequestParam lang: String): IRestResult {

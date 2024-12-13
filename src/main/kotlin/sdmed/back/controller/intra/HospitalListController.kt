@@ -10,51 +10,29 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import sdmed.back.advice.exception.AuthenticationEntryPointException
-import sdmed.back.config.ContentsType
-import sdmed.back.config.FConstants
-import sdmed.back.config.FExcelParserType
-import sdmed.back.config.FExtensions
+import sdmed.back.config.*
 import sdmed.back.model.common.IRestResult
-import sdmed.back.model.common.UserRole
-import sdmed.back.model.common.UserRoles
+import sdmed.back.model.common.user.UserRole
+import sdmed.back.model.common.user.UserRoles
 import sdmed.back.model.sqlCSO.BlobUploadModel
-import sdmed.back.model.sqlCSO.HospitalModel
-import sdmed.back.service.AzureBlobService
-import sdmed.back.service.HospitalService
-import sdmed.back.service.ResponseService
+import sdmed.back.model.sqlCSO.hospital.HospitalModel
+import sdmed.back.service.HospitalListService
 
 @Tag(name = "병원목록")
 @RestController
 @RequestMapping(value = ["/intra/hospitalList"])
-@CrossOrigin(origins = [FConstants.HTTP_MHHA, FConstants.HTTPS_MHHA], allowedHeaders = ["*"])
-class HospitalListController {
-	@Autowired lateinit var responseService: ResponseService
-	@Autowired lateinit var hospitalService: HospitalService
-	@Autowired lateinit var azureBlobService: AzureBlobService
+class HospitalListController: FControllerBase() {
+	@Autowired lateinit var hospitalListService: HospitalListService
 
 	@Operation(summary = "페이지 켜면 처음 보이는 거")
 	@GetMapping(value = ["/list"])
 	fun getList(@RequestHeader token: String) =
-		responseService.getResult(hospitalService.getAllHospital(token))
-
+		responseService.getResult(hospitalListService.getList(token))
 	@Operation(summary = "편집 버튼 누르면 보이는 거")
 	@GetMapping(value = ["/data/{thisPK}"])
 	fun getData(@RequestHeader token: String,
 							@PathVariable thisPK: String) =
-		responseService.getResult(hospitalService.getHospitalData(token, thisPK))
-
-	@Operation(summary = "엑셀 파일 업로드")
-	@PostMapping(value = ["/file/excel"], consumes = ["multipart/form-data"])
-	fun postExcel(@RequestHeader token: String,
-								@RequestParam file: MultipartFile) =
-		responseService.getResult(hospitalService.hospitalUpload(token, file))
-
-	@Operation(summary = "병원 정보 추가")
-	@PostMapping(value = ["/data"])
-	fun postData(@RequestHeader token: String,
-	             @RequestBody hospitalModel: HospitalModel) =
-		responseService.getResult(hospitalService.addHospitalData(token, hospitalModel))
-
+		responseService.getResult(hospitalListService.getData(token, thisPK))
 	@Operation(summary = "엑셀 샘플 다운로드")
 	@GetMapping(value = ["/file/sample"])
 	fun getExcelSample(): ResponseEntity<Resource> =
@@ -66,43 +44,54 @@ class HospitalListController {
 				.body(x)
 		}
 
-	@Operation(summary = "병원 정보 수정")
-	@PutMapping(value = ["/data"])
-	fun putData(@RequestHeader token: String,
-							@RequestBody hospitalModel: HospitalModel) =
-		responseService.getResult(hospitalService.hospitalDataModify(token, hospitalModel))
+	@Operation(summary = "엑셀 파일 업로드")
+	@PostMapping(value = ["/file/excel"], consumes = ["multipart/form-data"])
+	fun postExcel(@RequestHeader token: String,
+								@RequestParam file: MultipartFile) =
+		responseService.getResult(hospitalListService.hospitalUpload(token, file))
+	@Operation(summary = "병원 정보 추가")
+	@PostMapping(value = ["/data"])
+	fun postData(@RequestHeader token: String,
+	             @RequestBody hospitalModel: HospitalModel) =
+		responseService.getResult(hospitalListService.addHospitalData(token, hospitalModel))
 
 	@Operation(summary = "병원 사업자 등록증 업로드")
 	@PostMapping(value = ["/file/{thisPK}/image"])
 	fun postImage(@RequestHeader token: String,
 	              @PathVariable thisPK: String,
-								@RequestParam file: MultipartFile): IRestResult {
-		hospitalService.isValid(token)
-		val tokenUser = hospitalService.getUserDataByToken(token)
-		if (!hospitalService.haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.HospitalChanger))) {
+	              @RequestParam file: MultipartFile): IRestResult {
+		hospitalListService.isValid(token)
+		val tokenUser = hospitalListService.getUserDataByToken(token)
+		if (!hospitalListService.haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.HospitalChanger))) {
 			throw AuthenticationEntryPointException()
 		}
 
 		val today = FExtensions.getDateTimeString("yyyyMMdd")
-		val hospitalData = hospitalService.getHospitalData(token, thisPK)
+		val hospitalData = hospitalListService.getData(token, thisPK)
 		val blobUrl = azureBlobService.uploadFile(file, "hospital/$today", tokenUser.thisPK)
 		hospitalData.imageUrl = blobUrl
-		return responseService.getResult(hospitalService.hospitalDataModify(token, hospitalData))
+		return responseService.getResult(hospitalListService.hospitalDataModify(token, hospitalData))
 	}
+
+	@Operation(summary = "병원 정보 수정")
+	@PutMapping(value = ["/data"])
+	fun putData(@RequestHeader token: String,
+							@RequestBody hospitalModel: HospitalModel) =
+		responseService.getResult(hospitalListService.hospitalDataModify(token, hospitalModel))
 	@Operation(summary = "병원 사업자 등록증 업로드")
 	@PutMapping(value = ["/file/{thisPK}/image"])
 	fun putImage(@RequestHeader token: String,
 	             @PathVariable thisPK: String,
 	             @RequestBody blobModel: BlobUploadModel): IRestResult {
-		hospitalService.isValid(token)
-		val tokenUser = hospitalService.getUserDataByToken(token)
-		if (!hospitalService.haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.HospitalChanger))) {
+		hospitalListService.isValid(token)
+		val tokenUser = hospitalListService.getUserDataByToken(token)
+		if (!hospitalListService.haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.HospitalChanger))) {
 			throw AuthenticationEntryPointException()
 		}
 
-		val hospitalData = hospitalService.getHospitalData(token, thisPK)
+		val hospitalData = hospitalListService.getData(token, thisPK)
 		azureBlobService.blobUploadSave(blobModel.newSave())
 		hospitalData.imageUrl = blobModel.blobUrl
-		return responseService.getResult(hospitalService.hospitalDataModify(token, hospitalData))
+		return responseService.getResult(hospitalListService.hospitalDataModify(token, hospitalData))
 	}
 }

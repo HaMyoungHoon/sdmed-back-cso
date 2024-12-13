@@ -6,7 +6,13 @@ import sdmed.back.advice.exception.HosDataFileUploadException
 import sdmed.back.advice.exception.MedicineDataFileUploadException
 import sdmed.back.advice.exception.PharmaDataFileUploadException
 import sdmed.back.advice.exception.UserDataFileUploadException
-import sdmed.back.model.sqlCSO.*
+import sdmed.back.model.sqlCSO.hospital.HospitalModel
+import sdmed.back.model.sqlCSO.medicine.MedicineIngredientModel
+import sdmed.back.model.sqlCSO.medicine.MedicineModel
+import sdmed.back.model.sqlCSO.medicine.MedicinePriceModel
+import sdmed.back.model.sqlCSO.pharma.PharmaMedicineExcelParsingModel
+import sdmed.back.model.sqlCSO.pharma.PharmaModel
+import sdmed.back.model.sqlCSO.user.UserDataModel
 import java.util.*
 
 @Component

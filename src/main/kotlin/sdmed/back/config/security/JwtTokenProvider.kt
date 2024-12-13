@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import sdmed.back.config.FConstants
-import sdmed.back.model.sqlCSO.UserDataModel
+import sdmed.back.model.sqlCSO.user.UserDataModel
 import sdmed.back.repository.sqlCSO.IUserDataRepository
 import java.lang.Exception
 import java.security.Key
@@ -40,8 +40,6 @@ class JwtTokenProvider {
 		}.build()).expiration(Date(now.time + validTime)).signWith(getSignKey()).compact()
 	}
 	fun getAllClaimsFromToken(token : String): Claims = Jwts.parser().verifyWith(getSecretKey()).build().parseSignedClaims(token).payload
-	fun getUserPk(token : String): String = getAllClaimsFromToken(token).subject
-	fun getUserData(token: String): UserDataModel? = userDataRepository.selectById(getUserPk(token))?.lazyHide()
 	fun resolveToken(req : HttpServletRequest): String? =
 		req.getHeader(authToken)
 	fun validateToken(token : String) = try {

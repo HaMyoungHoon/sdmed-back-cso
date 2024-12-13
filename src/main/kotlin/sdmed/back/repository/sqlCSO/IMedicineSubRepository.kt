@@ -2,7 +2,7 @@ package sdmed.back.repository.sqlCSO
 
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
-import sdmed.back.model.sqlCSO.MedicineSubModel
+import sdmed.back.model.sqlCSO.medicine.MedicineSubModel
 
 @Repository
 interface IMedicineSubRepository: JpaRepository<MedicineSubModel, String> {
