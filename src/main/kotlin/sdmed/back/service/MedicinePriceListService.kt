@@ -18,6 +18,10 @@ class MedicinePriceListService: MedicineService() {
 		isValid(token)
 		return medicinePriceRepository.findAllByKdCodeOrderByApplyDateDesc(kdCode)
 	}
+	fun getPriceApplyDate(token: String): String {
+		isValid(token)
+		return medicinePriceRepository.selectLatestDate()
+	}
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
 	fun medicinePriceUpload(token: String, applyDate: Date, file: MultipartFile): String {
 		isValid(token)

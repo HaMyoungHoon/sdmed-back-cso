@@ -125,3 +125,8 @@ medicineExistException:
 currentPWNotMatchException:
   code: "-10029"
   msg: "password not match"
+
+
+requestModelNotFoundException:
+  code: "-10030"
+  msg: "not found request list"

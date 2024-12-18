@@ -16,4 +16,8 @@ interface IMedicinePriceRepository: JpaRepository<MedicinePriceModel, String> {
 			")\n" +
 			"SELECT * FROM RankedMedicinePrice as MedicinePriceModel WHERE RN = 1", nativeQuery = true)
 	fun selectAllByRecentData(): List<MedicinePriceModel>
+
+	@Query("SELECT TOP 1 applyDate FROM MedicinePriceModel " +
+			"ORDER BY applyDate DESC", nativeQuery = true)
+	fun selectLatestDate(): String
 }

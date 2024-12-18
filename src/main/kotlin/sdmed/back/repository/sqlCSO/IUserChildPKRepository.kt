@@ -13,10 +13,10 @@ interface IUserChildPKRepository: JpaRepository<UserChildPKModel, String> {
 	fun selectAllByMotherPK(motherPK: String): List<String>
 
 	@Query("WITH OnlyOneUserChildPKModel AS ( " +
-			"SELECT motherPK, ROW_NUMBER() OVER (PARTITION BY a.motherPK ODER BY (SELECT NULL)) AS RowNum " +
-			"FROM UserChildPKModel " +
-			"WHERE motherPK IN :motherPKInString) " +
-			"SELECT childPK FROM OnlyOneUserChildPKModel " +
+			"SELECT motherPK, childPK, ROW_NUMBER() OVER (PARTITION BY a.motherPK ORDER BY (SELECT NULL)) AS RowNum " +
+			"FROM UserChildPKModel a " +
+			"WHERE motherPK IN (:motherPKInString)) " +
+			"SELECT b.childPK FROM OnlyOneUserChildPKModel b " +
 			"WHERE RowNum = 1", nativeQuery = true)
 	fun selectAllByMotherPKInOnlyOne(motherPKInString: String): List<String>
 }

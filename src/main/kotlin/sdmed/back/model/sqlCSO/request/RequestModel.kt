@@ -1,4 +1,4 @@
-package sdmed.back.model.sqlCSO
+package sdmed.back.model.sqlCSO.request
 
 import jakarta.persistence.*
 import sdmed.back.model.common.RequestType
@@ -12,6 +12,8 @@ data class RequestModel(
 	var thisPK: String = UUID.randomUUID().toString(),
 	@Column(columnDefinition = "nvarchar(36)", updatable = false, nullable = false)
 	var requestUserPK: String = "",
+	@Column(columnDefinition = "nvarchar(255)")
+	var requestUserID: String = "",
 	@Column(columnDefinition = "nvarchar(36)", updatable = false)
 	var requestItemPK: String = "",
 	@Column(columnDefinition = "nvarchar(36)")
@@ -23,6 +25,6 @@ data class RequestModel(
 	@Column(updatable = false, nullable = false)
 	var requestDate: Date = Date(),
 	@Column
-	var responseData: Date? = null,
+	var responseDate: Date? = null,
 ) {
 }

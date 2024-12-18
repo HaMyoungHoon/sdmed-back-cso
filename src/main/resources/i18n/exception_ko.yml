@@ -125,3 +125,7 @@ medicineExistException:
 currentPWNotMatchException:
   code: "-10029"
   msg: "비밀번호가 일치하지 않습니다."
+
+requestModelNotFoundException:
+  code: "-10030"
+  msg: "요청 리스트가 존재하지 않습니다."

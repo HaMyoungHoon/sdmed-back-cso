@@ -36,7 +36,7 @@ data class UserDataModel(
 	var dept: Int = UserDept.None.flag,
 	@Column
 	var status: UserStatus = UserStatus.None,
-	@Column(columnDefinition = "text")
+	@Column(columnDefinition = "text", nullable = false)
 	var taxpayerImageUrl: String = "",
 	@Column(columnDefinition = "nvarchar(255)", nullable = false)
 	var companyName: String = "",
@@ -188,7 +188,7 @@ data class UserDataModel(
 		val companyAddress = FExtensions.escapeString(companyAddress)
 		val bankAccount = FExtensions.escapeString(bankAccount)
 		val regDateString = FExtensions.parseDateTimeString(regDate, "yyyy-MM-dd HH:mm:ss")
-		return "('$thisPK', '$id', '$pw', '$name', '$mail', '$phoneNumber', '$role', '$dept', '${status.index}', '$companyName', '$companyNumber', '$companyAddress', '$bankAccount', '$regDateString', '')"
+		return "('$thisPK', '$id', '$pw', '$name', '$mail', '$phoneNumber', '$role', '$dept', '${status.index}', '$companyName', '$companyNumber', '$companyAddress', '$bankAccount', '$regDateString', '$taxpayerImageUrl', '$bankAccountImageUrl')"
 	}
 
 	override fun toString(): String {

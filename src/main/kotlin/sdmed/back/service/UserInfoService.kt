@@ -37,14 +37,14 @@ class UserInfoService: UserService() {
 
 		return getUserDataByPK(userPK, childView, relationView, pharmaOwnMedicineView)
 	}
-	fun getListChildAble(token: String): List<UserDataModel> {
+	fun getListChildAble(token: String, thisPK: String): List<UserDataModel> {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.UserChanger))) {
 			throw AuthenticationEntryPointException()
 		}
 
-		return userDataRepository.selectAbleChild()
+		return userDataRepository.selectAbleChild(thisPK)
 	}
 
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
@@ -120,11 +120,14 @@ class UserInfoService: UserService() {
 
 		val mother = getUserDataByPK(motherPK)
 		val existChild = userDataRepository.findAllByThisPKIn(childPK).map { it.thisPK }.toMutableList()
-		val motherPKInString = "(${existChild.joinToString(",") { "'${it}'" }})"
+		deleteMothersChild(motherPK)
+		if (existChild.isEmpty()) {
+			return "count 0"
+		}
+		val motherPKInString = "${existChild.joinToString(",") { "'${it}'" }}"
 		userChildPKRepository.selectAllByMotherPKInOnlyOne(motherPKInString).let { x ->
 			existChild.removeIf { y -> y in x }
 		}
-		deleteMothersChild(motherPK)
 		val userChildPK = existChild.map { x -> UserChildPKModel().apply {
 			this.motherPK = motherPK
 			this.childPK = x

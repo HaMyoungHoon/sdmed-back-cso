@@ -34,9 +34,10 @@ class UserInfoController: FControllerBase() {
 							@RequestParam(required = false) pharmaOwnMedicineView: Boolean = false) =
 		responseService.getResult(userInfoService.getData(token, thisPK, childView, relationView, pharmaOwnMedicineView))
 	@Operation(summary = "자식으로 넣을 수 있는 유저 리스트")
-	@GetMapping(value = ["/list/childAble"])
-	fun getListChildAble(@RequestHeader token: String) =
-		responseService.getResult(userInfoService.getListChildAble(token))
+	@GetMapping(value = ["/list/childAble/{thisPK}"])
+	fun getListChildAble(@RequestHeader token: String,
+											 @PathVariable thisPK: String) =
+		responseService.getResult(userInfoService.getListChildAble(token, thisPK))
 	@Operation(summary = "유저 데이터 엑셀 샘플 다운로드")
 	@GetMapping(value = ["/file/sample"])
 	fun getExcelSample(): ResponseEntity<Resource> {
@@ -63,7 +64,7 @@ class UserInfoController: FControllerBase() {
 	@Operation(summary = "유저 데이터 모디파이")
 	@PutMapping(value = ["/data"])
 	fun putUser(@RequestHeader token: String,
-							@RequestParam userData: UserDataModel) =
+							@RequestBody userData: UserDataModel) =
 		responseService.getResult(userInfoService.userDataModify(token, userData))
 	@Operation(summary = "유저 세금계산서 이미지 url 변경")
 	@PutMapping(value = ["/file/{thisPK}/taxImage"])

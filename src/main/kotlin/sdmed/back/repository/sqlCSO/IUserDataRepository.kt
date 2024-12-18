@@ -38,6 +38,10 @@ interface IUserDataRepository: JpaRepository<UserDataModel, String> {
 	@Query("SELECT a FROM UserDataModel a " +
 			"WHERE NOT EXISTS ( " +
 			"SELECT 1 FROM UserChildPKModel b " +
-			"WHERE a.thisPK = b.motherPK)")
-	fun selectAbleChild(): List<UserDataModel>
+			"WHERE a.thisPK = b.motherPK)" +
+			"AND a.thisPK != :thisPK " +
+			"AND a.thisPK NOT IN ( " +
+			"SELECT b.childPK FROM UserChildPKModel b " +
+			"WHERE b.motherPK = :thisPK)")
+	fun selectAbleChild(thisPK: String): List<UserDataModel>
 }

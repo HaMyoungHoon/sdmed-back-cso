@@ -25,6 +25,10 @@ class MedicinePriceListController: FControllerBase() {
 	fun getHistoryList(@RequestHeader token: String,
 										 @RequestParam kdCode: Int) =
 		responseService.getResult(medicinePriceService.getMedicinePriceList(token, kdCode))
+	@Operation(summary = "약가 적용 날짜")
+	@GetMapping(value = ["/data/price/date"])
+	fun getMedicinePriceApplyDate(@RequestHeader token: String) =
+		responseService.getResult(medicinePriceService.getPriceApplyDate(token))
 
 	@Operation(summary = "약제급여목록및급여상한금액표 업로드")
 	@PostMapping(value = ["/file/priceExcel"], consumes = ["multipart/form-data"])

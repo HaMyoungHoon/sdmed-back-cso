@@ -10,6 +10,7 @@ import sdmed.back.model.common.ResponseType
 import sdmed.back.model.common.user.*
 import sdmed.back.model.sqlCSO.*
 import sdmed.back.model.sqlCSO.hospital.HospitalModel
+import sdmed.back.model.sqlCSO.request.RequestModel
 import sdmed.back.model.sqlCSO.user.UserDataModel
 import sdmed.back.repository.sqlCSO.*
 import java.sql.Timestamp
@@ -99,6 +100,7 @@ class UserService: FServiceBase() {
 			throw SignUpFailedException()
 		}
 
+		data.thisPK = UUID.randomUUID().toString()
 		data.pw = fAmhohwa.encrypt(data.pw)
 		if (data.id == "mhha") {
 			data.role = UserRole.Admin.flag
@@ -107,6 +109,7 @@ class UserService: FServiceBase() {
 		val ret = userDataRepository.save(data)
 		requestRepository.save(RequestModel().apply {
 			requestUserPK = data.thisPK
+			requestUserID = data.id
 			requestItemPK = data.thisPK
 			requestType = RequestType.SignUp
 			if (data.id == "mhha") {

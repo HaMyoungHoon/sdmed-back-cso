@@ -51,7 +51,7 @@ object FConstants {
 	const val MODEL_USER_COMPANY_ADDRESS = "회사주소"
 	const val MODEL_USER_BANK_ACCOUNT = "은행계좌번호"
 	const val MODEL_USER_COUNT = 12
-	const val MODEL_USER_INSERT_INTO = "INSERT INTO UserDataModel (thisPK, id, pw, name, mail, phoneNumber, role, dept, status, companyName, companyNumber, companyAddress, bankAccount, regDate, bankAccountImageUrl) VALUES "
+	const val MODEL_USER_INSERT_INTO = "INSERT INTO UserDataModel (thisPK, id, pw, name, mail, phoneNumber, role, dept, status, companyName, companyNumber, companyAddress, bankAccount, regDate, taxpayerImageUrl, bankAccountImageUrl) VALUES "
 	const val MODEL_USER_CHILD_INSERT_INTO = "INSERT INTO UserChildPKModel (thisPK, motherPK, childPK) VALUES "
 	const val MODEL_USER_CHILD_DELETE_BY_MOTHER_PK = "DELETE FROM UserChildPKModel WHERE motherPK =  "
 

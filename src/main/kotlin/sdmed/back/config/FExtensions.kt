@@ -11,6 +11,7 @@ import java.nio.file.Path
 import java.nio.file.Paths
 import java.nio.file.StandardCopyOption
 import java.time.LocalDate
+import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.*
 
@@ -58,13 +59,17 @@ object FExtensions {
 		}
 	}
 
+	fun getZoneId(): ZoneId {
+//		return ZoneId.systemDefault()
+		return ZoneId.of("UTC")
+	}
 	fun getDateTimeString(pattern: String): String {
 		val currentDate = Date()
-		val localDate = currentDate.toInstant().atZone(java.time.ZoneId.of("UTC")).toLocalDateTime()
+		val localDate = currentDate.toInstant().atZone(getZoneId()).toLocalDateTime()
 		return localDate.format(DateTimeFormatter.ofPattern(pattern))
 	}
 	fun parseDateTimeString(date: Date?, pattern: String) = date?.let {
-		val localDate = date.toInstant().atZone(java.time.ZoneId.of("UTC")).toLocalDateTime()
+		val localDate = date.toInstant().atZone(getZoneId()).toLocalDateTime()
 		localDate.format(DateTimeFormatter.ofPattern(pattern))
 	}
 	fun parseDateTimeString(date: java.sql.Date?, pattern: String) = date?.let {
@@ -76,7 +81,13 @@ object FExtensions {
 	}
 	fun parseStringToJavaDate(date: String?, pattern: String): Date {
 		val localDate = LocalDate.parse(date, DateTimeFormatter.ofPattern(pattern))
-		return Date.from(localDate.atStartOfDay(java.time.ZoneId.of("UTC")).toInstant())
+		return Date.from(localDate.atStartOfDay(getZoneId()).toInstant())
+	}
+	fun toZeroTime(date: Date): Date {
+		return Date.from(date.toInstant().atZone(getZoneId()).toLocalDateTime().toLocalDate().atStartOfDay().atZone(getZoneId()).toInstant())
+	}
+	fun toCloseTime(date: Date): Date {
+		return Date.from(date.toInstant().atZone(getZoneId()).toLocalDateTime().toLocalDate().atTime(23, 59, 59).atZone(getZoneId()).toInstant())
 	}
 
 	fun sampleFileDownload(excelType: FExcelParserType): Resource {

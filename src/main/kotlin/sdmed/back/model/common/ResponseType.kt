@@ -2,8 +2,9 @@ package sdmed.back.model.common
 
 enum class ResponseType(val index: Int) {
 	None(0),
-	OK(1),
-	Pending(2),
-	Ignore(3),
-	Reject(4),
+	Recep(1),
+	OK(2),
+	Pending(3),
+	Ignore(4),
+	Reject(5),
 }

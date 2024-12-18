@@ -180,6 +180,11 @@ class ExceptionAdvice {
 	protected fun currentPWNotMatchException(request: HttpServletRequest, exception: CurrentPWNotMatchException) =
 		responseService.getFailResult(getMessage("currentPWNotMatchException.code").toInt(), getMessageMerge("currentPWNotMatchException.msg", exception.message))
 
+	@ExceptionHandler(RequestModelNotFoundException::class)
+	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+	protected fun currentPWNotMatchException(request: HttpServletRequest, exception: RequestModelNotFoundException) =
+		responseService.getFailResult(getMessage("requestModelNotFoundException.code").toInt(), getMessageMerge("requestModelNotFoundException.msg", exception.message))
+
 	@ExceptionHandler(AsyncRequestTimeoutException::class)
 	@ResponseStatus(HttpStatus.OK)
 	protected fun asyncRequestTimeoutException(request: HttpServletRequest, exception: AsyncRequestTimeoutException): AsyncContext =

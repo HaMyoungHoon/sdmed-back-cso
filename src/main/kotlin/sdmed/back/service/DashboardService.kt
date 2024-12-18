@@ -1,10 +1,17 @@
 package sdmed.back.service
 
+import org.springframework.transaction.annotation.Transactional
 import sdmed.back.advice.exception.AuthenticationEntryPointException
+import sdmed.back.advice.exception.RequestModelNotFoundException
+import sdmed.back.config.FExtensions
 import sdmed.back.config.FServiceBase
+import sdmed.back.config.jpa.CSOJPAConfig
+import sdmed.back.model.common.ResponseType
 import sdmed.back.model.common.user.UserRole
 import sdmed.back.model.common.user.UserRoles
-import sdmed.back.model.sqlCSO.RequestModel
+import sdmed.back.model.sqlCSO.request.RequestModel
+import sdmed.back.model.sqlCSO.request.RequestUserCountModel
+import sdmed.back.model.sqlCSO.request.ResponseCountModel
 import sdmed.back.model.sqlCSO.user.UserDataModel
 import java.util.*
 
@@ -37,10 +44,10 @@ class DashboardService: FServiceBase() {
 		}
 
 		if (startDate > endDate) {
-			return requestRepository.selectAllByBetweenRequestDate(endDate, startDate)
+			return requestRepository.selectAllByBetweenRequestDate(FExtensions.toZeroTime(endDate), FExtensions.toCloseTime(startDate))
 		}
 
-		return requestRepository.selectAllByBetweenRequestDate(startDate, endDate)
+		return requestRepository.selectAllByBetweenRequestDate(FExtensions.toZeroTime(startDate), FExtensions.toCloseTime(endDate))
 	}
 
 	fun getUserData(token: String, thisPK: String): UserDataModel {
@@ -51,5 +58,67 @@ class DashboardService: FServiceBase() {
 		}
 
 		return getUserDataPK(thisPK)
+	}
+
+	fun getCountOfResponseType(token: String, startDate: Date, endDate: Date): List<ResponseCountModel> {
+		isValid(token)
+		val tokenUser = getUserDataByToken(token)
+		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee))) {
+			throw AuthenticationEntryPointException()
+		}
+
+		if (startDate > endDate) {
+			return requestRepository.selectCountOfResponseType(FExtensions.toZeroTime(endDate), FExtensions.toCloseTime(startDate))
+		}
+
+		return requestRepository.selectCountOfResponseType(FExtensions.toZeroTime(startDate), FExtensions.toCloseTime(endDate))
+	}
+
+	fun getTop10RequestUser(token: String, startDate: Date, endDate: Date): List<RequestUserCountModel> {
+		isValid(token)
+		val tokenUser = getUserDataByToken(token)
+		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee))) {
+			throw AuthenticationEntryPointException()
+		}
+
+		if (startDate > endDate) {
+			return requestRepository.selectTop10RequestUser(endDate, startDate)
+		}
+
+		return requestRepository.selectTop10RequestUser(startDate, endDate)
+	}
+
+	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
+	fun putRequestRecep(token: String, thisPK: String): RequestModel {
+		isValid(token)
+		val tokenUser = getUserDataByToken(token)
+		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee))) {
+			throw AuthenticationEntryPointException()
+		}
+
+		val requestModel = requestRepository.findByThisPK(thisPK) ?: throw RequestModelNotFoundException()
+		if (requestModel.responseType != ResponseType.None) {
+			return requestModel
+		}
+
+		requestModel.responseType = ResponseType.Recep
+		requestModel.responseUserPK = tokenUser.thisPK
+		requestModel.responseDate = Date()
+		return requestRepository.save(requestModel)
+	}
+
+	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
+	fun putRequestModelResponseData(token: String, data: RequestModel): RequestModel {
+		isValid(token)
+		val tokenUser = getUserDataByToken(token)
+		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee))) {
+			throw AuthenticationEntryPointException()
+		}
+
+		requestRepository.findByThisPK(data.thisPK) ?: throw RequestModelNotFoundException()
+
+		data.responseDate = Date()
+		data.responseUserPK = tokenUser.thisPK
+		return requestRepository.save(data)
 	}
 }
