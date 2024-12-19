@@ -13,7 +13,7 @@ interface IMedicineRepository: JpaRepository<MedicineModel, String> {
 	fun findAllByThisPKIn(medicinePK: List<String>): List<MedicineModel>
 	fun findAllByCodeIn(code: List<Int>): List<MedicineModel>
 
-	@Query("SELECT a FROM MedicineModel a " +
+	@Query("SELECT a.* FROM MedicineModel a " +
 			"WHERE a.inVisible = :inVisible AND (a.code LIKE %:code% OR a.kdCode LIKE %:kdCode%) " +
 			"ORDER BY a.code ASC", nativeQuery = true)
 	fun selectAllByCodeLikeOrKdCodeLike(code: Int, kdCode: Int, inVisible: Boolean = false): List<MedicineModel>
