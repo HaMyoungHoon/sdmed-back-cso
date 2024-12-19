@@ -46,9 +46,9 @@ class UserMappingController: FControllerBase() {
 		responseService.getResult(userMappingService.getPharmaData(token, pharmaPK, pharmaOwnMedicineView))
 
 	@Operation(summary = "유저-병원-제약사-약품 관계 변경")
-	@PutMapping(value = ["/data/user"])
+	@PutMapping(value = ["/data/user/{userPK}"])
 	fun putUserRelationModifyByPK(@RequestHeader token: String,
-	                              @RequestParam userPK: String,
+	                              @PathVariable userPK: String,
 	                              @RequestBody hosPharmaMedicinePairModel: List<HosPharmaMedicinePairModel>) =
 		responseService.getResult(userMappingService.userRelationModify(token, userPK, hosPharmaMedicinePairModel))
 }
