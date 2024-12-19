@@ -108,15 +108,16 @@ class DashboardService: FServiceBase() {
 	}
 
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
-	fun putRequestModelResponseData(token: String, data: RequestModel): RequestModel {
+	fun putRequestModelResponseData(token: String, thisPK: String, responseType: ResponseType): RequestModel {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee))) {
 			throw AuthenticationEntryPointException()
 		}
 
-		requestRepository.findByThisPK(data.thisPK) ?: throw RequestModelNotFoundException()
+		val data = requestRepository.findByThisPK(thisPK) ?: throw RequestModelNotFoundException()
 
+		data.responseType = responseType
 		data.responseDate = Date()
 		data.responseUserPK = tokenUser.thisPK
 		return requestRepository.save(data)

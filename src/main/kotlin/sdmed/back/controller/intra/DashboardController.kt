@@ -7,13 +7,12 @@ import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PutMapping
-import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import sdmed.back.config.FControllerBase
-import sdmed.back.model.sqlCSO.request.RequestModel
+import sdmed.back.model.common.ResponseType
 import sdmed.back.service.DashboardService
 import java.util.*
 
@@ -69,6 +68,7 @@ class DashboardController: FControllerBase() {
 	@Operation(summary = "요청 처리")
 	@PutMapping(value = ["/data/{thisPK}"])
 	fun putRequestModelResponseData(@RequestHeader token: String,
-																	@RequestBody data: RequestModel) =
-		responseService.getResult(dashboardService.putRequestModelResponseData(token, data))
+	                                @PathVariable thisPK: String,
+																	@RequestParam responseType: ResponseType) =
+		responseService.getResult(dashboardService.putRequestModelResponseData(token, thisPK, responseType))
 }
