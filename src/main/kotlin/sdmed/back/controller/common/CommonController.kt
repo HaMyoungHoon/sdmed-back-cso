@@ -27,7 +27,7 @@ class CommonController: FControllerBase() {
 	@Operation(summary = "로그인")
 	@GetMapping(value = ["/signIn"])
 	fun signIn(@RequestParam id: String,
-	           @RequestParam pw: String): IRestResult =
+	           @RequestParam pw: String) =
 		responseService.getResult(userService.signIn(id, pw))
 	@Operation(summary = "회원가입")
 	@PostMapping(value = ["/signUp"])
@@ -50,14 +50,18 @@ class CommonController: FControllerBase() {
 		return responseService.getSuccessResult()
 	}
 	@GetMapping(value = ["/version"])
-	fun version(): IRestResult {
-		return responseService.getResult("$strprofile $strVersion")
-	}
+	fun version() = responseService.getResult("$strprofile $strVersion")
+	@GetMapping(value = ["/serverTime"])
+	fun serverTime() = responseService.getResult(Date())
 
 	@Operation(summary = "내 권한 얻기")
 	@GetMapping(value = ["/myRole"])
 	fun getMyRole(@RequestHeader token: String) =
 		responseService.getResult(userService.getUserDataByToken(token).role)
+	@Operation(summary = "내 상태 얻기")
+	@GetMapping(value = ["/myState"])
+	fun getMyState(@RequestHeader token: String) =
+		responseService.getResult(userService.getUserDataByToken(token).status)
 	@GetMapping(value = ["/generate/sas"])
 	fun getGenerateSas(@RequestHeader token: String,
 										 @RequestParam(required = false) containerName: String = "",
