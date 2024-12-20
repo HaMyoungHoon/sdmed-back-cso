@@ -75,19 +75,20 @@ object FExtensions {
 	fun parseDateTimeString(date: java.sql.Date?, pattern: String) = date?.let {
 		parseDateTimeString(Date(it.time), pattern)
 	} ?: ""
-	fun parseStringToSqlDate(date: String?, pattern: String): java.sql.Date {
-		val localDate = LocalDate.parse(date, DateTimeFormatter.ofPattern(pattern))
-		return java.sql.Date.valueOf(localDate)
+	fun parseStringToSqlDate(date: String?, pattern: String): java.sql.Date = LocalDate.parse(date, DateTimeFormatter.ofPattern(pattern)).let {
+		java.sql.Date.valueOf(it)
 	}
-	fun parseStringToJavaDate(date: String?, pattern: String): Date {
-		val localDate = LocalDate.parse(date, DateTimeFormatter.ofPattern(pattern))
-		return Date.from(localDate.atStartOfDay(getZoneId()).toInstant())
+	fun parseStringToJavaDate(date: String?, pattern: String) = LocalDate.parse(date, DateTimeFormatter.ofPattern(pattern)).let {
+		Date.from(it.atStartOfDay(getZoneId()).toInstant())
 	}
-	fun toZeroTime(date: Date): Date {
-		return Date.from(date.toInstant().atZone(getZoneId()).toLocalDateTime().toLocalDate().atStartOfDay().atZone(getZoneId()).toInstant())
-	}
-	fun toCloseTime(date: Date): Date {
-		return Date.from(date.toInstant().atZone(getZoneId()).toLocalDateTime().toLocalDate().atTime(23, 59, 59).atZone(getZoneId()).toInstant())
+	fun toZeroTime(date: Date) =
+		Date.from(date.toInstant().atZone(getZoneId()).toLocalDateTime().toLocalDate().atStartOfDay().atZone(getZoneId()).toInstant())
+	fun toCloseTime(date: Date) =
+		Date.from(date.toInstant().atZone(getZoneId()).toLocalDateTime().toLocalDate().atTime(23, 59, 59).atZone(getZoneId()).toInstant())
+	fun getStartEndQueryDate(startDate: Date, endDate: Date) = if (startDate > endDate) {
+		Pair(toZeroTime(endDate), toCloseTime(startDate))
+	} else {
+		Pair(toZeroTime(startDate), toCloseTime(endDate))
 	}
 
 	fun sampleFileDownload(excelType: FExcelParserType): Resource {
