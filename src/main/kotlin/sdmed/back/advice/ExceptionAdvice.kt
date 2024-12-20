@@ -205,6 +205,16 @@ class ExceptionAdvice {
 	protected fun ediPharmaDueDateExistException(request: HttpServletRequest, exception: EDIPharmaDueDateExistException) =
 		responseService.getFailResult(getMessage("ediPharmaDueDateExistException.code").toInt(), getMessageMerge("ediPharmaDueDateExistException.msg", exception.message))
 
+	@ExceptionHandler(EDIUploadPharmaNotExistException::class)
+	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+	protected fun ediUploadPharmaNotExistException(request: HttpServletRequest, exception: EDIUploadPharmaNotExistException) =
+		responseService.getFailResult(getMessage("ediUploadPharmaNotExistException.code").toInt(), getMessageMerge("ediUploadPharmaNotExistException.msg", exception.message))
+
+	@ExceptionHandler(EDIUploadPharmaMedicineNotExistException::class)
+	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+	protected fun ediUploadPharmaMedicineNotExistException(request: HttpServletRequest, exception: EDIUploadPharmaMedicineNotExistException) =
+		responseService.getFailResult(getMessage("ediUploadPharmaMedicineNotExistException.code").toInt(), getMessageMerge("ediUploadPharmaMedicineNotExistException.msg", exception.message))
+
 	@ExceptionHandler(AsyncRequestTimeoutException::class)
 	@ResponseStatus(HttpStatus.OK)
 	protected fun asyncRequestTimeoutException(request: HttpServletRequest, exception: AsyncRequestTimeoutException): AsyncContext =

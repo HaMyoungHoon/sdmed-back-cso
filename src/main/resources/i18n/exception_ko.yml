@@ -145,3 +145,11 @@ ediUploadNotExistException:
 ediPharmaDueDateExistException:
   code: "-10034"
   msg: "해당 제약사의 EDI 마감일자가 이미 존재합니다."
+
+ediUploadPharmaNotExistException:
+  code: "-10035"
+  msg: "EDI 데이터-제약사가 존재하지 않습니다."
+
+ediUploadPharmaMedicineNotExistException:
+  code: "-10036"
+  msg: "EDI 데이터-제약사-약품이 존재하지 않습니다."
