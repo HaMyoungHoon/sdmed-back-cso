@@ -51,4 +51,19 @@ data class EDIUploadModel(
 	@Transient
 	var responseList: MutableList<EDIUploadResponseModel> = mutableListOf(),
 ) {
+	fun safeCopy(data: EDIUploadModel): EDIUploadModel {
+		this.ediState = data.ediState
+		this.pharmaList.onEach { x ->
+			data.pharmaList.find { y -> y.thisPK == x.thisPK }?.let { z ->
+				x.safeCopy(z)
+			}
+		}
+		this.responseList.onEach { x ->
+			data.responseList.find { y -> y.thisPK == x.thisPK }?.let { z ->
+				x.safeCopy(z)
+			}
+		}
+
+		return this
+	}
 }

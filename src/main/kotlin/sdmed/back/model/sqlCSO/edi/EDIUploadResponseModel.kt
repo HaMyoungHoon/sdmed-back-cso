@@ -21,4 +21,10 @@ data class EDIUploadResponseModel(
 	@Column(updatable = false, nullable = false)
 	var regDate: Date = Date(),
 	) {
+
+	fun safeCopy(data: EDIUploadResponseModel): EDIUploadResponseModel {
+		this.etc = data.etc
+		this.ediState = data.ediState
+		return this
+	}
 }

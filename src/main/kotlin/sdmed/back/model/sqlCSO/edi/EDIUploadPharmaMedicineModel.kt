@@ -44,4 +44,12 @@ data class EDIUploadPharmaMedicineModel(
 	@Column(columnDefinition = "nvarchar(2)", updatable = false, nullable = false)
 	var day: String = "",
 ) {
+	fun safeCopy(data: EDIUploadPharmaMedicineModel): EDIUploadPharmaMedicineModel {
+		this.count = data.count
+		this.price = data.price
+//		this.year = data.year
+//		this.month = data.month
+//		this.day = data.day
+		return this
+	}
 }

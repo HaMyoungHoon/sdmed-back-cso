@@ -9,6 +9,7 @@ import java.util.Date
 @Repository
 interface IEDIUploadRepository: JpaRepository<EDIUploadModel, String> {
 	fun findByThisPK(thisPK: String): EDIUploadModel?
+	fun findByThisPKIn(thisPK: List<String>): List<EDIUploadModel>
 	fun findByUserPKAndThisPK(userPK: String, thisPK: String): EDIUploadModel?
 
 	@Query("SELECT a FROM EDIUploadModel a " +

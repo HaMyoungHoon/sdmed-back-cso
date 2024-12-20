@@ -47,4 +47,14 @@ data class EDIUploadPharmaModel(
 		this.day = day
 		return this
 	}
+	fun safeCopy(data: EDIUploadPharmaModel): EDIUploadPharmaModel {
+		this.ediState = data.ediState
+		this.medicineList.onEach { x ->
+			data.medicineList.find { y -> y.thisPK == x.thisPK }?.let { z ->
+				x.safeCopy(z)
+			}
+		}
+
+		return this
+	}
 }
