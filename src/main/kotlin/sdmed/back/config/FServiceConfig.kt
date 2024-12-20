@@ -22,4 +22,9 @@ class FServiceConfig {
 
 	@Bean fun pharmaService() = PharmaService()
 	@Bean fun pharmaListService() = PharmaListService()
+
+	@Bean fun ediService() = EDIService()
+	@Bean fun ediDueDateService() = EDIDueDateService()
+	@Bean fun ediApplyDateService() = EDIApplyDateService()
+	@Bean fun ediListService() = EDIListService()
 }
