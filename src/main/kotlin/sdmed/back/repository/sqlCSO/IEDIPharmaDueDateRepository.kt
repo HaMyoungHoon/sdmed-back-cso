@@ -20,7 +20,7 @@ interface IEDIPharmaDueDateRepository: JpaRepository<EDIPharmaDueDateModel, Stri
 			"ORDER BY a.year, a.month DESC")
 	fun selectAllByPharmaThisYearDueDate(pharmaPK: String, year: String): List<EDIPharmaDueDateModel>
 	@Query("SELECT a FROM EDIPharmaDueDateModel a " +
-			"WHERE a.pharmaPK IN (:pharmaPK) AND a.year = :year AND a.month = :month " +
+			"WHERE a.pharmaPK IN (:pharmaPKString) AND a.year = :year AND a.month = :month " +
 			"ORDER BY a.pharmaPK DESC")
 	fun selectAllByPharmaInThisYearMonthDueDate(pharmaPKString: String, year: String, month: String): List<EDIPharmaDueDateModel>
 	@Query("SELECT a FROM EDIPharmaDueDateModel a " +

@@ -17,7 +17,7 @@ interface IEDIUploadRepository: JpaRepository<EDIUploadModel, String> {
 			"ORDER BY a.regDate DESC")
 	fun selectAllByDate(startDate: Date, endDate: Date): List<EDIUploadModel>
 	@Query("SELECT a FROM EDIUploadModel a " +
-			"WHERE a.userPK IN (:motherPKInString) AND a.regDate BETWEEN :startDate AND :endDate " +
+			"WHERE a.userPK IN (:childPKString) AND a.regDate BETWEEN :startDate AND :endDate " +
 			"ORDER BY a.regDate DESC")
 	fun selectAllByMyChildAndDate(childPKString: String, startDate: Date, endDate: Date): List<EDIUploadModel>
 	@Query("SELECT a FROM EDIUploadModel a " +
