@@ -11,11 +11,16 @@ interface IMedicinePriceRepository: JpaRepository<MedicinePriceModel, String> {
 	fun findAllByKdCodeOrderByApplyDateDesc(kdCode: Int): List<MedicinePriceModel>
 	fun findAllByKdCodeIn(kdCode: List<Int>): List<MedicinePriceModel>
 
-	@Query("WITH RankedMedicinePrice AS (\n" +
-			"    SELECT *, ROW_NUMBER() OVER (PARTITION BY kdCode ORDER BY applyDate DESC) as RN FROM medicinePriceModel\n" +
-			")\n" +
+	@Query("WITH RankedMedicinePrice AS ( " +
+			"SELECT *, ROW_NUMBER() OVER (PARTITION BY kdCode ORDER BY applyDate DESC) as RN FROM MedicinePriceModel) " +
 			"SELECT * FROM RankedMedicinePrice as MedicinePriceModel WHERE RN = 1", nativeQuery = true)
 	fun selectAllByRecentData(): List<MedicinePriceModel>
+
+	@Query("WITH RankedMedicinePrice As (" +
+			"SELECT *, ROW_NUMBER() OVER (PARTITION BY kdCode ORDER BY applyDate DESC) as RN FROM MedicinePriceModel " +
+			"WHERE applyDate <= :yearMonthDay) " +
+			"SELECT * FROM RankedMedicinePrice as MedicinePriceModel WHERE RN = 1 ", nativeQuery = true)
+	fun selectAllByRecentDataKDCodeInAndYearMonth(kdCodeString: String, yearMonthDay: String): List<MedicinePriceModel>
 
 	@Query("SELECT TOP 1 applyDate FROM MedicinePriceModel " +
 			"ORDER BY applyDate DESC", nativeQuery = true)
