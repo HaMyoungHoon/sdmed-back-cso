@@ -185,6 +185,26 @@ class ExceptionAdvice {
 	protected fun currentPWNotMatchException(request: HttpServletRequest, exception: RequestModelNotFoundException) =
 		responseService.getFailResult(getMessage("requestModelNotFoundException.code").toInt(), getMessageMerge("requestModelNotFoundException.msg", exception.message))
 
+	@ExceptionHandler(EDIApplyDateExistException::class)
+	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+	protected fun ediApplyDateExistException(request: HttpServletRequest, exception: EDIApplyDateExistException) =
+		responseService.getFailResult(getMessage("ediApplyDateExistException.code").toInt(), getMessageMerge("ediApplyDateExistException.msg", exception.message))
+
+	@ExceptionHandler(EDIApplyDateNotExistException::class)
+	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+	protected fun ediApplyDateNotExistException(request: HttpServletRequest, exception: EDIApplyDateNotExistException) =
+		responseService.getFailResult(getMessage("ediApplyDateNotExistException.code").toInt(), getMessageMerge("ediApplyDateNotExistException.msg", exception.message))
+
+	@ExceptionHandler(EDIUploadNotExistException::class)
+	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+	protected fun ediUploadNotExistException(request: HttpServletRequest, exception: EDIUploadNotExistException) =
+		responseService.getFailResult(getMessage("ediUploadNotExistException.code").toInt(), getMessageMerge("ediUploadNotExistException.msg", exception.message))
+
+	@ExceptionHandler(EDIPharmaDueDateExistException::class)
+	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+	protected fun ediPharmaDueDateExistException(request: HttpServletRequest, exception: EDIPharmaDueDateExistException) =
+		responseService.getFailResult(getMessage("ediPharmaDueDateExistException.code").toInt(), getMessageMerge("ediPharmaDueDateExistException.msg", exception.message))
+
 	@ExceptionHandler(AsyncRequestTimeoutException::class)
 	@ResponseStatus(HttpStatus.OK)
 	protected fun asyncRequestTimeoutException(request: HttpServletRequest, exception: AsyncRequestTimeoutException): AsyncContext =

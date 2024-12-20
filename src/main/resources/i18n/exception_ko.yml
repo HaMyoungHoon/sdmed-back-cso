@@ -129,3 +129,19 @@ currentPWNotMatchException:
 requestModelNotFoundException:
   code: "-10030"
   msg: "요청 리스트가 존재하지 않습니다."
+
+ediApplyDateExistException:
+  code: "-10031"
+  msg: "EDI 적용일자가 이미 존재합니다."
+
+ediApplyDateNotExistException:
+  code: "-10032"
+  msg: "EDI 적용일자가 존재하지 않습니다."
+
+ediUploadNotExistException:
+  code: "-10033"
+  msg: "EDI 데이터가 없습니다."
+
+ediPharmaDueDateExistException:
+  code: "-10034"
+  msg: "해당 제약사의 EDI 마감일자가 이미 존재합니다."

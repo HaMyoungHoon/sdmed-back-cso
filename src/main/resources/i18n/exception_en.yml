@@ -126,7 +126,22 @@ currentPWNotMatchException:
   code: "-10029"
   msg: "password not match"
 
-
 requestModelNotFoundException:
   code: "-10030"
   msg: "not found request list"
+
+ediApplyDateExistException:
+  code: "-10031"
+  msg: "already exist EDI applyDate"
+
+ediApplyDateNotExistException:
+  code: "-10032"
+  msg: "not exist EDI applyDate"
+
+ediUploadNotExistException:
+  code: "-10033"
+  msg: "not exist EDI data"
+
+ediPharmaDueDateExistException:
+  code: "-10034"
+  msg: "already exist EDI Pharma Due Date"
