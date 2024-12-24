@@ -22,6 +22,13 @@ class EDIDueDateController: FControllerBase() {
 							@RequestParam(required = false) isYear: Boolean = false) =
 		responseService.getResult(ediDueDateService.getEDIDueDateList(token, date, isYear))
 
+	@Operation(summary = "")
+	@GetMapping(value = ["/list/range"])
+	fun getListRange(@RequestHeader token: String,
+									 @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) startDate: Date,
+									 @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) endDate: Date) =
+		responseService.getResult(ediDueDateService.getEDIDueDateRangeList(token, startDate, endDate))
+
 	@Operation(summary = "특정 제약사 마감일")
 	@GetMapping(value = ["/data/{pharmaPK}/{year}"])
 	fun getData(@RequestHeader token: String,
@@ -32,9 +39,21 @@ class EDIDueDateController: FControllerBase() {
 	@Operation(summary = "특정 제약사들 마감일")
 	@GetMapping(value = ["/list/pharma"])
 	fun getListPharma(@RequestHeader token: String,
-	                  @RequestBody pharmaPK: List<String>,
+	                  @RequestParam pharmaPK: List<String>,
 										@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) date: Date) =
 		responseService.getResult(ediDueDateService.getEDIPharmaDueDateList(token, pharmaPK, date))
+
+	@Operation(summary = "이번 달 등록 가능 제약사 목록")
+	@GetMapping(value = ["/list/pharma/date"])
+	fun getListPharmaAble(@RequestHeader token: String,
+												@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) date: Date) =
+		responseService.getResult(ediDueDateService.getEDIPharmaAble(token, date))
+	@Operation(summary = "이번 달 등록 가능 제약사 목록")
+	@GetMapping(value = ["/list/pharma/date/{year}/{month}"])
+	fun getListPharmaAble(@RequestHeader token: String,
+												@PathVariable year: String,
+												@PathVariable month: String) =
+		responseService.getResult(ediDueDateService.getEDIPharmaAble(token, year, month))
 
 	@Operation(summary = "제약사 마감일 등록")
 	@PostMapping(value = [ "/data/{pharmaPK}"])
@@ -50,6 +69,26 @@ class EDIDueDateController: FControllerBase() {
 							 @PathVariable month: String,
 							 @PathVariable day: String) =
 		responseService.getResult(ediDueDateService.postEDIPharmaDueDate(token, pharmaPK, year, month, day))
+	@Operation(summary = "제약사들 마감일 등록")
+	@PostMapping(value = ["/list"])
+	fun postData(@RequestHeader token: String,
+							 @RequestBody pharmaPK: List<String>,
+							 @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) date: Date) =
+		responseService.getResult(ediDueDateService.postEDIPharmaDueDate(token, pharmaPK, date))
+	@Operation(summary = "제약사 마감일 수정")
+	@PutMapping(value = ["/data/{pharmaPK}"])
+	fun putData(@RequestHeader token: String,
+							@PathVariable pharmaPK: String,
+							@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) date: Date) =
+		responseService.getResult(ediDueDateService.putEDIPharmaDueDate(token, pharmaPK, date))
+	@Operation(summary = "제약사 마감일 수정")
+	@PutMapping(value = ["/data/{pharmaPK}/{year}/{month}/{day}"])
+	fun putData(@RequestHeader token: String,
+							@PathVariable pharmaPK: String,
+							@PathVariable year: String,
+							@PathVariable month: String,
+							@PathVariable day: String) =
+		responseService.getResult(ediDueDateService.putEDIPharmaDueDate(token, pharmaPK, year, month, day))
 	@Operation(summary = "제약사 마감일 제거")
 	@DeleteMapping(value = ["/data/{pharmaPK}"])
 	fun deleteData(@RequestHeader token: String,
