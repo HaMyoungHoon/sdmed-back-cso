@@ -14,11 +14,11 @@ data class EDIPharmaDueDateModel(
 	var pharmaPK: String = "",
 	@Column(columnDefinition = "nvarchar(255)", updatable = false, nullable = false)
 	var orgName: String = "",
-	@Column(columnDefinition = "nvarchar(4)", updatable = false, nullable = false)
+	@Column(columnDefinition = "nvarchar(4)", nullable = false)
 	var year: String = "",
-	@Column(columnDefinition = "nvarchar(2)", updatable = false, nullable = false)
+	@Column(columnDefinition = "nvarchar(2)", nullable = false)
 	var month: String = "",
-	@Column(columnDefinition = "nvarchar(2)", updatable = false, nullable = false)
+	@Column(columnDefinition = "nvarchar(2)", nullable = false)
 	var day: String = "",
 	@Column
 	var regDate: Date = Date()
