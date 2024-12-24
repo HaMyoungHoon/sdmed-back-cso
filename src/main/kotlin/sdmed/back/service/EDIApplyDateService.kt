@@ -18,7 +18,7 @@ class EDIApplyDateService: EDIService() {
 	fun getAllApplyDate(token: String): List<EDIApplyDateModel> {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
-		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin))) {
+		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.EdiChanger))) {
 			return ediApplyDateRepository.selectAllByUse()
 		}
 
@@ -32,7 +32,7 @@ class EDIApplyDateService: EDIService() {
 	fun postApplyDate(token: String, applyDate: Date): EDIApplyDateModel {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
-		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin))) {
+		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.EdiChanger))) {
 			throw AuthenticationEntryPointException()
 		}
 
@@ -58,7 +58,7 @@ class EDIApplyDateService: EDIService() {
 	fun putApplyDateModify(token: String, thisPK: String, state: EDIApplyDateState): EDIApplyDateModel {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
-		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin))) {
+		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.EdiChanger))) {
 			throw AuthenticationEntryPointException()
 		}
 
