@@ -12,7 +12,7 @@ import sdmed.back.model.sqlCSO.medicine.MedicineModel
 import java.util.*
 
 class EDIListService: EDIService() {
-	fun getEDIUploadList(token: String, startDate: Date, endDate: Date): List<EDIUploadModel> {
+	fun getEDIUploadList(token: String, startDate: Date, endDate: Date): List<EDIUploadListModel> {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
 		val queryDate = FExtensions.getStartEndQueryDate(startDate, endDate)
@@ -22,7 +22,7 @@ class EDIListService: EDIService() {
 
 		return ediUploadRepository.selectAllByDate(queryDate.first, queryDate.second)
 	}
-	fun getEDIUploadListMyChild(token: String, startDate: Date, endDate: Date): List<EDIUploadModel> {
+	fun getEDIUploadListMyChild(token: String, startDate: Date, endDate: Date): List<EDIUploadListModel> {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
 		val queryDate = FExtensions.getStartEndQueryDate(startDate, endDate)
