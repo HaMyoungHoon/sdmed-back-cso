@@ -11,7 +11,8 @@ enum class UserRole(var flag: Int, var desc: String) {
 	UserChanger(Admin.flag.shl(4), "UserChanger"),
 	HospitalChanger(Admin.flag.shl(5), "HospitalChanger"),
 	PharmaChanger(Admin.flag.shl(6), "PharmaChanger"),
-	MedicineChanger(Admin.flag.shl(7), "MedicineChanger");
+	MedicineChanger(Admin.flag.shl(7), "MedicineChanger"),
+	EdiChanger(Admin.flag.shl(8), "EdiChanger");
 
 	infix fun and(rhs: UserRole) = EnumSet.of(this, rhs)
 	fun toS() = EnumSet.of(this)
