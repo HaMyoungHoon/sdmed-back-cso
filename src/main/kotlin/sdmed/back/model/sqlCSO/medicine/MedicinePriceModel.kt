@@ -14,7 +14,7 @@ data class MedicinePriceModel(
 	var kdCode: Int = 0,
 	@Column
 	var maxPrice: Int = 0,
-	@Column(columnDefinition = "text")
+	@Column(columnDefinition = "nvarchar(max)")
 	var ancestorCode: String = "",
 	@Column
 	var applyDate: Date = Date(),

@@ -36,7 +36,7 @@ data class UserDataModel(
 	var dept: Int = UserDept.None.flag,
 	@Column
 	var status: UserStatus = UserStatus.None,
-	@Column(columnDefinition = "text", nullable = false)
+	@Column(columnDefinition = "nvarchar(max)", nullable = false)
 	var taxpayerImageUrl: String = "",
 	@Column(columnDefinition = "nvarchar(255)", nullable = false)
 	var companyName: String = "",
@@ -44,7 +44,7 @@ data class UserDataModel(
 	var companyNumber: String = "",
 	@Column(columnDefinition = "nvarchar(255)", nullable = false)
 	var companyAddress: String = "",
-	@Column(columnDefinition = "text", nullable = false)
+	@Column(columnDefinition = "nvarchar(max)", nullable = false)
 	var bankAccountImageUrl: String = "",
 	@Column(columnDefinition = "nvarchar(255)", nullable = false)
 	var bankAccount: String = "",
@@ -59,6 +59,21 @@ data class UserDataModel(
 	@Transient
 	var hosList: MutableList<HospitalModel> = mutableListOf()
 ) {
+	fun safeCopy(data: UserDataModel): UserDataModel {
+		this.name = data.name
+		this.mail = data.mail
+		this.phoneNumber = data.phoneNumber
+		this.role = data.role
+		this.dept = data.dept
+		this.status = data.status
+		this.taxpayerImageUrl = data.taxpayerImageUrl
+		this.companyName = data.companyName
+		this.companyNumber = data.companyNumber
+		this.companyAddress = data.companyAddress
+		this.bankAccountImageUrl = data.bankAccountImageUrl
+		this.bankAccount = data.bankAccount
+		return this
+	}
 	fun buildData(claims: Claims): UserDataModel {
 		this.thisPK = claims[FConstants.CLAIM_INDEX].toString()
 		this.name = claims[FConstants.CLAIM_NAME].toString()

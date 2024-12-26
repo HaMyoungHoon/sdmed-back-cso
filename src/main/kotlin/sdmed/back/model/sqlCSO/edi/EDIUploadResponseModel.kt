@@ -14,7 +14,7 @@ data class EDIUploadResponseModel(
 	var ediPK: String = "",
 	@Column(columnDefinition = "nvarchar(36)", updatable = false, nullable = false)
 	var userPK: String = "",
-	@Column(columnDefinition = "text")
+	@Column(columnDefinition = "nvarchar(max)")
 	var etc: String = "",
 	@Column(updatable = false, nullable = false)
 	var ediState: EDIState = EDIState.None,

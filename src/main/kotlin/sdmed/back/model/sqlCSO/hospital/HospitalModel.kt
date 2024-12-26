@@ -60,11 +60,11 @@ data class HospitalModel(
 	var openDate: Date? = null,
 	@Column
 	var closeDate: Date? = null,
-	@Column(columnDefinition = "text", nullable = false)
+	@Column(columnDefinition = "nvarchar(max)", nullable = false)
 	var etc1: String = "",
-	@Column(columnDefinition = "text", nullable = false)
+	@Column(columnDefinition = "nvarchar(max)", nullable = false)
 	var etc2: String = "",
-	@Column(columnDefinition = "text", nullable = false)
+	@Column(columnDefinition = "nvarchar(max)", nullable = false)
 	var imageUrl: String = "",
 	@Column(columnDefinition = "bit default 0", nullable = false)
 	var inVisible: Boolean = false,

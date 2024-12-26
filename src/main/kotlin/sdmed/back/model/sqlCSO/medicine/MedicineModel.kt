@@ -19,9 +19,9 @@ data class MedicineModel(
 	var kdCode: Int = 0,
 	@Column
 	var standardCode: Int = 0,
-	@Column(columnDefinition = "text")
+	@Column(columnDefinition = "nvarchar(max)")
 	var pharma: String = "",
-	@Column(columnDefinition = "text")
+	@Column(columnDefinition = "nvarchar(max)")
 	var name: String = "",
 	@Column
 	var customPrice: Int = 0,
