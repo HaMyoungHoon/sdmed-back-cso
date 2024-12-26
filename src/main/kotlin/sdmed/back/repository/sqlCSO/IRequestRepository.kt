@@ -12,6 +12,7 @@ import java.util.*
 @Repository
 interface IRequestRepository: JpaRepository<RequestModel, String> {
 	fun findByThisPK(thisPK: String): RequestModel?
+	fun findByRequestItemPK(requestItemPK: String): RequestModel?
 	fun findAllByResponseTypeAndRequestUserPKInOrderByRequestDateDesc(responseType: ResponseType = ResponseType.None, requestUserPK: List<String>): List<RequestModel>
 
 	@Query("SELECT a FROM RequestModel a " +
