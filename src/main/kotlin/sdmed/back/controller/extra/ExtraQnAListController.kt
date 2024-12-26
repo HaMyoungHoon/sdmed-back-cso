@@ -20,10 +20,16 @@ class ExtraQnAListController: FControllerBase() {
 	fun getList(@RequestHeader token: String) =
 		responseService.getResult(qnaListService.getMyList(token))
 
+	@Operation(summary = "qna 헤더")
+	@GetMapping(value = ["/data/header/{thisPK}"])
+	fun getHeaderData(@RequestHeader token: String,
+	                  @PathVariable thisPK: String) =
+		responseService.getResult(qnaListService.getHeaderData(token, thisPK))
+
 	@Operation(summary = "qna 상세")
-	@GetMapping(value = ["/data/{thisPK}"])
-	fun getData(@RequestHeader token: String,
-							@PathVariable thisPK: String) =
+	@GetMapping(value = ["/data/content/{thisPK}"])
+	fun getContentData(@RequestHeader token: String,
+	                   @PathVariable thisPK: String) =
 		responseService.getResult(qnaListService.getContentData(token, thisPK))
 
 	@Operation(summary = "qna 남기기")
@@ -41,7 +47,7 @@ class ExtraQnAListController: FControllerBase() {
 		responseService.getResult(qnaListService.postQnAReplyQuestion(token, thisPK, qnaReplyModel))
 
 	@Operation(summary = "qna 종료하기")
-	@PostMapping(value = ["/data/{thisPK}"])
+	@PutMapping(value = ["/data/{thisPK}"])
 	fun putData(@RequestHeader token: String,
 							@PathVariable thisPK: String) =
 		responseService.getResult(qnaListService.putQnAComplete(token, thisPK))

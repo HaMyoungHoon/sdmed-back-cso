@@ -1,9 +1,11 @@
 package sdmed.back.model.sqlCSO.qna
 
 import jakarta.persistence.Column
+import jakarta.persistence.Entity
 import jakarta.persistence.Id
 import java.util.*
 
+@Entity
 data class QnAReplyModel(
 	@Id
 	@Column(columnDefinition = "nvarchar(36)", updatable = false, nullable = false)

@@ -33,6 +33,18 @@ class QnAListController: FControllerBase() {
 										@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) endDate: Date) =
 		responseService.getResult(qnaListService.getListDate(token, startDate, endDate))
 
+	@Operation(summary = "qna 헤더")
+	@GetMapping(value = ["/data/header/{thisPK}"])
+	fun getHeaderData(@RequestHeader token: String,
+	                  @PathVariable thisPK: String) =
+		responseService.getResult(qnaListService.getHeaderData(token, thisPK))
+
+	@Operation(summary = "qna 상세")
+	@GetMapping(value = ["/data/content/{thisPK}"])
+	fun getContentData(@RequestHeader token: String,
+	                   @PathVariable thisPK: String) =
+		responseService.getResult(qnaListService.getContentData(token, thisPK))
+
 	@Operation(summary = "답변 넣기")
 	@PostMapping(value = ["/data/{thisPK}"])
 	fun postReply(@RequestHeader token: String,
@@ -41,7 +53,7 @@ class QnAListController: FControllerBase() {
 		responseService.getResult(qnaListService.postQnAReplyAnswer(token, thisPK, qnaReplyModel))
 
 	@Operation(summary = "qna 종료하기")
-	@PostMapping(value = ["/data/{thisPK}"])
+	@PutMapping(value = ["/data/{thisPK}"])
 	fun putData(@RequestHeader token: String,
 	            @PathVariable thisPK: String) =
 		responseService.getResult(qnaListService.putQnAComplete(token, thisPK))

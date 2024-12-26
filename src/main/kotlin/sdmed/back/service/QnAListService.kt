@@ -61,6 +61,15 @@ class QnAListService: QnAService() {
 		return qnaHeaderRepository.selectAllByDate(queryDate.first, queryDate.second)
 	}
 
+	fun getHeaderData(token: String, thisPK: String): QnAHeaderModel {
+		isValid(token)
+		val tokenUser = getUserDataByToken(token)
+		return if (haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee))) {
+			qnaHeaderRepository.findByThisPK(thisPK) ?: throw QnAHeaderNotExistException()
+		} else if (haveRole(tokenUser, UserRole.BusinessMan.toS())) {
+			qnaHeaderRepository.findByThisPKAndUserPK(thisPK, tokenUser.thisPK) ?: throw QnAHeaderNotExistException()
+		} else throw AuthenticationEntryPointException()
+	}
 	fun getContentData(token: String, thisPK: String): QnAContentModel {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
