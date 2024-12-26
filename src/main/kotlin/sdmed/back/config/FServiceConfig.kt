@@ -27,4 +27,8 @@ class FServiceConfig {
 	@Bean fun ediDueDateService() = EDIDueDateService()
 	@Bean fun ediApplyDateService() = EDIApplyDateService()
 	@Bean fun ediListService() = EDIListService()
+	@Bean fun ediRequestService() = EDIRequestService()
+
+	@Bean fun qnaService() = QnAService()
+	@Bean fun qnaListService() = QnAListService()
 }
