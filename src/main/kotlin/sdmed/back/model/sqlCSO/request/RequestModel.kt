@@ -18,11 +18,13 @@ data class RequestModel(
 	var requestItemPK: String = "",
 	@Column(columnDefinition = "nvarchar(36)")
 	var responseUserPK: String = "",
+	@Column(columnDefinition = "nvarchar(255)")
+	var responseUserName: String = "",
 	@Column(nullable = false)
 	var requestType: RequestType = RequestType.SignUp,
 	@Column
 	var responseType: ResponseType = ResponseType.None,
-	@Column(updatable = false, nullable = false)
+	@Column(nullable = false)
 	var requestDate: Date = Date(),
 	@Column
 	var responseDate: Date? = null,
