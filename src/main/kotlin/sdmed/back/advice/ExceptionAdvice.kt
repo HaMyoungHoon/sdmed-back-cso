@@ -6,9 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.MessageSource
 import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.http.HttpStatus
-import org.springframework.web.bind.annotation.ExceptionHandler
-import org.springframework.web.bind.annotation.ResponseStatus
-import org.springframework.web.bind.annotation.RestControllerAdvice
+import org.springframework.web.bind.annotation.*
 import org.springframework.web.context.request.async.AsyncRequestTimeoutException
 import org.springframework.web.multipart.MultipartException
 import sdmed.back.service.ResponseService
@@ -214,6 +212,16 @@ class ExceptionAdvice {
 	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
 	protected fun ediUploadPharmaMedicineNotExistException(request: HttpServletRequest, exception: EDIUploadPharmaMedicineNotExistException) =
 		responseService.getFailResult(getMessage("ediUploadPharmaMedicineNotExistException.code").toInt(), getMessageMerge("ediUploadPharmaMedicineNotExistException.msg", exception.message))
+
+	@ExceptionHandler(QnAHeaderNotExistException::class)
+	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+	protected fun qnaHeaderNotExistException(request: HttpServletRequest, exception: QnAHeaderNotExistException) =
+		responseService.getFailResult(getMessage("qnaHeaderNotExistException.code").toInt(), getMessageMerge("qnaHeaderNotExistException.msg", exception.message))
+
+	@ExceptionHandler(QnAContentNotExistException::class)
+	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+	protected fun qnaContentNotExistException(request: HttpServletRequest, exception: QnAContentNotExistException) =
+		responseService.getFailResult(getMessage("qnaContentNotExistException.code").toInt(), getMessageMerge("qnaContentNotExistException.msg", exception.message))
 
 	@ExceptionHandler(AsyncRequestTimeoutException::class)
 	@ResponseStatus(HttpStatus.OK)
