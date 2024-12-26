@@ -153,3 +153,11 @@ ediUploadPharmaNotExistException:
 ediUploadPharmaMedicineNotExistException:
   code: "-10036"
   msg: "EDI 데이터-제약사-약품이 존재하지 않습니다."
+
+qnaHeaderNotExistException:
+  code: "-10037"
+  msg: "qna 가 존재하지 않습니다."
+
+qnaContentNotExistException:
+  code: "-10038"
+  msg: "qna 컨텐츠가 존재하지 않습니다."

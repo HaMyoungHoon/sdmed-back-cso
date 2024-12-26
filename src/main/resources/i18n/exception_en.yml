@@ -153,3 +153,11 @@ ediUploadPharmaNotExistException:
 ediUploadPharmaMedicineNotExistException:
   code: "-10036"
   msg: "not exist EDI Pharma Medicine"
+
+qnaHeaderNotExistException:
+  code: "-10037"
+  msg: "not exist qna"
+
+qnaContentNotExistException:
+  code: "-10038"
+  msg: "not exist qna content"
