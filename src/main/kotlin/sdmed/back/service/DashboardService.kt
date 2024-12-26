@@ -103,6 +103,7 @@ class DashboardService: FServiceBase() {
 
 		requestModel.responseType = ResponseType.Recep
 		requestModel.responseUserPK = tokenUser.thisPK
+		requestModel.responseUserName = tokenUser.name
 		requestModel.responseDate = Date()
 		return requestRepository.save(requestModel)
 	}
@@ -120,6 +121,7 @@ class DashboardService: FServiceBase() {
 		data.responseType = responseType
 		data.responseDate = Date()
 		data.responseUserPK = tokenUser.thisPK
+		data.responseUserName = tokenUser.name
 		return requestRepository.save(data)
 	}
 }
