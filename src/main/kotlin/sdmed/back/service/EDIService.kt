@@ -27,6 +27,15 @@ class EDIService: FServiceBase() {
 	@Autowired lateinit var medicineRepository: IMedicineRepository
 	@Autowired lateinit var medicinePriceRepository: IMedicinePriceRepository
 
+	protected fun parseEDIUploadModel(data: EDIUploadModel) = data.apply {
+		this.responseList = ediUploadResponseRepository.findAllByEdiPKOrderByRegDate(thisPK).toMutableList()
+		this.fileList = ediUploadFileRepository.findAllByEdiPKOrderByThisPK(thisPK).toMutableList()
+		val pharmaList = ediUploadPharmaRepository.findALlByEdiPKOrderByPharmaPK(thisPK)
+		val medicineList = ediUploadPharmaMedicineRepository.findAllByEdiPKAndPharmaPKInOrderByMedicinePK(thisPK, pharmaList.map { it.pharmaPK })
+		val newData: MutableList<EDIUploadPharmaModel> = mutableListOf()
+		mergeEDIPharmaMedicine(pharmaList, medicineList, newData)
+		this.pharmaList = newData
+	}
 	protected fun carriedOverPharma(pharmaList: List<EDIUploadPharmaModel>, dueDateList: List<EDIPharmaDueDateModel>): List<EDIUploadPharmaModel> {
 		val dueDateMap = dueDateList.associateBy { it.pharmaPK }
 		return pharmaList.map { x ->
