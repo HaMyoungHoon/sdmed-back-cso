@@ -71,76 +71,6 @@ class EDIListService: EDIService() {
 		return ret
 	}
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
-	fun postEDIData(token: String, uploadModel: EDIUploadModel): EDIUploadModel {
-		isValid(token)
-		val tokenUser = getUserDataByToken(token)
-		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.BusinessMan))) {
-			throw AuthenticationEntryPointException()
-		}
-
-		if (!canIUseApplyDate(token, uploadModel.year, uploadModel.month)) {
-			throw NotValidOperationException("${uploadModel.year}-${uploadModel.month}")
-		}
-
-		val serverTime = Date()
-		val serverTimeYear = FExtensions.parseDateTimeString(serverTime, "yyyy") ?: throw NotValidOperationException()
-		val serverTimeMonth = FExtensions.parseDateTimeString(serverTime, "MM") ?: throw NotValidOperationException()
-		val serverTimeDay = FExtensions.parseDateTimeString(serverTime, "dd") ?: throw NotValidOperationException()
-		uploadModel.thisPK = UUID.randomUUID().toString()
-		uploadModel.day = serverTimeDay
-		val hospital = hospitalRepository.findByThisPK(uploadModel.hospitalPK) ?: throw HospitalNotFoundException()
-		val existPharmaList = pharmaRepository.findAllByThisPKIn(uploadModel.pharmaList.map { it.pharmaPK })
-
-		val realPharma = realPharmaCheck(uploadModel.thisPK, uploadModel.pharmaList, existPharmaList)
-		val existMedicineList = medicineRepository.findAllByThisPKIn(realPharma.flatMap { x -> x.medicineList.map { y -> y.medicinePK } })
-
-		val kdCodeString = existMedicineList.map { it.kdCode }.joinToString { "'${it}'" }
-		val yearMonthDay = "${uploadModel.year}-${uploadModel.month}-${uploadModel.day}"
-		val medicinePriceList = medicinePriceRepository.selectAllByRecentDataKDCodeInAndYearMonth(kdCodeString, yearMonthDay)
-		val existMedicineNewData = mutableListOf<MedicineModel>()
-		mergeMedicinePrice(existMedicineList, medicinePriceList, existMedicineNewData)
-
-		val realMedicineList = realMedicineCheck(uploadModel.thisPK, realPharma.flatMap { it.medicineList }, existMedicineNewData)
-		realPharma.onEach {
-			it.thisPK = UUID.randomUUID().toString()
-			it.ediPK = uploadModel.thisPK
-			it.year = uploadModel.year
-			it.month = serverTimeMonth
-			it.day = uploadModel.day
-			it.medicineList.clear()
-		}
-		realMedicineList.onEach {
-			it.thisPK = UUID.randomUUID().toString()
-			it.ediPK = uploadModel.thisPK
-			it.year = uploadModel.year
-			it.month = uploadModel.month
-			it.day = uploadModel.day
-		}
-		val realPharmaNewData: MutableList<EDIUploadPharmaModel> = mutableListOf()
-		mergeEDIPharmaMedicine(realPharma, realMedicineList, realPharmaNewData)
-		// 여기까진 올린 데이터가 진짜 있나 없나만 보는 거임
-		// 밑은 올린 데이터가 마감 기한을 넘겼으면 이월 시키는 거임
-		// 사진 데이터는 2024-11-11 자료라고 해도, 처리하는 지금은 2025-01-10 이면 마감일자를 1월 기준으로 봄
-		// 그리고 pharma 의 year, month, day 는 처리 된 날짜를 말하는 거임
-		// medicine 의 year, month, day 는 약가 기준일을 말함.
-		val pharmaPKString = realPharmaNewData.map { it.pharmaPK }.joinToString { "'${it}'" }
-		val dueDateList = ediPharmaDueDateRepository.selectAllByPharmaInThisYearMonthDueDate(pharmaPKString, serverTimeYear, serverTimeMonth)
-		uploadModel.orgName = hospital.orgName
-		uploadModel.pharmaList = carriedOverPharma(realPharmaNewData, dueDateList).toMutableList()
-		uploadModel.ediState = EDIState.None
-		uploadModel.regDate = serverTime
-		uploadModel.fileList.onEach {
-			it.thisPK = UUID.randomUUID().toString()
-			it.ediPK = uploadModel.thisPK
-		}
-		val ret = ediUploadRepository.save(uploadModel)
-		val stackTrace = Thread.currentThread().stackTrace
-		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "add edi upload : ${uploadModel.thisPK} ${uploadModel.year}-${uploadModel.month}-${uploadModel.day}")
-		logRepository.save(logModel)
-		return ret
-	}
-
-	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
 	fun putEDIUpload(token: String, thisPK: String, ediUploadModel: EDIUploadModel): EDIUploadModel {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
@@ -152,6 +82,10 @@ class EDIListService: EDIService() {
 		data.safeCopy(ediUploadModel)
 		ediUploadPharmaMedicineRepository.saveAll(data.pharmaList.flatMap { it.medicineList })
 		ediUploadPharmaRepository.saveAll(data.pharmaList)
+
+		val stackTrace = Thread.currentThread().stackTrace
+		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "modify edi : ${data.thisPK}")
+		logRepository.save(logModel)
 		return ediUploadRepository.save(data)
 	}
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
@@ -227,15 +161,5 @@ class EDIListService: EDIService() {
 		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "del edi pharma medicine : ${deletableData.count()}")
 		logRepository.save(logModel)
 		return "count: ${deletableData.count()}"
-	}
-
-	private fun parseEDIUploadModel(data: EDIUploadModel) = data.apply {
-		this.responseList = ediUploadResponseRepository.findAllByEdiPKOrderByRegDate(thisPK).toMutableList()
-		this.fileList = ediUploadFileRepository.findAllByEdiPKOrderByThisPK(thisPK).toMutableList()
-		val pharmaList = ediUploadPharmaRepository.findALlByEdiPKOrderByPharmaPK(thisPK)
-		val medicineList = ediUploadPharmaMedicineRepository.findAllByEdiPKAndPharmaPKInOrderByMedicinePK(thisPK, pharmaList.map { it.pharmaPK })
-		val newData: MutableList<EDIUploadPharmaModel> = mutableListOf()
-		mergeEDIPharmaMedicine(pharmaList, medicineList, newData)
-		this.pharmaList = newData
 	}
 }
