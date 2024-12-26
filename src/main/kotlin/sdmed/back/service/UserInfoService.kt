@@ -3,6 +3,7 @@ package sdmed.back.service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
 import sdmed.back.advice.exception.AuthenticationEntryPointException
+import sdmed.back.advice.exception.UserNotFoundException
 import sdmed.back.config.FConstants
 import sdmed.back.config.jpa.CSOJPAConfig
 import sdmed.back.model.common.user.UserDept
@@ -55,15 +56,21 @@ class UserInfoService: UserService() {
 			throw AuthenticationEntryPointException()
 		}
 
+		val buff = userDataRepository.findByThisPK(userData.thisPK) ?: throw UserNotFoundException()
+		if (buff.id == "mhha") {
+			return buff
+		}
+		buff.safeCopy(userData)
+
 		var mask = UserRole.Admin.flag
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin))) {
 			mask = mask or UserRole.CsoAdmin.flag
 		}
 
-		userData.role = userData.role and mask.inv()
-		val ret = userDataRepository.save(userData)
+		buff.role = buff.role and mask.inv()
+		val ret = userDataRepository.save(buff)
 		val stackTrace = Thread.currentThread().stackTrace
-		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "${userData.id} modify : $userData")
+		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "${buff.id} modify : $buff")
 		logRepository.save(logModel)
 		return ret
 	}
