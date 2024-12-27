@@ -33,11 +33,8 @@ class EDIDueDateService: EDIService() {
 			throw AuthenticationEntryPointException()
 		}
 
-		return if (startDate > endDate) {
-			ediPharmaDueDateRepository.selectAllByThisYearMonthRangeDueDate(endDate, startDate)
-		} else {
-			ediPharmaDueDateRepository.selectAllByThisYearMonthRangeDueDate(startDate, endDate)
-		}
+		val queryDate = FExtensions.getStartEndQueryDate(startDate, endDate)
+		return ediPharmaDueDateRepository.selectAllByThisYearMonthRangeDueDate(queryDate.first, queryDate.second)
 	}
 	fun getEDIPharmaDueDateList(token: String, pharmaPK: String, year: String): List<EDIPharmaDueDateModel> {
 		isValid(token)

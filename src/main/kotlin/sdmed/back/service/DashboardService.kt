@@ -43,11 +43,8 @@ class DashboardService: FServiceBase() {
 			throw AuthenticationEntryPointException()
 		}
 
-		if (startDate > endDate) {
-			return requestRepository.selectAllByBetweenRequestDate(FExtensions.toZeroTime(endDate), FExtensions.toCloseTime(startDate))
-		}
-
-		return requestRepository.selectAllByBetweenRequestDate(FExtensions.toZeroTime(startDate), FExtensions.toCloseTime(endDate))
+		val queryDate = FExtensions.getStartEndQueryDate(startDate, endDate)
+		return requestRepository.selectAllByBetweenRequestDate(queryDate.first, queryDate.second)
 	}
 
 	fun getUserData(token: String, thisPK: String): UserDataModel {
@@ -67,11 +64,8 @@ class DashboardService: FServiceBase() {
 			throw AuthenticationEntryPointException()
 		}
 
-		if (startDate > endDate) {
-			return requestRepository.selectCountOfResponseType(FExtensions.toZeroTime(endDate), FExtensions.toCloseTime(startDate))
-		}
-
-		return requestRepository.selectCountOfResponseType(FExtensions.toZeroTime(startDate), FExtensions.toCloseTime(endDate))
+		val queryDate = FExtensions.getStartEndQueryDate(startDate, endDate)
+		return requestRepository.selectCountOfResponseType(queryDate.first, queryDate.second)
 	}
 
 	fun getTop10RequestUser(token: String, startDate: Date, endDate: Date): List<RequestUserCountModel> {
@@ -81,11 +75,8 @@ class DashboardService: FServiceBase() {
 			throw AuthenticationEntryPointException()
 		}
 
-		if (startDate > endDate) {
-			return requestRepository.selectTop10RequestUser(endDate, startDate)
-		}
-
-		return requestRepository.selectTop10RequestUser(startDate, endDate)
+		val queryDate = FExtensions.getStartEndQueryDate(startDate, endDate)
+		return requestRepository.selectTop10RequestUser(queryDate.first, queryDate.second)
 	}
 
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
