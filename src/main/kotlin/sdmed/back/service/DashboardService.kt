@@ -23,9 +23,9 @@ class DashboardService: FServiceBase() {
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee))) {
 			throw AuthenticationEntryPointException()
 		}
-		val childPKLIst = userChildPKRepository.selectAllByMotherPK(tokenUser.thisPK)
+		val childPKList = userChildPKRepository.selectAllByMotherPK(tokenUser.thisPK)
 
-		return requestRepository.findAllByResponseTypeAndRequestUserPKInOrderByRequestDateDesc(requestUserPK = childPKLIst)
+		return requestRepository.findAllByResponseTypeNotAndRequestUserPKInOrderByRequestDateDesc(requestUserPK = childPKList)
 	}
 	fun getListByNoResponse(token: String): List<RequestModel> {
 		isValid(token)
