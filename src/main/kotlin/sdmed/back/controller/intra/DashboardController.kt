@@ -33,6 +33,12 @@ class DashboardController: FControllerBase() {
 	                  @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) endDate: Date) =
 		responseService.getResult(dashboardService.getListByDate(token, startDate, endDate))
 
+	@Operation(summary = "request 모델 데이터")
+	@GetMapping(value = ["/data/requestData/{requestItemPK}"])
+	fun getRequestData(@RequestHeader token: String,
+										 @PathVariable requestItemPK: String) =
+		responseService.getResult(dashboardService.getRequestData(token, requestItemPK))
+
 	@Operation(summary = "얘 누구지 하고 찾는 거")
 	@GetMapping(value = ["/data/{thisPK}"])
 	fun getUserData(@RequestHeader token: String,
