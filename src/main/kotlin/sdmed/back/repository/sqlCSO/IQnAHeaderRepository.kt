@@ -11,7 +11,7 @@ import java.util.Date
 interface IQnAHeaderRepository: JpaRepository<QnAHeaderModel, String> {
 	fun findByThisPK(thisPK: String): QnAHeaderModel?
 	fun findByThisPKAndUserPK(thisPK: String, userPK: String): QnAHeaderModel?
-	fun findAllByUserPK(userPK: String): List<QnAHeaderModel>
+	fun findAllByUserPKOrderByRegDateDesc(userPK: String): List<QnAHeaderModel>
 	fun findAllByUserPKIn(userPK: List<String>): List<QnAHeaderModel>
 
 	@Query("SELECT a FROM QnAHeaderModel a " +

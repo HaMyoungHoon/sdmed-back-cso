@@ -29,7 +29,7 @@ class QnAListService: QnAService() {
 			throw AuthenticationEntryPointException()
 		}
 
-		return qnaHeaderRepository.findAllByUserPK(tokenUser.thisPK)
+		return qnaHeaderRepository.findAllByUserPKOrderByRegDateDesc(tokenUser.thisPK)
 	}
 	fun getHaveToReplyList(token: String): List<QnAHeaderModel> {
 		isValid(token)
@@ -143,7 +143,8 @@ class QnAListService: QnAService() {
 		val reply = QnAReplyModel().apply {
 			this.headerPK = thisPK
 			this.userPK = tokenUser.thisPK
-			this.id = tokenUser.id
+			this.name = tokenUser.name
+			this.content = qnaReplyModel.content
 			this.fileList = qnaReplyModel.fileList
 		}
 		reply.fileList.onEach {
@@ -189,7 +190,7 @@ class QnAListService: QnAService() {
 		val reply = QnAReplyModel().apply {
 			this.headerPK = thisPK
 			this.userPK = tokenUser.thisPK
-			this.id = tokenUser.id
+			this.name = tokenUser.name
 			this.fileList = qnaReplyModel.fileList
 		}
 		reply.fileList.onEach {
