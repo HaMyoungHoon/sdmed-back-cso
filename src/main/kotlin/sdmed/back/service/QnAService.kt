@@ -15,11 +15,11 @@ class QnAService: FServiceBase() {
 
 
 	protected fun mergeReply(reply: List<QnAReplyModel>, replyFile: List<QnAReplyFileModel>) {
-		val replyFileMap = replyFile.associateBy { it.replyPK }
+		val replyFileMap = replyFile.groupBy { it.replyPK }
 		for (buff in reply) {
 			val replyFileBuff = replyFileMap[buff.thisPK]
-			if (replyFileBuff != null) {
-				buff.fileList.add(replyFileBuff)
+			if (!replyFileBuff.isNullOrEmpty()) {
+				buff.fileList.addAll(replyFileBuff)
 			}
 		}
 	}

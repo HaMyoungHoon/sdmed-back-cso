@@ -48,7 +48,7 @@ class QnAListService: QnAService() {
 		}
 
 		val childPK = userChildPKRepository.selectAllByMotherPK(tokenUser.thisPK)
-		return qnaHeaderRepository.findAllByUserPKIn(childPK)
+		return qnaHeaderRepository.findAllByUserPKInOrderByRegDateDesc(childPK)
 	}
 	fun getListDate(token: String, startDate: Date, endDate: Date): List<QnAHeaderModel> {
 		isValid(token)
@@ -65,18 +65,18 @@ class QnAListService: QnAService() {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
 		return if (haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee))) {
-			qnaHeaderRepository.findByThisPK(thisPK) ?: throw QnAHeaderNotExistException()
+			qnaHeaderRepository.findByThisPKOrderByRegDateDesc(thisPK) ?: throw QnAHeaderNotExistException()
 		} else if (haveRole(tokenUser, UserRole.BusinessMan.toS())) {
-			qnaHeaderRepository.findByThisPKAndUserPK(thisPK, tokenUser.thisPK) ?: throw QnAHeaderNotExistException()
+			qnaHeaderRepository.findByThisPKAndUserPKOrderByRegDateDesc(thisPK, tokenUser.thisPK) ?: throw QnAHeaderNotExistException()
 		} else throw AuthenticationEntryPointException()
 	}
 	fun getContentData(token: String, thisPK: String): QnAContentModel {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
 		val data = if (haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee))) {
-			qnaHeaderRepository.findByThisPK(thisPK) ?: throw QnAHeaderNotExistException()
+			qnaHeaderRepository.findByThisPKOrderByRegDateDesc(thisPK) ?: throw QnAHeaderNotExistException()
 		} else if (haveRole(tokenUser, UserRole.BusinessMan.toS())) {
-			qnaHeaderRepository.findByThisPKAndUserPK(thisPK, tokenUser.thisPK) ?: throw QnAHeaderNotExistException()
+			qnaHeaderRepository.findByThisPKAndUserPKOrderByRegDateDesc(thisPK, tokenUser.thisPK) ?: throw QnAHeaderNotExistException()
 		} else throw AuthenticationEntryPointException()
 
 		val content = qnaContentRepository.findByHeaderPK(data.thisPK) ?: throw QnAContentNotExistException()
@@ -138,7 +138,7 @@ class QnAListService: QnAService() {
 			throw AuthenticationEntryPointException()
 		}
 
-		val header = qnaHeaderRepository.findByThisPK(thisPK) ?: throw QnAHeaderNotExistException()
+		val header = qnaHeaderRepository.findByThisPKOrderByRegDateDesc(thisPK) ?: throw QnAHeaderNotExistException()
 		header.qnaState = QnAState.Reply
 		val reply = QnAReplyModel().apply {
 			this.headerPK = thisPK
@@ -181,7 +181,7 @@ class QnAListService: QnAService() {
 			throw AuthenticationEntryPointException()
 		}
 
-		val header = qnaHeaderRepository.findByThisPK(thisPK) ?: throw QnAHeaderNotExistException()
+		val header = qnaHeaderRepository.findByThisPKOrderByRegDateDesc(thisPK) ?: throw QnAHeaderNotExistException()
 		if (header.qnaState != QnAState.Reply || header.qnaState == QnAState.OK) {
 			throw NotValidOperationException()
 		}
@@ -191,6 +191,7 @@ class QnAListService: QnAService() {
 			this.headerPK = thisPK
 			this.userPK = tokenUser.thisPK
 			this.name = tokenUser.name
+			this.content = qnaReplyModel.content
 			this.fileList = qnaReplyModel.fileList
 		}
 		reply.fileList.onEach {
@@ -230,9 +231,9 @@ class QnAListService: QnAService() {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
 		val header = if (haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee))) {
-			qnaHeaderRepository.findByThisPK(thisPK) ?: throw QnAHeaderNotExistException()
+			qnaHeaderRepository.findByThisPKOrderByRegDateDesc(thisPK) ?: throw QnAHeaderNotExistException()
 		} else if (haveRole(tokenUser, UserRole.BusinessMan.toS())) {
-			qnaHeaderRepository.findByThisPKAndUserPK(thisPK, tokenUser.thisPK) ?: throw QnAHeaderNotExistException()
+			qnaHeaderRepository.findByThisPKAndUserPKOrderByRegDateDesc(thisPK, tokenUser.thisPK) ?: throw QnAHeaderNotExistException()
 		} else {
 			throw AuthenticationEntryPointException()
 		}
