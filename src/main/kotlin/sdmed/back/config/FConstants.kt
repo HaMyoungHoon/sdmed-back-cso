@@ -111,7 +111,7 @@ object FConstants {
 	const val MODEL_MEDICINE_ETC1 = "비고1"
 	const val MODEL_MEDICINE_ETC2 = "비고2"
 	const val MODEL_MEDICINE_COUNT = 21
-	const val MODEL_MEDICINE_INSERT_INTO = "INSERT INTO MedicineModel (thisPK, code, mainIngredientCode, kdCode, standardCode, pharma, name, customPrice, inVisible) VALUES "
+	const val MODEL_MEDICINE_INSERT_INTO = "INSERT INTO MedicineModel (thisPK, code, mainIngredientCode, kdCode, standardCode, pharma, name, customPrice, charge, inVisible) VALUES "
 	const val MODEL_MEDICINE_SUB_INSERT_INTO = "INSERT INTO MedicineSubModel (thisPK, code, standard, accountUnit, " +
 			"medicineType, medicineMethod, medicineCategory, medicineGroup, medicineDiv, medicineRank, medicineStorageTemp, medicineStorageBox, " +
 			"packageUnit, unit, etc1, etc2) VALUES "

@@ -1,6 +1,7 @@
 package sdmed.back.model.sqlCSO.medicine
 
 import jakarta.persistence.*
+import org.hibernate.annotations.ColumnDefault
 import sdmed.back.config.FConstants
 import sdmed.back.config.FExtensions
 import sdmed.back.model.common.medicine.*
@@ -25,6 +26,9 @@ data class MedicineModel(
 	var name: String = "",
 	@Column
 	var customPrice: Int = 0,
+	@Column(nullable = false)
+	@ColumnDefault("50")
+	var charge: Int = 50,
 	@Column(columnDefinition = "bit default 0", nullable = false)
 	var inVisible: Boolean = false,
 	@Transient
@@ -140,7 +144,7 @@ data class MedicineModel(
 		val mainIngredientCode = FExtensions.escapeString(mainIngredientCode)
 		val pharmaName = FExtensions.escapeString(pharma)
 		val name = FExtensions.escapeString(name)
-		return "('$thisPK', '$code', '$mainIngredientCode', '$kdCode', '$standardCode', '$pharmaName', '$name', '$customPrice', '$inVisible')"
+		return "('$thisPK', '$code', '$mainIngredientCode', '$kdCode', '$standardCode', '$pharmaName', '$name', '$customPrice', '$charge', '$inVisible')"
 	}
 	fun insertSubString() = medicineSubModel.insertString()
 }
