@@ -47,6 +47,15 @@ class DashboardService: FServiceBase() {
 		return requestRepository.selectAllByBetweenRequestDate(queryDate.first, queryDate.second)
 	}
 
+	fun getRequestData(token: String, requestItemPK: String): RequestModel? {
+		isValid(token)
+		val tokenUser = getUserDataByToken(token)
+		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee))) {
+			throw AuthenticationEntryPointException()
+		}
+		return requestRepository.findByRequestItemPK(requestItemPK)
+	}
+
 	fun getUserData(token: String, thisPK: String): UserDataModel {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
