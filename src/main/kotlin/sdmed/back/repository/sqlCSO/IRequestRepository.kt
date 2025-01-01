@@ -16,7 +16,7 @@ interface IRequestRepository: JpaRepository<RequestModel, String> {
 	fun findAllByResponseTypeNotAndRequestUserPKInOrderByRequestDateDesc(responseType: ResponseType = ResponseType.OK, requestUserPK: List<String>): List<RequestModel>
 
 	@Query("SELECT a FROM RequestModel a " +
-			"WHERE (a.responseType = 0 OR a.responseType = 1) AND a.requestUserPK IN :childPKInString " +
+			"WHERE (a.responseType = 0 OR a.responseType = 1) AND a.requestUserPK IN (:childPKInString) " +
 			"ORDER BY a.requestDate DESC")
 	fun selectAllByMyChildNoResponse(childPKInString: String): List<RequestModel>
 
@@ -34,9 +34,9 @@ interface IRequestRepository: JpaRepository<RequestModel, String> {
 			"GROUP BY a.responseType")
 	fun selectCountOfResponseType(startDate: Date, endDate: Date): List<ResponseCountModel>
 
-	@Query("SELECT count(a.requestUserID) as count, a.requestUserID as requestUserID FROM RequestModel a " +
+	@Query("SELECT count(a.requestUserName) as count, a.requestUserName as requestUserName FROM RequestModel a " +
 			"WHERE a.requestDate BETWEEN :startDate AND :endDate " +
-			"GROUP BY a.requestUserID " +
+			"GROUP BY a.requestUserName " +
 			"ORDER BY count DESC LIMIT 10")
 	fun selectTop10RequestUser(startDate: Date, endDate: Date): List<RequestUserCountModel>
 }
