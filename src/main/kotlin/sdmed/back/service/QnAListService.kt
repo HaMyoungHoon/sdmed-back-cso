@@ -99,7 +99,7 @@ class QnAListService: QnAService() {
 
 		val header = QnAHeaderModel().apply {
 			this.userPK = tokenUser.thisPK
-			this.id = tokenUser.id
+			this.name = tokenUser.name
 			this.title = title
 		}
 		val content = QnAContentModel().apply {
@@ -120,7 +120,7 @@ class QnAListService: QnAService() {
 
 		requestRepository.save(RequestModel().apply {
 			this.requestUserPK = tokenUser.thisPK
-			this.requestUserID = tokenUser.id
+			this.requestUserName = tokenUser.name
 			this.requestItemPK = header.thisPK
 			this.requestType = RequestType.QnA
 		})
@@ -214,7 +214,7 @@ class QnAListService: QnAService() {
 		} else {
 			requestRepository.save(RequestModel().apply {
 				this.requestUserPK = tokenUser.thisPK
-				this.requestUserID = tokenUser.id
+				this.requestUserName = tokenUser.id
 				this.requestItemPK = header.thisPK
 				this.requestType = RequestType.QnA
 			})
