@@ -11,9 +11,10 @@ interface IPharmaMedicineRelationRepository: JpaRepository<PharmaMedicineRelatio
 	fun findAllByPharmaPKIn(pharmaPK: List<String>): List<PharmaMedicineRelationModel>
 	fun findAllByMedicinePK(medicinePK: String): List<PharmaMedicineRelationModel>
 	fun findAllByMedicinePKIn(medicinePK: List<String>): List<PharmaMedicineRelationModel>
+	fun findAllByPharmaPKNotAndMedicinePKIn(pharmaPK: String, medicinePK: List<String>): List<PharmaMedicineRelationModel>
 
 	@Query("SELECT a FROM PharmaMedicineRelationModel a " +
 			"LEFT JOIN PharmaModel b ON a.thisPK = b.thisPK " +
-			"WHERE b.code IN :code")
+			"WHERE b.code IN (:code)")
 	fun selectAllByCodeIn(code: List<Int>): List<PharmaMedicineRelationModel>
 }
