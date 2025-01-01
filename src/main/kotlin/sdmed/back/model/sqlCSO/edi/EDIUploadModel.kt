@@ -11,6 +11,7 @@ import java.util.*
  *
  * @property thisPK
  * @property userPK
+ * @property name
  * @property year 해당 데이터 원본 날짜
  * @property month 해당 데이터 원본 날짜
  * @property day 해당 업로드 서버 날짜  (서버는 2024-12-12 인데, 데이터가 2024-10월 분 일 수도 있음)
@@ -30,6 +31,8 @@ data class EDIUploadModel(
 	var thisPK: String = UUID.randomUUID().toString(),
 	@Column(columnDefinition = "nvarchar(36)", updatable = false, nullable = false)
 	var userPK: String = "",
+	@Column(columnDefinition = "nvarchar(255)", nullable = false)
+	var name: String = "",
 	@Column(columnDefinition = "nvarchar(4)", nullable = false)
 	var year: String = "",
 	@Column(columnDefinition = "nvarchar(2)", nullable = false)
