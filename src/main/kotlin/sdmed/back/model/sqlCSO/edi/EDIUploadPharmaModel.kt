@@ -38,6 +38,8 @@ data class EDIUploadPharmaModel(
 		this.year = pharma.year
 		this.month = pharma.month
 		this.day = pharma.day
+		this.isCarriedOver = pharma.isCarriedOver
+		this.ediState = pharma.ediState
 		this.medicineList = pharma.medicineList
 		return this
 	}
