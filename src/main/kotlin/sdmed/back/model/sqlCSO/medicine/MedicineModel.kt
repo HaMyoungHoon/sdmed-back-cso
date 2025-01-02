@@ -90,19 +90,20 @@ data class MedicineModel(
 			5 -> name = data ?: ""
 			6 -> medicineSubModel.standard = data ?: ""
 			7 -> medicineSubModel.accountUnit = data?.toDoubleOrNull() ?: 0.0
-			8 -> customPrice = data?.toIntOrNull() ?: 0
-			9 -> medicineSubModel.medicineType = MedicineType.parseString(data)
-			10 -> medicineSubModel.medicineMethod = MedicineMethod.parseString(data)
-			11 -> medicineSubModel.medicineCategory = MedicineCategory.parseString(data)
-			12 -> medicineSubModel.medicineGroup = MedicineGroup.parseString(data)
-			13 -> medicineSubModel.medicineDiv = MedicineDiv.parseString(data)
-			14 -> medicineSubModel.medicineRank = MedicineRank.parseString(data)
-			15 -> medicineSubModel.medicineStorageTemp = MedicineStorageTemp.parseString(data)
-			16 -> medicineSubModel.medicineStorageBox = MedicineStorageBox.parseString(data)
-			17 -> medicineSubModel.packageUnit = data?.toIntOrNull() ?: 0
-			18 -> medicineSubModel.unit = data ?: ""
-			19 -> medicineSubModel.etc1 = data ?: ""
-			20 -> medicineSubModel.etc2 = data ?: ""
+			8 -> charge = data?.toIntOrNull() ?: 50
+			9 -> customPrice = data?.toIntOrNull() ?: 0
+			10 -> medicineSubModel.medicineType = MedicineType.parseString(data)
+			11 -> medicineSubModel.medicineMethod = MedicineMethod.parseString(data)
+			12 -> medicineSubModel.medicineCategory = MedicineCategory.parseString(data)
+			13 -> medicineSubModel.medicineGroup = MedicineGroup.parseString(data)
+			14 -> medicineSubModel.medicineDiv = MedicineDiv.parseString(data)
+			15 -> medicineSubModel.medicineRank = MedicineRank.parseString(data)
+			16 -> medicineSubModel.medicineStorageTemp = MedicineStorageTemp.parseString(data)
+			17 -> medicineSubModel.medicineStorageBox = MedicineStorageBox.parseString(data)
+			18 -> medicineSubModel.packageUnit = data?.toIntOrNull() ?: 0
+			19 -> medicineSubModel.unit = data ?: ""
+			20 -> medicineSubModel.etc1 = data ?: ""
+			21 -> medicineSubModel.etc2 = data ?: ""
 		}
 	}
 	fun titleGet(index: Int): String {
@@ -115,19 +116,20 @@ data class MedicineModel(
 			5 -> FConstants.MODEL_MEDICINE_NAME
 			6 -> FConstants.MODEL_MEDICINE_STANDARD
 			7 -> FConstants.MODEL_MEDICINE_ACCOUNT_UNIT
-			8 -> FConstants.MODEL_MEDICINE_CUSTOM_PRICE
-			9 -> FConstants.MODEL_MEDICINE_TYPE
-			10 -> FConstants.MODEL_MEDICINE_METHOD
-			11 -> FConstants.MODEL_MEDICINE_CATEGORY
-			12 -> FConstants.MODEL_MEDICINE_GROUP
-			13 -> FConstants.MODEL_MEDICINE_DIV
-			14 -> FConstants.MODEL_MEDICINE_RANK
-			15 -> FConstants.MODEL_MEDICINE_STORAGE_TEMP
-			16 -> FConstants.MODEL_MEDICINE_STORAGE_BOX
-			17 -> FConstants.MODEL_MEDICINE_PACKAGE_UNIT
-			18 -> FConstants.MODEL_MEDICINE_UNIT
-			19 -> FConstants.MODEL_MEDICINE_ETC1
-			20 -> FConstants.MODEL_MEDICINE_ETC2
+			8 -> FConstants.MODEL_MEDICINE_CHARGE
+			9 -> FConstants.MODEL_MEDICINE_CUSTOM_PRICE
+			10 -> FConstants.MODEL_MEDICINE_TYPE
+			11 -> FConstants.MODEL_MEDICINE_METHOD
+			12 -> FConstants.MODEL_MEDICINE_CATEGORY
+			13 -> FConstants.MODEL_MEDICINE_GROUP
+			14 -> FConstants.MODEL_MEDICINE_DIV
+			15 -> FConstants.MODEL_MEDICINE_RANK
+			16 -> FConstants.MODEL_MEDICINE_STORAGE_TEMP
+			17 -> FConstants.MODEL_MEDICINE_STORAGE_BOX
+			18 -> FConstants.MODEL_MEDICINE_PACKAGE_UNIT
+			19 -> FConstants.MODEL_MEDICINE_UNIT
+			20 -> FConstants.MODEL_MEDICINE_ETC1
+			21 -> FConstants.MODEL_MEDICINE_ETC2
 			else -> ""
 		}
 	}
