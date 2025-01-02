@@ -8,13 +8,14 @@ import sdmed.back.advice.exception.HospitalNotFoundException
 import sdmed.back.advice.exception.NotValidOperationException
 import sdmed.back.config.FExtensions
 import sdmed.back.config.jpa.CSOJPAConfig
+import sdmed.back.model.common.RequestType
 import sdmed.back.model.common.user.UserRole
 import sdmed.back.model.common.user.UserRoles
 import sdmed.back.model.sqlCSO.LogModel
 import sdmed.back.model.sqlCSO.edi.*
 import sdmed.back.model.sqlCSO.hospital.HospitalModel
 import sdmed.back.model.sqlCSO.medicine.MedicineModel
-import sdmed.back.model.sqlCSO.pharma.PharmaModel
+import sdmed.back.model.sqlCSO.request.RequestModel
 import sdmed.back.repository.sqlCSO.IUserRelationRepository
 import java.util.*
 
@@ -146,7 +147,7 @@ class EDIRequestService: EDIService() {
 		val dueDateList = ediPharmaDueDateRepository.selectAllByPharmaInThisYearMonthDueDate(pharmaPKString, serverTimeYear, serverTimeMonth)
 		ediUploadModel.orgName = hospital.orgName
 		ediUploadModel.pharmaList = carriedOverPharma(realPharmaNewData, dueDateList).toMutableList()
-		ediUploadModel.ediState = EDIState.None
+		ediUploadModel.ediState = if (ediUploadModel.pharmaList.count { x -> x.ediState == EDIState.Pending } > 0) EDIState.Pending else EDIState.None
 		ediUploadModel.regDate = serverTime
 		ediUploadModel.fileList.onEach {
 			it.thisPK = UUID.randomUUID().toString()
@@ -156,6 +157,12 @@ class EDIRequestService: EDIService() {
 		ediUploadPharmaRepository.saveAll(ediUploadModel.pharmaList)
 		ediUploadPharmaMedicineRepository.saveAll(ediUploadModel.pharmaList.flatMap { it.medicineList })
 		ediUploadFileRepository.saveAll(ediUploadModel.fileList)
+		requestRepository.save(RequestModel().apply {
+			requestUserPK = tokenUser.thisPK
+			requestItemPK = ediUploadModel.thisPK
+			requestUserName = tokenUser.name
+			requestType = RequestType.EDIUpload
+		})
 		val stackTrace = Thread.currentThread().stackTrace
 		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "add edi upload : ${ediUploadModel.thisPK} ${ediUploadModel.year}-${ediUploadModel.month}-${ediUploadModel.day}")
 		logRepository.save(logModel)
