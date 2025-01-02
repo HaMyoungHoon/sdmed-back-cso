@@ -8,5 +8,5 @@ import sdmed.back.model.sqlCSO.edi.EDIUploadPharmaMedicineModel
 interface IEDIUploadPharmaMedicineRepository: JpaRepository<EDIUploadPharmaMedicineModel, String> {
 	fun findByThisPK(thisPK: String): EDIUploadPharmaMedicineModel?
 	fun findByThisPKIn(thisPK: List<String>): List<EDIUploadPharmaMedicineModel>
-	fun findAllByEdiPKAndPharmaPKInOrderByMedicinePK(ediPK: String, pharmaPK: List<String>): List<EDIUploadPharmaMedicineModel>
+	fun findAllByEdiPKAndInVisibleAndPharmaPKInOrderByMedicinePK(ediPK: String, inVisible: Boolean = false, pharmaPK: List<String>): List<EDIUploadPharmaMedicineModel>
 }

@@ -27,11 +27,11 @@ class EDIService: FServiceBase() {
 	@Autowired lateinit var medicineRepository: IMedicineRepository
 	@Autowired lateinit var medicinePriceRepository: IMedicinePriceRepository
 
-	protected fun parseEDIUploadModel(data: EDIUploadModel) = data.apply {
+	protected fun parseEDIUploadModel(data: EDIUploadModel, inVisible: Boolean = false) = data.apply {
 		this.responseList = ediUploadResponseRepository.findAllByEdiPKOrderByRegDate(thisPK).toMutableList()
 		this.fileList = ediUploadFileRepository.findAllByEdiPKOrderByThisPK(thisPK).toMutableList()
 		val pharmaList = ediUploadPharmaRepository.findALlByEdiPKOrderByPharmaPK(thisPK)
-		val medicineList = ediUploadPharmaMedicineRepository.findAllByEdiPKAndPharmaPKInOrderByMedicinePK(thisPK, pharmaList.map { it.pharmaPK })
+		val medicineList = ediUploadPharmaMedicineRepository.findAllByEdiPKAndInVisibleAndPharmaPKInOrderByMedicinePK(thisPK, inVisible, pharmaList.map { it.pharmaPK })
 		val newData: MutableList<EDIUploadPharmaModel> = mutableListOf()
 		mergeEDIPharmaMedicine(pharmaList, medicineList, newData)
 		this.pharmaList = newData
@@ -58,6 +58,7 @@ class EDIService: FServiceBase() {
 
 				x.dateCopy(pharmaYear.toString(), pharmaMonth.toString(), pharmaDay.toString()).apply {
 					isCarriedOver = true
+					ediState = EDIState.Pending
 				}
 			} else {
 				x
@@ -133,7 +134,6 @@ class EDIService: FServiceBase() {
 					})
 				}
 			}
-			pharma?.medicineList?.add(medicine)
 		}
 	}
 	protected fun canIUseApplyDate(token: String, applyDate: Date): Boolean {

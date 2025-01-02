@@ -20,6 +20,7 @@ import java.util.*
  * @property year 자료 업데이트 일자의 기준약가 날짜
  * @property month 자료 업데이트 일자의 기준약가 날짜
  * @property day 자료 업데이트 일자의 기준약가 날짜
+ * @property inVisible
  * @constructor Create empty E d i upload pharma medicine model
  */
 @Entity
@@ -48,6 +49,9 @@ data class EDIUploadPharmaMedicineModel(
 	var month: String = "",
 	@Column(columnDefinition = "nvarchar(2)", updatable = false, nullable = false)
 	var day: String = "",
+	@Column
+	@ColumnDefault("false")
+	var inVisible: Boolean = false
 ) {
 	fun safeCopy(data: EDIUploadPharmaMedicineModel): EDIUploadPharmaMedicineModel {
 		this.count = data.count
