@@ -27,8 +27,9 @@ class ExtraEDIRequestController: FControllerBase() {
 	@Operation(summary = "내가 가진 병원의 제약사 목록")
 	@GetMapping(value = ["/list/pharma/{hosPK}"])
 	fun getPharmaList(@RequestHeader token: String,
-										@PathVariable hosPK: String) =
-		responseService.getResult(ediRequestService.getPharmaList(token, hosPK))
+										@PathVariable hosPK: String,
+										@RequestParam(required = false) withMedicine: Boolean = true) =
+		responseService.getResult(ediRequestService.getPharmaList(token, hosPK, withMedicine))
 
 	@Operation(summary = "내가 가진 병원의 제약사의 약품 목록")
 	@GetMapping(value = ["/list/medicine/{hosPK}"])
