@@ -54,8 +54,7 @@ class EDIDueDateService: EDIService() {
 		val year = FExtensions.parseDateTimeString(date, "yyyy") ?: throw NotValidOperationException()
 		val month = FExtensions.parseDateTimeString(date, "MM") ?: throw NotValidOperationException()
 
-		val pharmaPKString = pharmaPK.joinToString(",") { it }
-		return ediPharmaDueDateRepository.selectAllByPharmaInThisYearMonthDueDate(pharmaPKString, year, month)
+		return ediPharmaDueDateRepository.selectAllByPharmaInThisYearMonthDueDate(year, month).filter { it.pharmaPK in pharmaPK }
 	}
 	fun getEDIPharmaAble(token: String, date: Date): List<PharmaModel> {
 		val year = FExtensions.parseDateTimeString(date, "yyyy") ?: throw NotValidOperationException()
@@ -116,8 +115,7 @@ class EDIDueDateService: EDIService() {
 		val day = FExtensions.parseDateTimeString(date, "dd") ?: throw NotValidOperationException()
 
 		val pharma = pharmaRepository.findAllByThisPKIn(pharmaPK)
-		val pharmaPKString = pharmaPK.joinToString(",") { it }
-		val existDueDate = ediPharmaDueDateRepository.selectAllByPharmaInThisYearMonthDueDate(pharmaPKString, year, month)
+		val existDueDate = ediPharmaDueDateRepository.selectAllByPharmaInThisYearMonthDueDate(year, month).filter { it.pharmaPK in pharmaPK }
 
 		val buff = pharma.filterNot { x -> x.thisPK in existDueDate.map { it.pharmaPK } }.map { x ->
 			EDIPharmaDueDateModel().apply {
@@ -131,7 +129,7 @@ class EDIDueDateService: EDIService() {
 
 		val ret = ediPharmaDueDateRepository.saveAll(buff)
 		val stackTrace = Thread.currentThread().stackTrace
-		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "add edi due date : $pharmaPKString $year $month $day")
+		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "add edi due date : ${pharmaPK.joinToString(",")} $year $month $day")
 		logRepository.save(logModel)
 		return ret
 	}

@@ -16,11 +16,6 @@ interface IRequestRepository: JpaRepository<RequestModel, String> {
 	fun findAllByResponseTypeNotAndRequestUserPKInOrderByRequestDateDesc(responseType: ResponseType = ResponseType.OK, requestUserPK: List<String>): List<RequestModel>
 
 	@Query("SELECT a FROM RequestModel a " +
-			"WHERE (a.responseType = 0 OR a.responseType = 1) AND a.requestUserPK IN (:childPKInString) " +
-			"ORDER BY a.requestDate DESC")
-	fun selectAllByMyChildNoResponse(childPKInString: String): List<RequestModel>
-
-	@Query("SELECT a FROM RequestModel a " +
 			"WHERE a.responseType != 2 " +
 			"ORDER BY a.requestDate DESC")
 	fun selectAllByNoResponse(): List<RequestModel>

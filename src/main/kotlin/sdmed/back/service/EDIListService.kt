@@ -35,7 +35,7 @@ class EDIListService: EDIService() {
 			return arrayListOf()
 		}
 
-		return ediUploadRepository.selectAllByMyChildAndDate(myChildPK.joinToString(",") { it }, queryDate.first, queryDate.second)
+		return ediUploadRepository.selectAllByMyChildAndDate(queryDate.first, queryDate.second).filter { it.userPK in myChildPK }
 	}
 	fun getEDIUploadData(token: String, thisPK: String): EDIUploadModel {
 		isValid(token)

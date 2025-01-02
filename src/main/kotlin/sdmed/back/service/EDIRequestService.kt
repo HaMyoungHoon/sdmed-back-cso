@@ -48,8 +48,8 @@ class EDIRequestService: EDIService() {
 
 		val ret = userRelationRepository.selectAllMyPharma(tokenUser.thisPK, hosPK).distinctBy { it.thisPK }
 		if (withMedicine) {
-			val pharmaPKString = ret.map { it.thisPK }.joinToString(",") { it }
-			val medicine = userRelationRepository.selectAllMyMedicine(tokenUser.thisPK, hosPK, pharmaPKString).distinctBy { it.thisPK }
+			val pharmaPK = ret.map { it.thisPK }
+			val medicine = userRelationRepository.selectAllMyMedicine(tokenUser.thisPK, hosPK).distinctBy { it.thisPK }.filter { it.pharmaPK in pharmaPK }
 			mergePharmaMedicine(ret, medicine)
 		}
 		return ret
@@ -64,8 +64,7 @@ class EDIRequestService: EDIService() {
 			return arrayListOf()
 		}
 
-		val pharmaPKString = pharmaPK.joinToString(",") { it }
-		return userRelationRepository.selectAllMyMedicine(tokenUser.thisPK, hosPK, pharmaPKString)
+		return userRelationRepository.selectAllMyMedicine(tokenUser.thisPK, hosPK).distinctBy { it.thisPK }.filter { it.pharmaPK in pharmaPK }
 	}
 	fun getEDIUploadMyList(token: String, startDate: Date, endDate: Date): List<EDIUploadModel> {
 		isValid(token)
@@ -143,8 +142,7 @@ class EDIRequestService: EDIService() {
 		// 사진 데이터는 2024-11-11 자료라고 해도, 처리하는 지금은 2025-01-10 이면 마감일자를 1월 기준으로 봄
 		// 그리고 pharma 의 year, month, day 는 처리 된 날짜를 말하는 거임
 		// medicine 의 year, month, day 는 약가 기준일을 말함.
-		val pharmaPKString = realPharmaNewData.map { it.pharmaPK }.joinToString { it }
-		val dueDateList = ediPharmaDueDateRepository.selectAllByPharmaInThisYearMonthDueDate(pharmaPKString, serverTimeYear, serverTimeMonth)
+		val dueDateList = ediPharmaDueDateRepository.selectAllByPharmaInThisYearMonthDueDate(serverTimeYear, serverTimeMonth).filter { x -> x.pharmaPK in realPharmaNewData.map { y -> y.pharmaPK } }
 		ediUploadModel.orgName = hospital.orgName
 		ediUploadModel.pharmaList = carriedOverPharma(realPharmaNewData, dueDateList).toMutableList()
 		ediUploadModel.ediState = if (ediUploadModel.pharmaList.count { x -> x.ediState == EDIState.Pending } > 0) EDIState.Pending else EDIState.None

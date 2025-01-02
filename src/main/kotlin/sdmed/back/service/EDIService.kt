@@ -41,6 +41,7 @@ class EDIService: FServiceBase() {
 		return pharmaList.map { x ->
 			val buff = dueDateMap[x.pharmaPK]
 			if (buff != null) {
+				var isCarriedOver = false
 				var pharmaYear = x.year.toInt()
 				var pharmaMonth = x.month.toInt()
 				var pharmaDay = x.day.toInt()
@@ -54,11 +55,12 @@ class EDIService: FServiceBase() {
 						pharmaYear++
 					}
 					pharmaDay = 1
+					isCarriedOver = true
 				}
 
 				x.dateCopy(pharmaYear.toString(), pharmaMonth.toString(), pharmaDay.toString()).apply {
-					isCarriedOver = true
-					ediState = EDIState.Pending
+					this.isCarriedOver = isCarriedOver
+					ediState = if (isCarriedOver) EDIState.Pending else EDIState.None
 				}
 			} else {
 				x
