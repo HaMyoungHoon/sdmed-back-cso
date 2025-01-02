@@ -53,6 +53,13 @@ class EDIListController: FControllerBase() {
 										@RequestBody ediUploadPharmaModel: EDIUploadPharmaModel) =
 		responseService.getResult(ediListService.putEDIPharma(token,  thisPK, ediUploadPharmaModel))
 
+	@Operation(summary = "edi 데이터-제약사 상태 수정")
+	@PutMapping(value = ["/data/pharma/{thisPK}/state"])
+	fun putEDIPharmaState(@RequestHeader token: String,
+	                  @PathVariable thisPK: String,
+	                  @RequestBody ediUploadPharmaModel: EDIUploadPharmaModel) =
+		responseService.getResult(ediListService.putEDIPharmaState(token,  thisPK, ediUploadPharmaModel))
+
 	@Operation(summary = "edi 데이터-제약사-약품 수정")
 	@PutMapping(value = ["/data/pharma/medicine/{thisPK}"])
 	fun putPharmaMedicineData(@RequestHeader token: String,

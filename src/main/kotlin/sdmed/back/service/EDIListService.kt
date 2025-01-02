@@ -4,11 +4,11 @@ import org.springframework.transaction.annotation.Transactional
 import sdmed.back.advice.exception.*
 import sdmed.back.config.FExtensions
 import sdmed.back.config.jpa.CSOJPAConfig
+import sdmed.back.model.common.ResponseType
 import sdmed.back.model.common.user.UserRole
 import sdmed.back.model.common.user.UserRoles
 import sdmed.back.model.sqlCSO.LogModel
 import sdmed.back.model.sqlCSO.edi.*
-import sdmed.back.model.sqlCSO.medicine.MedicineModel
 import java.util.*
 
 class EDIListService: EDIService() {
@@ -97,9 +97,53 @@ class EDIListService: EDIService() {
 		}
 
 		val data = ediUploadPharmaRepository.findByThisPK(thisPK) ?: throw EDIUploadPharmaNotExistException()
+		data.medicineList = ediUploadPharmaMedicineRepository.findByThisPKIn(pharma.medicineList.map { x -> x.thisPK }).toMutableList()
 		data.safeCopy(pharma)
 		ediUploadPharmaMedicineRepository.saveAll(data.medicineList)
 		val ret = ediUploadPharmaRepository.save(data)
+		val stackTrace = Thread.currentThread().stackTrace
+		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "modify edi pharma : ${data.thisPK} ${data.orgName}")
+		logRepository.save(logModel)
+		return ret
+	}
+	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
+	fun putEDIPharmaState(token: String, thisPK: String, pharma: EDIUploadPharmaModel): EDIUploadPharmaModel {
+		isValid(token)
+		val tokenUser = getUserDataByToken(token)
+		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee))) {
+			throw AuthenticationEntryPointException()
+		}
+
+		val data = ediUploadPharmaRepository.findByThisPK(thisPK) ?: throw EDIUploadPharmaNotExistException()
+		data.ediState = pharma.ediState
+		val ret = ediUploadPharmaRepository.save(data)
+		val mother = ediUploadRepository.findByThisPK(data.ediPK) ?: throw EDIUploadNotExistException()
+		val allChildEdiState = ediUploadPharmaRepository.findALlByEdiPKOrderByPharmaPK(mother.thisPK).map { x -> x.ediState }
+		var responseType = ResponseType.None
+		if (allChildEdiState.count { x -> x == EDIState.None } == allChildEdiState.count()) {
+			mother.ediState = EDIState.None
+		} else if (allChildEdiState.count { x -> x == EDIState.Reject } > 0) {
+			mother.ediState = EDIState.Reject
+			responseType = ResponseType.Reject
+		} else if (allChildEdiState.count { x -> x == EDIState.OK } == allChildEdiState.count()) {
+			mother.ediState = EDIState.OK
+			responseType = ResponseType.OK
+		} else if (allChildEdiState.count { x -> x == EDIState.OK } > 0 ){
+			mother.ediState = EDIState.Partial
+			responseType = ResponseType.Recep
+		} else {
+			mother.ediState = EDIState.Pending
+			responseType = ResponseType.Pending
+		}
+		ediUploadRepository.save(mother)
+		val request = requestRepository.findByRequestItemPK(mother.thisPK)
+		if (request != null) {
+			request.responseUserPK = tokenUser.thisPK
+			request.responseUserName = tokenUser.name
+			request.responseDate = Date()
+			request.responseType = responseType
+			requestRepository.save(request)
+		}
 		val stackTrace = Thread.currentThread().stackTrace
 		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "modify edi pharma : ${data.thisPK} ${data.orgName}")
 		logRepository.save(logModel)
@@ -131,11 +175,13 @@ class EDIListService: EDIService() {
 
 		val data = ediUploadPharmaMedicineRepository.findByThisPK(thisPK) ?: throw EDIUploadPharmaMedicineNotExistException()
 		val edi = ediUploadRepository.findByThisPK(data.ediPK) ?: throw EDIUploadNotExistException()
-		if (edi.ediState != EDIState.None) {
+		if (edi.ediState == EDIState.OK) {
 			throw NotValidOperationException()
 		}
 
-		ediUploadPharmaMedicineRepository.delete(data)
+		data.inVisible = true
+		ediUploadPharmaMedicineRepository.save(data)
+//		ediUploadPharmaMedicineRepository.delete(data)
 		val stackTrace = Thread.currentThread().stackTrace
 		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "del edi pharma medicine : ${data.thisPK} ${data.name}")
 		logRepository.save(logModel)
@@ -156,7 +202,9 @@ class EDIListService: EDIService() {
 		if (deletableData.isEmpty()) {
 			return "count 0"
 		}
-		ediUploadPharmaMedicineRepository.deleteAll(deletableData)
+		deletableData.onEach { x -> x.inVisible = true }
+		ediUploadPharmaMedicineRepository.saveAll(deletableData)
+//		ediUploadPharmaMedicineRepository.deleteAll(deletableData)
 		val stackTrace = Thread.currentThread().stackTrace
 		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "del edi pharma medicine : ${deletableData.count()}")
 		logRepository.save(logModel)
