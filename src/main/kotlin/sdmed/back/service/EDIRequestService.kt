@@ -38,16 +38,22 @@ class EDIRequestService: EDIService() {
 
 		return userRelationRepository.selectAllMyHospital(tokenUser.thisPK)
 	}
-	fun getPharmaList(token: String, hosPK: String): List<PharmaModel> {
+	fun getPharmaList(token: String, hosPK: String, withMedicine: Boolean = true): List<EDIPharmaBuffModel> {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.BusinessMan))) {
 			throw AuthenticationEntryPointException()
 		}
 
-		return userRelationRepository.selectAllMyPharma(tokenUser.thisPK, hosPK)
+		val ret = userRelationRepository.selectAllMyPharma(tokenUser.thisPK, hosPK).distinctBy { it.thisPK }
+		if (withMedicine) {
+			val pharmaPKString = ret.map { it.thisPK }.joinToString(",") { it }
+			val medicine = userRelationRepository.selectAllMyMedicine(tokenUser.thisPK, hosPK, pharmaPKString).distinctBy { it.thisPK }
+			mergePharmaMedicine(ret, medicine)
+		}
+		return ret
 	}
-	fun getMedicineList(token: String, hosPK: String, pharmaPK: List<String>): List<MedicineModel> {
+	fun getMedicineList(token: String, hosPK: String, pharmaPK: List<String>): List<EDIMedicineBuffModel> {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.BusinessMan))) {
@@ -57,10 +63,10 @@ class EDIRequestService: EDIService() {
 			return arrayListOf()
 		}
 
-		val pharmaPKString = pharmaPK.joinToString(",") { "'${it}'" }
+		val pharmaPKString = pharmaPK.joinToString(",") { it }
 		return userRelationRepository.selectAllMyMedicine(tokenUser.thisPK, hosPK, pharmaPKString)
 	}
-	fun getEDIUploadMyList(token: String, startDate: Date, endDate: Date): List<EDIUploadListModel> {
+	fun getEDIUploadMyList(token: String, startDate: Date, endDate: Date): List<EDIUploadModel> {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.BusinessMan))) {
@@ -98,13 +104,16 @@ class EDIRequestService: EDIService() {
 		val serverTimeDay = FExtensions.parseDateTimeString(serverTime, "dd") ?: throw NotValidOperationException()
 		ediUploadModel.thisPK = UUID.randomUUID().toString()
 		ediUploadModel.day = serverTimeDay
+		ediUploadModel.regDate = serverTime
+		ediUploadModel.userPK = tokenUser.thisPK
+		ediUploadModel.name = tokenUser.name
 		val hospital = hospitalRepository.findByThisPK(ediUploadModel.hospitalPK) ?: throw HospitalNotFoundException()
 		val existPharmaList = pharmaRepository.findAllByThisPKIn(ediUploadModel.pharmaList.map { it.pharmaPK })
 
 		val realPharma = realPharmaCheck(ediUploadModel.thisPK, ediUploadModel.pharmaList, existPharmaList)
 		val existMedicineList = medicineRepository.findAllByThisPKIn(realPharma.flatMap { x -> x.medicineList.map { y -> y.medicinePK } })
 
-		val kdCodeString = existMedicineList.map { it.kdCode }.joinToString { "'${it}'" }
+		val kdCodeString = existMedicineList.map { it.kdCode } // .joinToString { "$it" }
 		val yearMonthDay = "${ediUploadModel.year}-${ediUploadModel.month}-${ediUploadModel.day}"
 		val medicinePriceList = medicinePriceRepository.selectAllByRecentDataKDCodeInAndYearMonth(kdCodeString, yearMonthDay)
 		val existMedicineNewData = mutableListOf<MedicineModel>()
@@ -133,7 +142,7 @@ class EDIRequestService: EDIService() {
 		// 사진 데이터는 2024-11-11 자료라고 해도, 처리하는 지금은 2025-01-10 이면 마감일자를 1월 기준으로 봄
 		// 그리고 pharma 의 year, month, day 는 처리 된 날짜를 말하는 거임
 		// medicine 의 year, month, day 는 약가 기준일을 말함.
-		val pharmaPKString = realPharmaNewData.map { it.pharmaPK }.joinToString { "'${it}'" }
+		val pharmaPKString = realPharmaNewData.map { it.pharmaPK }.joinToString { it }
 		val dueDateList = ediPharmaDueDateRepository.selectAllByPharmaInThisYearMonthDueDate(pharmaPKString, serverTimeYear, serverTimeMonth)
 		ediUploadModel.orgName = hospital.orgName
 		ediUploadModel.pharmaList = carriedOverPharma(realPharmaNewData, dueDateList).toMutableList()
@@ -144,6 +153,9 @@ class EDIRequestService: EDIService() {
 			it.ediPK = ediUploadModel.thisPK
 		}
 		val ret = ediUploadRepository.save(ediUploadModel)
+		ediUploadPharmaRepository.saveAll(ediUploadModel.pharmaList)
+		ediUploadPharmaMedicineRepository.saveAll(ediUploadModel.pharmaList.flatMap { it.medicineList })
+		ediUploadFileRepository.saveAll(ediUploadModel.fileList)
 		val stackTrace = Thread.currentThread().stackTrace
 		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "add edi upload : ${ediUploadModel.thisPK} ${ediUploadModel.year}-${ediUploadModel.month}-${ediUploadModel.day}")
 		logRepository.save(logModel)

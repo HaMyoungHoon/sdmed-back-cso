@@ -54,7 +54,7 @@ class EDIDueDateService: EDIService() {
 		val year = FExtensions.parseDateTimeString(date, "yyyy") ?: throw NotValidOperationException()
 		val month = FExtensions.parseDateTimeString(date, "MM") ?: throw NotValidOperationException()
 
-		val pharmaPKString = pharmaPK.joinToString(",") { "'${it}'" }
+		val pharmaPKString = pharmaPK.joinToString(",") { it }
 		return ediPharmaDueDateRepository.selectAllByPharmaInThisYearMonthDueDate(pharmaPKString, year, month)
 	}
 	fun getEDIPharmaAble(token: String, date: Date): List<PharmaModel> {
@@ -116,7 +116,7 @@ class EDIDueDateService: EDIService() {
 		val day = FExtensions.parseDateTimeString(date, "dd") ?: throw NotValidOperationException()
 
 		val pharma = pharmaRepository.findAllByThisPKIn(pharmaPK)
-		val pharmaPKString = pharmaPK.joinToString(",") { "'${it}'" }
+		val pharmaPKString = pharmaPK.joinToString(",") { it }
 		val existDueDate = ediPharmaDueDateRepository.selectAllByPharmaInThisYearMonthDueDate(pharmaPKString, year, month)
 
 		val buff = pharma.filterNot { x -> x.thisPK in existDueDate.map { it.pharmaPK } }.map { x ->

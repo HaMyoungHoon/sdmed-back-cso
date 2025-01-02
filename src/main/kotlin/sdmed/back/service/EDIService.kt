@@ -90,10 +90,21 @@ class EDIService: FServiceBase() {
 					if (this.price == 0) {
 						this.price = if (existMedicine.customPrice != 0) existMedicine.customPrice else existMedicine.maxPrice
 					}
+					this.charge = existMedicine.charge
+					this.name = existMedicine.name
 				})
 			}
 		}
 		return ret
+	}
+	protected fun mergePharmaMedicine(pharmaList: List<EDIPharmaBuffModel>, medicineList: List<EDIMedicineBuffModel>) {
+		val medicineMap = medicineList.groupBy { it.pharmaPK }
+		for (pharma in pharmaList) {
+			val buff = medicineMap[pharma.thisPK]
+			if (!buff.isNullOrEmpty()) {
+				pharma.medicineList.addAll(buff)
+			}
+		}
 	}
 	protected fun mergeMedicinePrice(medicineList: List<MedicineModel>, medicinePriceList: List<MedicinePriceModel>, newData: MutableList<MedicineModel>) {
 		val medicinePriceMap = medicinePriceList.associateBy { it.kdCode }
