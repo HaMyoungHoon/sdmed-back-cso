@@ -109,7 +109,7 @@ class UserService: FServiceBase() {
 		val ret = userDataRepository.save(data)
 		requestRepository.save(RequestModel().apply {
 			requestUserPK = data.thisPK
-			requestUserID = data.id
+			requestUserName = data.id
 			requestItemPK = data.thisPK
 			requestType = RequestType.SignUp
 			if (data.id == "mhha") {
