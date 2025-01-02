@@ -161,3 +161,7 @@ qnaHeaderNotExistException:
 qnaContentNotExistException:
   code: "-10038"
   msg: "not exist qna content"
+
+ediPharmaDueDateNotExistException:
+  code: "-10039"
+  msg: "not exist EDI Pharma Due Date"

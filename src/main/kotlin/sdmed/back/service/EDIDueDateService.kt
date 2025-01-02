@@ -1,10 +1,7 @@
 package sdmed.back.service
 
 import org.springframework.transaction.annotation.Transactional
-import sdmed.back.advice.exception.AuthenticationEntryPointException
-import sdmed.back.advice.exception.EDIPharmaDueDateExistException
-import sdmed.back.advice.exception.NotValidOperationException
-import sdmed.back.advice.exception.PharmaNotFoundException
+import sdmed.back.advice.exception.*
 import sdmed.back.config.FExtensions
 import sdmed.back.config.jpa.CSOJPAConfig
 import sdmed.back.model.common.user.UserRole
@@ -148,13 +145,18 @@ class EDIDueDateService: EDIService() {
 			throw AuthenticationEntryPointException()
 		}
 
-		val buff = ediPharmaDueDateRepository.findByThisPK(thisPK)?.apply {
+		val buff = ediPharmaDueDateRepository.findByThisPK(thisPK) ?: throw EDIPharmaDueDateNotExistException()
+
+		val exist = ediPharmaDueDateRepository.selectByPharmaThisYearMonthDueDate(buff.pharmaPK, year, month)
+		if (exist != null) {
+			throw EDIPharmaDueDateExistException()
+		}
+
+		val ret = ediPharmaDueDateRepository.save(buff.apply {
 			this.year = year
 			this.month = month
 			this.day = day
-		} ?: throw EDIPharmaDueDateExistException()
-
-		val ret = ediPharmaDueDateRepository.save(buff)
+		})
 		val stackTrace = Thread.currentThread().stackTrace
 		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "add edi due date : ${buff.orgName} $year $month $day")
 		logRepository.save(logModel)

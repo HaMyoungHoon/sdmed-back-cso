@@ -161,3 +161,7 @@ qnaHeaderNotExistException:
 qnaContentNotExistException:
   code: "-10038"
   msg: "qna 컨텐츠가 존재하지 않습니다."
+
+ediPharmaDueDateNotExistException:
+  code: "-10039"
+  msg: "해당 제약사의 EDI 마감일자가 존재하지 않습니다."

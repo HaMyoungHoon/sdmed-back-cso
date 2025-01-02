@@ -223,6 +223,11 @@ class ExceptionAdvice {
 	protected fun qnaContentNotExistException(request: HttpServletRequest, exception: QnAContentNotExistException) =
 		responseService.getFailResult(getMessage("qnaContentNotExistException.code").toInt(), getMessageMerge("qnaContentNotExistException.msg", exception.message))
 
+	@ExceptionHandler(EDIPharmaDueDateNotExistException::class)
+	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+	protected fun ediPharmaDueDateNotExistException(request: HttpServletRequest, exception: EDIPharmaDueDateNotExistException) =
+		responseService.getFailResult(getMessage("ediPharmaDueDateNotExistException.code").toInt(), getMessageMerge("ediPharmaDueDateNotExistException.msg", exception.message))
+
 	@ExceptionHandler(AsyncRequestTimeoutException::class)
 	@ResponseStatus(HttpStatus.OK)
 	protected fun asyncRequestTimeoutException(request: HttpServletRequest, exception: AsyncRequestTimeoutException): AsyncContext =

@@ -71,16 +71,15 @@ class UserInfoController: FControllerBase() {
 	fun putUserTaxImageUrl(@RequestHeader token: String,
 												 @PathVariable thisPK: String,
 												 @RequestBody blobModel: BlobUploadModel) =
-		userInfoService.userTaxImageUrlModify(token, thisPK, blobModel.blobUrl).apply {
+		responseService.getResult(userInfoService.userTaxImageUrlModify(token, thisPK, blobModel.blobUrl).apply {
 			azureBlobService.blobUploadSave(blobModel.newSave())
-		}
+		})
 	@Operation(summary = "유저 통장 이미지 url 변경")
 	@PutMapping(value = ["/file/{thisPK}/bankImage"])
 	fun putUserBankImageUrl(@RequestHeader token: String,
 	                        @PathVariable thisPK: String,
-	                        @RequestBody blobModel: BlobUploadModel): IRestResult {
-		val ret = userInfoService.userBankImageUrlModify(token, thisPK, blobModel.blobUrl)
-		azureBlobService.blobUploadSave(blobModel.newSave())
-		return responseService.getResult(ret)
-	}
+	                        @RequestBody blobModel: BlobUploadModel) =
+		responseService.getResult(userInfoService.userBankImageUrlModify(token, thisPK, blobModel.blobUrl).apply {
+			azureBlobService.blobUploadSave(blobModel.newSave())
+		})
 }

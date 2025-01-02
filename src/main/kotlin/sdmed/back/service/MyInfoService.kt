@@ -15,7 +15,7 @@ class MyInfoService: UserService() {
 	fun getMyData(token: String, childView: Boolean = false, relationView: Boolean = false, pharmaOwnMedicineView: Boolean = false): UserDataModel {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
-		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.UserChanger))) {
+		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee, UserRole.BusinessMan))) {
 			throw AuthenticationEntryPointException()
 		}
 		return getUserDataByPK(tokenUser.thisPK, childView, relationView, pharmaOwnMedicineView)
@@ -23,7 +23,7 @@ class MyInfoService: UserService() {
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
 	fun passwordChange(token: String, currentPW: String, afterPW: String, confirmPW: String): UserDataModel {
 		val tokenUser = getUserDataByToken(token)
-		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.UserChanger))) {
+		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee, UserRole.BusinessMan))) {
 			throw AuthenticationEntryPointException()
 		}
 		if (tokenUser.pw != fAmhohwa.encrypt(currentPW)) {
