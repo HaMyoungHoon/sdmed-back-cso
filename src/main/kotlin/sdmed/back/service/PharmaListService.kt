@@ -39,13 +39,15 @@ class PharmaListService: PharmaService() {
 		}
 
 		isValid(token)
-		val ret = if (isSearchTypeCode) {
+		var ret = if (isSearchTypeCode) {
 			searchString.toIntOrNull()?.let { x ->
 				medicineRepository.selectAllByCodeLikeOrKdCodeLike(x, x)
 			} ?: medicineRepository.selectAllByNameContainingOrPharmaContaining(searchString, searchString)
 		} else {
 			medicineRepository.selectAllByNameContainingOrPharmaContaining(searchString, searchString)
 		}
+		val exist = pharmaMedicineRelationRepository.findAllByMedicinePKIn(ret.map { it.thisPK })
+		ret = ret.filterNot { it.thisPK in exist.map { it.medicinePK } }
 		val sub = medicineSubRepository.findALlByCodeInOrderByCode(ret.map { it.code })
 		val ingredient = medicineIngredientRepository.findAllByMainIngredientCodeIn(ret.map { it.mainIngredientCode })
 		medicineMerge(ret, sub, ingredient)
@@ -140,7 +142,9 @@ class PharmaListService: PharmaService() {
 
 		val already: MutableList<PharmaMedicineRelationModel> = mutableListOf()
 		existPharma.chunked(500).forEach { x -> already.addAll(pharmaMedicineRelationRepository.findAllByPharmaPKIn(x.map { y -> y.thisPK })) }
-		existMedicine.removeIf { it.thisPK in already.map { it.medicinePK } }
+		existMedicine.removeIf { x -> x.thisPK in already.map { y -> y.medicinePK } }
+		val exist = pharmaMedicineRelationRepository.findAllByMedicinePKIn(existMedicine.map { it.thisPK })
+		existMedicine.removeIf { x -> x.thisPK in exist.map { y -> y.medicinePK } }
 
 		val pharmaMap = existPharma.associateBy({it.code}, {it.thisPK})
 		val medicineMap = existMedicine.associateBy({it.code}, {it.thisPK})
@@ -189,7 +193,9 @@ class PharmaListService: PharmaService() {
 		}
 
 		val ret = pharmaRepository.findByThisPK(pharmaPK) ?: throw PharmaNotFoundException()
-		val existMedicine = medicineRepository.findAllByThisPKIn(medicinePKList)
+		val existMedicine = medicineRepository.findAllByThisPKIn(medicinePKList).toMutableList()
+		val exist = pharmaMedicineRelationRepository.findAllByPharmaPKNotAndMedicinePKIn(pharmaPK, medicinePKList)
+		existMedicine.removeIf { x -> x.thisPK in exist.map { y -> y.medicinePK } }
 
 		deleteRelationByPharmaPK(ret.thisPK)
 		if (existMedicine.isEmpty()) {
