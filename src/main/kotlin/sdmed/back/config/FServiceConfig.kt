@@ -7,6 +7,7 @@ import sdmed.back.service.*
 @Configuration
 class FServiceConfig {
 	@Bean fun dashboardService() = DashboardService()
+	@Bean fun extraDashboardService() = ExtraDashboardService()
 
 	@Bean fun userService() = UserService()
 	@Bean fun myInfoService() = MyInfoService()
