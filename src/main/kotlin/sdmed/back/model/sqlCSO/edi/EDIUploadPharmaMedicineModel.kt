@@ -11,7 +11,8 @@ import java.util.*
  *
  * @property thisPK
  * @property ediPK
- * @property pharmaPK
+ * @property pharmaPK 이건 발주처고
+ * @property makerCode 이건 제조사임
  * @property medicinePK
  * @property name
  * @property count
@@ -32,6 +33,8 @@ data class EDIUploadPharmaMedicineModel(
 	var ediPK: String = "",
 	@Column(columnDefinition = "nvarchar(36)", updatable = false, nullable = false)
 	var pharmaPK: String = "",
+	@Column(columnDefinition = "nvarchar(50)", updatable = false, nullable = false)
+	var makerCode: String = "",
 	@Column(columnDefinition = "nvarchar(36)", updatable = false, nullable = false)
 	var medicinePK: String = "",
 	@Column(columnDefinition = "nvarchar(255)", updatable = false, nullable = false)
@@ -50,7 +53,6 @@ data class EDIUploadPharmaMedicineModel(
 	@Column(columnDefinition = "nvarchar(2)", updatable = false, nullable = false)
 	var day: String = "",
 	@Column
-	@ColumnDefault("false")
 	var inVisible: Boolean = false
 ) {
 	fun safeCopy(data: EDIUploadPharmaMedicineModel): EDIUploadPharmaMedicineModel {

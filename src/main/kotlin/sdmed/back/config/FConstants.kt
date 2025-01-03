@@ -93,7 +93,8 @@ object FConstants {
 	const val MODEL_MEDICINE_MAIN_INGREDIENT_CODE = "주성분코드"
 	const val MODEL_MEDICINE_KD_CODE = "제품코드"
 	const val MODEL_MEDICINE_STANDARD_CODE = "표준코드"
-	const val MODEL_MEDICINE_PHARMA = "제조사"
+	const val MODEL_MEDICINE_MAKER_NAME = "제조사"
+	const val MODEL_MEDICINE_MAKER_CODE = "제조사코드"
 	const val MODEL_MEDICINE_NAME = "제품명"
 	const val MODEL_MEDICINE_STANDARD = "규격"
 	const val MODEL_MEDICINE_ACCOUNT_UNIT = "계산단위"
@@ -111,8 +112,8 @@ object FConstants {
 	const val MODEL_MEDICINE_UNIT = "단위"
 	const val MODEL_MEDICINE_ETC1 = "비고1"
 	const val MODEL_MEDICINE_ETC2 = "비고2"
-	const val MODEL_MEDICINE_COUNT = 22
-	const val MODEL_MEDICINE_INSERT_INTO = "INSERT INTO MedicineModel (thisPK, code, mainIngredientCode, kdCode, standardCode, pharma, name, customPrice, charge, inVisible) VALUES "
+	const val MODEL_MEDICINE_COUNT = 23
+	const val MODEL_MEDICINE_INSERT_INTO = "INSERT INTO MedicineModel (thisPK, code, mainIngredientCode, kdCode, standardCode, makerName, makerCode, name, customPrice, charge, inVisible) VALUES "
 	const val MODEL_MEDICINE_SUB_INSERT_INTO = "INSERT INTO MedicineSubModel (thisPK, code, standard, accountUnit, " +
 			"medicineType, medicineMethod, medicineCategory, medicineGroup, medicineDiv, medicineRank, medicineStorageTemp, medicineStorageBox, " +
 			"packageUnit, unit, etc1, etc2) VALUES "
@@ -130,16 +131,18 @@ object FConstants {
 	const val MODEL_MEDICINE_PRICE_GENERAL = "전일"
 	const val MODEL_MEDICINE_PRICE_ETC = "비고"
 	const val MODEL_MEDICINE_PRICE_ANCESTOR_CODE = "목록정비전코드"
-	const val MODEL_MEDICINE_PRICE_COUNT = 13
+	const val MODEL_MEDICINE_PRICE_COUNT = 12
 	const val MODEL_MEDICINE_PRICE_INSERT_INTO = "INSERT INTO MedicinePriceModel (thisPK, kdCode, maxPrice, ancestorCode, applyDate) VALUES "
 	const val MODEL_MEDICINE_INGREDIENT_INSERT_INTO = "INSERT INTO MedicineIngredientModel (thisPK, mainIngredientCode, mainIngredientName) VALUES "
 
 	const val MODEL_USER_RELATIONS_DELETE_WHERE_USER_PK = "DELETE FROM UserRelationModel WHERE userPK = "
 	const val MODEL_USER_RELATIONS_INSERT_INTO = "INSERT INTO UserRelationModel (thisPK, userPK, hosPK, pharmaPK, medicinePK) VALUES "
 
-	const val MODEL_PHARMA_MEDICINE_PARSE_PHARMA_CODE = "제약사코드"
-	const val MODEL_PHARMA_MEDICINE_PARSE_MEDICINE_CODE = "약품코드"
-	const val MODEL_PHARMA_MEDICINE_PARSE_COUNT = 2
+	const val MODEL_PHARMA_MEDICINE_PARSE_PHARMA_NAME = "발주처"
+	const val MODEL_PHARMA_MEDICINE_PARSE_MEDICINE_NAME = "제품명"
+	const val MODEL_PHARMA_MEDICINE_PARSE_PHARMA_CODE = "발주처코드"
+	const val MODEL_PHARMA_MEDICINE_PARSE_MEDICINE_CODE = "제품코드"
+	const val MODEL_PHARMA_MEDICINE_PARSE_COUNT = 4
 
 	const val REGEX_ONLY_ALPHABET = "[^a-zA-Z0-9]"
 	const val REGEX_SPECIAL_CHAR_REMOVE = "[^가-힣a-zA-Z0-9\\s]"

@@ -32,6 +32,10 @@ class MedicineListController: FControllerBase() {
 	@GetMapping(value = ["/list/mainIngredient"])
 	fun getMainIngredientList(@RequestHeader token: String) =
 		responseService.getResult(medicineListService.getMainIngredientList(token))
+	@Operation(summary = "제조사 리스트")
+	@GetMapping(value = ["/list/pharma"])
+	fun getPharmaList(@RequestHeader token: String) =
+		responseService.getResult(medicineListService.getPharmaList(token))
 	@Operation(summary = "엑셀 샘플 다운로드")
 	@GetMapping(value = ["/file/sample"])
 	fun getExcelSample(): ResponseEntity<Resource> =

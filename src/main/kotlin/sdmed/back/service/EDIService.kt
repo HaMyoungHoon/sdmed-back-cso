@@ -95,6 +95,7 @@ class EDIService: FServiceBase() {
 					}
 					this.charge = existMedicine.charge
 					this.name = existMedicine.name
+					this.makerCode = existMedicine.makerCode
 				})
 			}
 		}

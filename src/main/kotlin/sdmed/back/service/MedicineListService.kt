@@ -1,5 +1,6 @@
 package sdmed.back.service
 
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
 import sdmed.back.advice.exception.AuthenticationEntryPointException
@@ -11,9 +12,12 @@ import sdmed.back.model.common.user.UserRoles
 import sdmed.back.model.sqlCSO.LogModel
 import sdmed.back.model.sqlCSO.medicine.MedicineIngredientModel
 import sdmed.back.model.sqlCSO.medicine.MedicineModel
+import sdmed.back.model.sqlCSO.pharma.PharmaModel
+import sdmed.back.repository.sqlCSO.IPharmaRepository
 import java.util.*
 
 class MedicineListService: MedicineService() {
+	@Autowired lateinit var pharmaRepository: IPharmaRepository
 
 	fun getList(token: String, withAllPrice: Boolean = false) = getAllMedicine(token, withAllPrice)
 	fun getMedicineData(token: String, thisPK: String, withAllPrice: Boolean = false): MedicineModel {
@@ -33,6 +37,10 @@ class MedicineListService: MedicineService() {
 	fun getMainIngredientList(token: String): List<MedicineIngredientModel> {
 		isValid(token)
 		return medicineIngredientRepository.findAll()
+	}
+	fun getPharmaList(token: String): List<PharmaModel> {
+		isValid(token)
+		return pharmaRepository.selectAllByInvisibleOrderByCode()
 	}
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
 	fun medicineUpload(token: String, file: MultipartFile): String {

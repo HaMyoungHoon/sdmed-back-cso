@@ -8,6 +8,6 @@ enum class MedicineMethod(var index: Int, var desc: String) {
 	Dental(4, "치과");
 
 	companion object {
-		fun parseString(data: String?) = entries.find { it.desc == data } ?: ETC
+		fun parseString(data: String?) = entries.find { data?.contains(it.desc) == true } ?: ETC
 	}
 }
