@@ -58,7 +58,7 @@ class EDIService: FServiceBase() {
 					isCarriedOver = true
 				}
 
-				x.dateCopy(pharmaYear.toString(), pharmaMonth.toString(), pharmaDay.toString()).apply {
+				x.dateCopy("%04d".format(pharmaYear), "%02d".format(pharmaMonth), "%02d".format(pharmaDay)).apply {
 					this.isCarriedOver = isCarriedOver
 					ediState = if (isCarriedOver) EDIState.Pending else EDIState.None
 				}
