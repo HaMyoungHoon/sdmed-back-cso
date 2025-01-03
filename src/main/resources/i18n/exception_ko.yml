@@ -165,3 +165,7 @@ qnaContentNotExistException:
 ediPharmaDueDateNotExistException:
   code: "-10039"
   msg: "해당 제약사의 EDI 마감일자가 존재하지 않습니다."
+
+ediUploadPharmaExistException:
+  code: "-10040"
+  msg: "EDI 데이터-제약사가 이미 존재합니다."

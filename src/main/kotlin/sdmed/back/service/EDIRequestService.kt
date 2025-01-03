@@ -2,10 +2,7 @@ package sdmed.back.service
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.transaction.annotation.Transactional
-import sdmed.back.advice.exception.AuthenticationEntryPointException
-import sdmed.back.advice.exception.EDIUploadNotExistException
-import sdmed.back.advice.exception.HospitalNotFoundException
-import sdmed.back.advice.exception.NotValidOperationException
+import sdmed.back.advice.exception.*
 import sdmed.back.config.FExtensions
 import sdmed.back.config.jpa.CSOJPAConfig
 import sdmed.back.model.common.RequestType
@@ -108,12 +105,16 @@ class EDIRequestService: EDIService() {
 		ediUploadModel.userPK = tokenUser.thisPK
 		ediUploadModel.name = tokenUser.name
 		val hospital = hospitalRepository.findByThisPK(ediUploadModel.hospitalPK) ?: throw HospitalNotFoundException()
-		val existPharmaList = pharmaRepository.findAllByThisPKIn(ediUploadModel.pharmaList.map { it.pharmaPK })
+		if (hospital.inVisible) {
+			throw HospitalNotFoundException()
+		}
+
+		val existPharmaList = pharmaRepository.findAllByThisPKIn(ediUploadModel.pharmaList.map { it.pharmaPK }).filter { !it.inVisible }
 
 		val realPharma = realPharmaCheck(ediUploadModel.thisPK, ediUploadModel.pharmaList, existPharmaList)
-		val existMedicineList = medicineRepository.findAllByThisPKIn(realPharma.flatMap { x -> x.medicineList.map { y -> y.medicinePK } })
+		val existMedicineList = medicineRepository.findAllByThisPKIn(realPharma.flatMap { x -> x.medicineList.map { y -> y.medicinePK } }).filter { !it.inVisible }
 
-		val kdCodeString = existMedicineList.map { it.kdCode } // .joinToString { "$it" }
+		val kdCodeString = existMedicineList.map { it.kdCode }
 		val yearMonthDay = "${ediUploadModel.year}-${ediUploadModel.month}-${ediUploadModel.day}"
 		val medicinePriceList = medicinePriceRepository.selectAllByRecentDataKDCodeInAndYearMonth(kdCodeString, yearMonthDay)
 		val existMedicineNewData = mutableListOf<MedicineModel>()
@@ -151,6 +152,16 @@ class EDIRequestService: EDIService() {
 			it.thisPK = UUID.randomUUID().toString()
 			it.ediPK = ediUploadModel.thisPK
 		}
+
+		// 지금 Reject 상태가 아닌 pharma, year, month 가 있을 경우 제거함.
+		ediUploadModel.pharmaList.removeIf { it.medicineList.isEmpty() }
+		val notRejectPharma = ediUploadPharmaRepository.selectAllByMyNotReject(tokenUser.thisPK).map { Triple(it.pharmaPK, it.year, it.month) }
+		ediUploadModel.pharmaList = ediUploadModel.pharmaList.filterNot { Triple(it.pharmaPK, it.year, it.month) in notRejectPharma }.toMutableList()
+
+		if (ediUploadModel.pharmaList.isEmpty()) {
+			throw EDIUploadPharmaExistException()
+		}
+
 		val ret = ediUploadRepository.save(ediUploadModel)
 		ediUploadPharmaRepository.saveAll(ediUploadModel.pharmaList)
 		ediUploadPharmaMedicineRepository.saveAll(ediUploadModel.pharmaList.flatMap { it.medicineList })
