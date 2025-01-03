@@ -175,7 +175,7 @@ class EDIDueDateService: EDIService() {
 		val buff = ediPharmaDueDateRepository.findByThisPK(thisPK) ?: throw EDIPharmaDueDateNotExistException()
 
 		val exist = ediPharmaDueDateRepository.selectByPharmaThisYearMonthDueDate(buff.pharmaPK, year, month)
-		if (exist != null) {
+		if (exist != null && exist.thisPK != buff.thisPK) {
 			throw EDIPharmaDueDateExistException()
 		}
 
