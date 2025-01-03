@@ -122,14 +122,14 @@ class PharmaListService: PharmaService() {
 
 		var pharmaMedicineParseModel = excelFileParser.pharmaMedicineUploadExcelParse(tokenUser.id, file)
 		val existPharma: MutableList<PharmaModel> = mutableListOf()
-		pharmaMedicineParseModel.chunked(500).forEach { x -> existPharma.addAll(pharmaRepository.findAllByCodeIn(x.map { y -> y.pharmaCode })) }
+		pharmaMedicineParseModel.chunked(100).forEach { x -> existPharma.addAll(pharmaRepository.findAllByCodeIn(x.map { y -> y.pharmaCode })) }
 		pharmaMedicineParseModel = pharmaMedicineParseModel.filter { x -> x.pharmaCode in existPharma.map { y -> y.code } }.toMutableList()
 		if (pharmaMedicineParseModel.isEmpty()) {
 			return "count : 0"
 		}
 
 		val existMedicine: MutableList<MedicineModel> = mutableListOf()
-		pharmaMedicineParseModel.chunked(500).forEach { x -> existMedicine.addAll(medicineRepository.findAllByCodeIn(x.flatMap { y -> y.medicineCodeList })) }
+		pharmaMedicineParseModel.chunked(10).forEach { x -> existMedicine.addAll(medicineRepository.findAllByCodeIn(x.flatMap { y -> y.medicineCodeList })) }
 		pharmaMedicineParseModel = pharmaMedicineParseModel.map { x ->
 			val filteredMedicineCodeList = x.medicineCodeList.filter { y -> y in existMedicine.map { z -> z.code }.toSet() }
 			x.copy(medicineCodeList = filteredMedicineCodeList.toMutableList())
@@ -139,9 +139,10 @@ class PharmaListService: PharmaService() {
 		}
 
 		val already: MutableList<PharmaMedicineRelationModel> = mutableListOf()
-		existPharma.chunked(500).forEach { x -> already.addAll(pharmaMedicineRelationRepository.findAllByPharmaPKIn(x.map { y -> y.thisPK })) }
+		existPharma.chunked(10).forEach { x -> already.addAll(pharmaMedicineRelationRepository.findAllByPharmaPKIn(x.map { y -> y.thisPK })) }
 		existMedicine.removeIf { x -> x.thisPK in already.map { y -> y.medicinePK } }
-		val exist = pharmaMedicineRelationRepository.findAllByMedicinePKIn(existMedicine.map { it.thisPK })
+		val exist = mutableListOf<PharmaMedicineRelationModel>()
+		existMedicine.chunked(500).forEach { x -> exist.addAll(pharmaMedicineRelationRepository.findAllByMedicinePKIn(x.map { it.thisPK })) }
 		existMedicine.removeIf { x -> x.thisPK in exist.map { y -> y.medicinePK } }
 
 		val pharmaMap = existPharma.associateBy({it.code}, {it.thisPK})
@@ -160,7 +161,7 @@ class PharmaListService: PharmaService() {
 			}
 		}
 
-		pharmaMedicineRelationModel.chunked(500).forEach { insertRelation(it) }
+		pharmaMedicineRelationModel.chunked(10).forEach { insertRelation(it) }
 
 		val stackTrace = Thread.currentThread().stackTrace
 		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "add pharma count : ${pharmaMedicineRelationModel.count()}")
