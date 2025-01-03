@@ -12,8 +12,8 @@ data class MedicineSubModel(
 	@Id
 	@Column(columnDefinition = "nvarchar(36)", updatable = false, nullable = false)
 	var thisPK: String = UUID.randomUUID().toString(),
-	@Column(nullable = false, unique = true)
-	var code: Int = 0,
+	@Column(columnDefinition = "nvarchar(50)", nullable = false, unique = true)
+	var code: String = "",
 	@Column(columnDefinition = "nvarchar(100)")
 	var standard: String = "",
 	@Column

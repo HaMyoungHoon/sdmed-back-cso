@@ -40,9 +40,7 @@ class PharmaListService: PharmaService() {
 
 		isValid(token)
 		var ret = if (isSearchTypeCode) {
-			searchString.toIntOrNull()?.let { x ->
-				medicineRepository.selectAllByCodeLikeOrKdCodeLike(x, x)
-			} ?: medicineRepository.selectAllByNameContainingOrPharmaContaining(searchString, searchString)
+			medicineRepository.selectAllByCodeLikeOrKdCodeLike(searchString, searchString)
 		} else {
 			medicineRepository.selectAllByNameContainingOrPharmaContaining(searchString, searchString)
 		}

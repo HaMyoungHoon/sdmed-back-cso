@@ -10,8 +10,8 @@ data class MedicinePriceModel(
 	@Id
 	@Column(columnDefinition = "nvarchar(36)", updatable = false, nullable = false)
 	var thisPK: String = UUID.randomUUID().toString(),
-	@Column
-	var kdCode: Int = 0,
+	@Column(columnDefinition = "nvarchar(20)")
+	var kdCode: String = "",
 	@Column
 	var maxPrice: Int = 0,
 	@Column(columnDefinition = "nvarchar(max)")
@@ -51,7 +51,7 @@ data class MedicinePriceModel(
 	}
 	fun indexSet(data: String?, index: Int) {
 		when (index) {
-			4 -> kdCode = data?.toIntOrNull() ?: 0
+			4 -> kdCode = data ?: ""
 			9 -> maxPrice = data?.toIntOrNull() ?: 0
 			12 -> ancestorCode = data ?: ""
 		}
@@ -75,7 +75,7 @@ data class MedicinePriceModel(
 		}
 	}
 	fun errorCondition(): Boolean {
-		if (kdCode == 0) {
+		if (kdCode.toIntOrNull() == null) {
 			return true
 		}
 

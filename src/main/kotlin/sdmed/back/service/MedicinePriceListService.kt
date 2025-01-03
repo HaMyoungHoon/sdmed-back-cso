@@ -14,7 +14,7 @@ import java.util.*
 class MedicinePriceListService: MedicineService() {
 
 	fun getList(token: String, withAllPrice: Boolean = false) = getAllMedicine(token, withAllPrice)
-	fun getMedicinePriceList(token: String, kdCode: Int): List<MedicinePriceModel> {
+	fun getMedicinePriceList(token: String, kdCode: String): List<MedicinePriceModel> {
 		isValid(token)
 		return medicinePriceRepository.findAllByKdCodeOrderByApplyDateDesc(kdCode)
 	}

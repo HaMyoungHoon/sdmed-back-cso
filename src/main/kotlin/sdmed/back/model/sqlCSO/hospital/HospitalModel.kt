@@ -16,8 +16,8 @@ data class HospitalModel(
 	@Id
 	@Column(columnDefinition = "nvarchar(36)", updatable = false, nullable = false)
 	var thisPK: String = UUID.randomUUID().toString(),
-	@Column(nullable = false)
-	var code: Int = 0,
+	@Column(columnDefinition = "nvarchar(50)", nullable = false)
+	var code: String = "",
 	@Column(columnDefinition = "nvarchar(255)", nullable = false)
 	var orgName: String = "",
 	@Column(columnDefinition = "nvarchar(255)", nullable = false)
@@ -106,7 +106,7 @@ data class HospitalModel(
 	}
 	fun indexGet(index: Int): String {
 		return when (index) {
-			0 -> code.toString()
+			0 -> code
 			1 -> orgName
 			2 -> innerName
 			3 -> ownerName
@@ -134,7 +134,7 @@ data class HospitalModel(
 	}
 	fun indexSet(data: String?, index: Int) {
 		when (index) {
-			0 -> code = data?.toIntOrNull() ?: 0
+			0 -> code = data ?: ""
 			1 -> orgName = data ?: ""
 			2 -> innerName = data ?: ""
 			3 -> ownerName = data ?: ""
@@ -188,7 +188,7 @@ data class HospitalModel(
 		}
 	}
 	fun errorCondition(): Boolean {
-		if (indexGet(0) == "0") {
+		if (indexGet(0).isBlank()) {
 			return true
 		} else if (indexGet(1).isEmpty()) {
 			return true

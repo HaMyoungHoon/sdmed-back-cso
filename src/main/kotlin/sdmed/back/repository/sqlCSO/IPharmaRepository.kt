@@ -8,9 +8,9 @@ import sdmed.back.model.sqlCSO.pharma.PharmaModel
 @Repository
 interface IPharmaRepository: JpaRepository<PharmaModel, String> {
 	fun findByThisPK(thisPK: String): PharmaModel?
-	fun findByCode(code: Int): PharmaModel?
+	fun findByCode(code: String): PharmaModel?
 	fun findAllByThisPKIn(thisPK: List<String>): List<PharmaModel>
-	fun findAllByCodeIn(codes: List<Int>): List<PharmaModel>
+	fun findAllByCodeIn(codes: List<String>): List<PharmaModel>
 
 	@Query("SELECT * FROM PharmaModel " +
 			"WHERE inVisible = :inVisible AND code LIKE %:code% " +

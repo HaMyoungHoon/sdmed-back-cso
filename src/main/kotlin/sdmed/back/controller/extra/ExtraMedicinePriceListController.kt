@@ -20,6 +20,6 @@ class ExtraMedicinePriceListController: FControllerBase() {
 	@Operation(summary = "가격 변경 이력")
 	@GetMapping(value = ["/list/{kdCode}"])
 	fun getHistoryList(@RequestHeader token: String,
-	                   @PathVariable kdCode: Int) =
+	                   @PathVariable kdCode: String) =
 		responseService.getResult(medicinePriceService.getMedicinePriceList(token, kdCode))
 }

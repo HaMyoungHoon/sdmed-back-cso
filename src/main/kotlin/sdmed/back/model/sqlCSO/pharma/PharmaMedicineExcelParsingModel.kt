@@ -5,8 +5,8 @@ import java.util.UUID
 
 data class PharmaMedicineExcelParsingModel(
 	var thisPK: String = UUID.randomUUID().toString(),
-	var pharmaCode: Int = 0,
-	var medicineCodeList: MutableList<Int> = mutableListOf()
+	var pharmaCode: String = "",
+	var medicineCodeList: MutableList<String> = mutableListOf()
 ) {
 	fun findHeader(data: List<String>): Boolean {
 		if (data.size < FConstants.MODEL_PHARMA_MEDICINE_PARSE_COUNT) {
@@ -40,21 +40,23 @@ data class PharmaMedicineExcelParsingModel(
 	}
 	fun indexSet(data: String?, index: Int) {
 		when (index) {
-			0 -> pharmaCode = data?.toIntOrNull() ?: 0
-			1 -> medicineCodeList.add(data?.toIntOrNull() ?: 0)
+			2 -> pharmaCode = data ?: ""
+			3 -> medicineCodeList.add(data ?: "")
 		}
 	}
 	fun titleGet(index: Int): String {
 		return when (index) {
-			0 -> FConstants.MODEL_PHARMA_MEDICINE_PARSE_PHARMA_CODE
-			1 -> FConstants.MODEL_PHARMA_MEDICINE_PARSE_MEDICINE_CODE
+			0 -> FConstants.MODEL_PHARMA_MEDICINE_PARSE_PHARMA_NAME
+			1 -> FConstants.MODEL_PHARMA_MEDICINE_PARSE_MEDICINE_NAME
+			2 -> FConstants.MODEL_PHARMA_MEDICINE_PARSE_PHARMA_CODE
+			3 -> FConstants.MODEL_PHARMA_MEDICINE_PARSE_MEDICINE_CODE
 			else -> ""
 		}
 	}
 	fun errorCondition(): Boolean {
-		if (pharmaCode == 0) {
+		if (pharmaCode.isBlank()) {
 			return true
-		} else if(medicineCodeList.isEmpty() || medicineCodeList.find { it == 0 } != null) {
+		} else if(medicineCodeList.isEmpty() || medicineCodeList.find { it.isBlank() } != null) {
 			return true
 		}
 

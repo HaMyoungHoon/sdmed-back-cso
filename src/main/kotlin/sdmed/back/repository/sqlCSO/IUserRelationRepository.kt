@@ -31,8 +31,9 @@ interface IUserRelationRepository: JpaRepository<UserRelationModel, String> {
 			"ORDER BY a.code ASC ")
 	fun selectAllMyPharma(userPK: String, hosPK: String): List<EDIPharmaBuffModel>
 
-	@Query("SELECT new sdmed.back.model.sqlCSO.edi.EDIMedicineBuffModel(a.thisPK, a.code, a.pharma, a.name, b.pharmaPK) FROM MedicineModel a " +
+	@Query("SELECT new sdmed.back.model.sqlCSO.edi.EDIMedicineBuffModel(a.thisPK, a.code, c.orgName, a.name, b.pharmaPK) FROM MedicineModel a " +
 			"LEFT JOIN UserRelationModel b ON a.thisPK = b.medicinePK " +
+			"LEFT JOIN PharmaModel c ON b.pharmaPK = c.thisPK " +
 			"WHERE a.inVisible = false AND b.userPK = :userPK AND b.hosPK = :hosPK " +
 			"ORDER BY a.code ASC ")
 	fun selectAllMyMedicine(userPK: String, hosPK: String): List<EDIMedicineBuffModel>

@@ -8,8 +8,8 @@ import sdmed.back.model.sqlCSO.medicine.MedicinePriceModel
 @Repository
 interface IMedicinePriceRepository: JpaRepository<MedicinePriceModel, String> {
 	fun findAllByOrderByApplyDateDesc(): List<MedicinePriceModel>
-	fun findAllByKdCodeOrderByApplyDateDesc(kdCode: Int): List<MedicinePriceModel>
-	fun findAllByKdCodeIn(kdCode: List<Int>): List<MedicinePriceModel>
+	fun findAllByKdCodeOrderByApplyDateDesc(kdCode: String): List<MedicinePriceModel>
+	fun findAllByKdCodeIn(kdCode: List<String>): List<MedicinePriceModel>
 
 	@Query("WITH RankedMedicinePrice AS ( " +
 			"SELECT *, ROW_NUMBER() OVER (PARTITION BY kdCode ORDER BY applyDate DESC) as RN FROM MedicinePriceModel) " +
@@ -20,7 +20,7 @@ interface IMedicinePriceRepository: JpaRepository<MedicinePriceModel, String> {
 			"SELECT *, ROW_NUMBER() OVER (PARTITION BY kdCode ORDER BY applyDate DESC) as RN FROM MedicinePriceModel " +
 			"WHERE applyDate <= :yearMonthDay) " +
 			"SELECT * FROM RankedMedicinePrice as MedicinePriceModel WHERE RN = 1 AND kdCode IN (:kdCodeString) ", nativeQuery = true)
-	fun selectAllByRecentDataKDCodeInAndYearMonth(kdCodeString: List<Int>, yearMonthDay: String): List<MedicinePriceModel>
+	fun selectAllByRecentDataKDCodeInAndYearMonth(kdCodeString: List<String>, yearMonthDay: String): List<MedicinePriceModel>
 
 	@Query("SELECT TOP 1 applyDate FROM MedicinePriceModel " +
 			"ORDER BY applyDate DESC", nativeQuery = true)

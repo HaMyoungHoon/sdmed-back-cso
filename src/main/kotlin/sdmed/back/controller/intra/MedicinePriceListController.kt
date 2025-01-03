@@ -23,7 +23,7 @@ class MedicinePriceListController: FControllerBase() {
 	@Operation(summary = "가격 변경 이력")
 	@GetMapping(value = ["/list/price"])
 	fun getHistoryList(@RequestHeader token: String,
-										 @RequestParam kdCode: Int) =
+										 @RequestParam kdCode: String) =
 		responseService.getResult(medicinePriceService.getMedicinePriceList(token, kdCode))
 	@Operation(summary = "약가 적용 날짜")
 	@GetMapping(value = ["/data/price/date"])
