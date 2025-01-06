@@ -81,7 +81,7 @@ class CommonController: FControllerBase() {
 					 @RequestBody content: String): IRestResult {
 		userService.isValid(token)
 		val tokenUser = userService.getUserDataByToken(token)
-		if (!userService.haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee, UserRole.BusinessMan))) {
+		if (!userService.haveRole(tokenUser, UserRoles.of(UserRole.Admin))) {
 			throw AuthenticationEntryPointException()
 		}
 
