@@ -75,4 +75,17 @@ class CommonController: FControllerBase() {
 		val key = azureBlobService.generateSas(containerName, blobUrl)
 		return responseService.getResult(key)
 	}
+
+	@PostMapping("/test")
+	fun test(@RequestHeader token: String,
+					 @RequestBody content: String): IRestResult {
+		userService.isValid(token)
+		val tokenUser = userService.getUserDataByToken(token)
+		if (!userService.haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee, UserRole.BusinessMan))) {
+			throw AuthenticationEntryPointException()
+		}
+
+		val key = azureBlobService.uploadString(content, "String", tokenUser.thisPK)
+		return responseService.getResult(key)
+	}
 }
