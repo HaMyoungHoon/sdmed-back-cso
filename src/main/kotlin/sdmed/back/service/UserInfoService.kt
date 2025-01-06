@@ -20,9 +20,10 @@ class UserInfoService: UserService() {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
 		if (haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee))) {
-			return userDataRepository.findAllByOrderByNameDesc().toMutableList().run {
-				filter { it.thisPK != tokenUser.thisPK }
-			}
+			return userDataRepository.findAllByOrderByNameDesc()
+//			return userDataRepository.findAllByOrderByNameDesc().toMutableList().run {
+//				filter { it.thisPK != tokenUser.thisPK }
+//			}
 		}
 
 		return userDataRepository.selectWhereDeptOrderByNameAsc(UserRoles.of(UserDept.TaxPayer, UserDept.Personal).getFlag()).run {
