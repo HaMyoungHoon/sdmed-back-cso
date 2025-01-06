@@ -12,6 +12,6 @@ interface IEDIUploadPharmaRepository: JpaRepository<EDIUploadPharmaModel, String
 
 	@Query("SELECT a FROM EDIUploadPharmaModel a " +
 			"LEFT JOIN EDIUploadModel b ON a.ediPK = b.thisPK " +
-			"WHERE b.userPK = :userPK AND a.ediState != 2 ")
-	fun selectAllByMyNotReject(userPK: String): List<EDIUploadPharmaModel>
+			"WHERE b.userPK = :userPK AND b.year = :year AND b.month = :month AND a.ediState != 2 ")
+	fun selectAllByMyNotReject(userPK: String, year: String, month: String): List<EDIUploadPharmaModel>
 }

@@ -48,7 +48,7 @@ class EDIService: FServiceBase() {
 				val buffYear = buff.year.toInt()
 				val buffMonth = buff.month.toInt()
 				val buffDay = buff.day.toInt()
-				while (pharmaYear == buffYear && pharmaMonth == buffMonth && pharmaDay <= buffDay) {
+				while (pharmaYear == buffYear && pharmaMonth == buffMonth && pharmaDay > buffDay) {
 					pharmaMonth++
 					if (pharmaMonth > 12) {
 						pharmaMonth = 1

@@ -124,7 +124,7 @@ class EDIRequestService: EDIService() {
 		realPharma.onEach {
 			it.thisPK = UUID.randomUUID().toString()
 			it.ediPK = ediUploadModel.thisPK
-			it.year = ediUploadModel.year
+			it.year = serverTimeYear
 			it.month = serverTimeMonth
 			it.day = ediUploadModel.day
 			it.medicineList.clear()
@@ -155,7 +155,7 @@ class EDIRequestService: EDIService() {
 
 		// 지금 Reject 상태가 아닌 pharma, year, month 가 있을 경우 제거함.
 		ediUploadModel.pharmaList.removeIf { it.medicineList.isEmpty() }
-		val notRejectPharma = ediUploadPharmaRepository.selectAllByMyNotReject(tokenUser.thisPK).map { Triple(it.pharmaPK, it.year, it.month) }
+		val notRejectPharma = ediUploadPharmaRepository.selectAllByMyNotReject(tokenUser.thisPK, ediUploadModel.year, ediUploadModel.month).map { Triple(it.pharmaPK, it.year, it.month) }
 		ediUploadModel.pharmaList = ediUploadModel.pharmaList.filterNot { Triple(it.pharmaPK, it.year, it.month) in notRejectPharma }.toMutableList()
 
 		if (ediUploadModel.pharmaList.isEmpty()) {
