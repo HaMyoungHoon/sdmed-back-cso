@@ -1,5 +1,6 @@
 package sdmed.back.service
 
+import com.azure.core.util.BinaryData
 import com.azure.storage.blob.BlobServiceClient
 import com.azure.storage.blob.BlobServiceClientBuilder
 import com.azure.storage.blob.models.BlobHttpHeaders
@@ -49,6 +50,19 @@ class AzureBlobService {
 			this.uploaderPK = uploaderPK
 			this.originalFilename = file.originalFilename ?: ""
 			this.mimeType = mimeType
+		})
+		return blobClient.blobUrl
+	}
+	fun uploadString(content: String, section: String, uploaderPK: String): String {
+		val blobUrl = "$section/${UUID.randomUUID()}.html"
+		val containerClient = blobServiceClient.createBlobContainerIfNotExists(containerName)
+		val blobClient = containerClient.getBlobClient(blobUrl)
+		blobClient.upload(BinaryData.fromString(content))
+		blobUploadRepository.save(BlobUploadModel().apply {
+			this.blobUrl = blobUrl
+			this.uploaderPK = uploaderPK
+			this.originalFilename = "${section}.html"
+			this.mimeType = "application/octet-stream"
 		})
 		return blobClient.blobUrl
 	}
