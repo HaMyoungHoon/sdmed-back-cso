@@ -5,6 +5,8 @@ import org.springframework.core.io.Resource
 import org.springframework.core.io.UrlResource
 import org.springframework.stereotype.Component
 import org.springframework.web.multipart.MultipartFile
+import sdmed.back.model.common.ResponseType
+import sdmed.back.model.sqlCSO.edi.EDIState
 import java.lang.Exception
 import java.nio.file.Files
 import java.nio.file.Path
@@ -78,6 +80,9 @@ object FExtensions {
 	fun parseStringToSqlDate(date: String?, pattern: String): java.sql.Date = LocalDate.parse(date, DateTimeFormatter.ofPattern(pattern)).let {
 		java.sql.Date.valueOf(it)
 	}
+	fun parseIntDateToSqlDate(year: Int, month: Int, day: Int): Date {
+		return parseStringToSqlDate("${"%04d".format(year)}-${"%02d".format(month)}-${"%02d".format(day)}", "yyyy-MM-dd")
+	}
 	fun parseStringToJavaDate(date: String?, pattern: String) = LocalDate.parse(date, DateTimeFormatter.ofPattern(pattern)).let {
 		Date.from(it.atStartOfDay(getZoneId()).toInstant())
 	}
@@ -89,6 +94,28 @@ object FExtensions {
 		Pair(toZeroTime(endDate), toCloseTime(startDate))
 	} else {
 		Pair(toZeroTime(startDate), toCloseTime(endDate))
+	}
+
+	fun ediStateParse(ediState: List<EDIState>): EDIState {
+		return if (ediState.all { it == EDIState.OK }) EDIState.OK
+		else if (ediState.all { it == EDIState.Reject }) EDIState.Reject
+		else if (ediState.any { it == EDIState.OK }) EDIState.Partial
+		else if (ediState.any { it == EDIState.Partial}) EDIState.Partial
+		else if (ediState.any { it == EDIState.Pending}) EDIState.Pending
+		else if (ediState.any { it == EDIState.Reject}) EDIState.Partial
+		else EDIState.None
+	}
+	fun ediStateToResponseType(ediState: EDIState): ResponseType {
+		return when (ediState) {
+			EDIState.OK -> return ResponseType.OK
+			EDIState.Reject -> return ResponseType.Reject
+			EDIState.Pending -> return ResponseType.Pending
+			EDIState.Partial -> return ResponseType.Recep
+			else -> ResponseType.Ignore
+		}
+	}
+	fun ediStateToResponseType(ediState: List<EDIState>): ResponseType {
+		return ediStateToResponseType(ediStateParse(ediState))
 	}
 
 	fun sampleFileDownload(excelType: FExcelParserType): Resource {

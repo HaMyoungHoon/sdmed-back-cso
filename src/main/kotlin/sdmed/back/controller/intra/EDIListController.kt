@@ -33,11 +33,11 @@ class EDIListController: FControllerBase() {
 		responseService.getResult(ediListService.getEDIUploadData(token, thisPK))
 
 	@Operation(summary = "edi 업로드 응답")
-	@PostMapping(value = ["/data/{thisPK}"])
+	@PostMapping(value = ["/data/{ediPharmaPK}"])
 	fun postData(@RequestHeader token: String,
-							 @PathVariable thisPK: String,
+							 @PathVariable ediPharmaPK: String,
 							 @RequestBody ediUploadResponseModel: EDIUploadResponseModel) =
-		responseService.getResult(ediListService.postEDIResponseData(token, thisPK, ediUploadResponseModel))
+		responseService.getResult(ediListService.postEDIResponseData(token, ediPharmaPK, ediUploadResponseModel))
 
 	@Operation(summary = "edi 데이터 수정")
 	@PutMapping(value = ["/data/{thisPK}"])

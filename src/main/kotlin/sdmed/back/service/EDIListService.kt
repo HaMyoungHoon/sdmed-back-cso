@@ -49,22 +49,36 @@ class EDIListService: EDIService() {
 	}
 
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
-	fun postEDIResponseData(token: String, thisPK: String, responseData: EDIUploadResponseModel): EDIUploadModel {
+	fun postEDIResponseData(token: String, ediPharmaPK: String, responseData: EDIUploadResponseModel): EDIUploadModel {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee))) {
 			throw AuthenticationEntryPointException()
 		}
 
-		val data = ediUploadRepository.findByThisPK(thisPK) ?: throw EDIUploadNotExistException()
+		val data = ediUploadPharmaRepository.findByThisPK(ediPharmaPK) ?: throw EDIUploadNotExistException()
 		data.ediState = responseData.ediState
-		val ret = ediUploadRepository.save(data)
+		ediUploadPharmaRepository.save(data)
+		val mother = ediUploadRepository.findByThisPK(data.ediPK) ?: throw EDIUploadNotExistException()
+		mother.ediState = FExtensions.ediStateParse(ediUploadPharmaRepository.findALlByEdiPKOrderByPharmaPK(mother.thisPK).map { it.ediState })
+		val ret = ediUploadRepository.save(mother)
 		ediUploadResponseRepository.save(EDIUploadResponseModel().apply {
-			this.ediPK = thisPK
+			this.ediPK = mother.thisPK
+			this.pharmaPK = data.thisPK
+			this.pharmaName = data.orgName
 			this.userPK = tokenUser.thisPK
+			this.userName = tokenUser.name
 			this.etc = responseData.etc
 			this.ediState = responseData.ediState
 		})
+		val request = requestRepository.findByRequestItemPK(mother.thisPK)
+		if (request != null) {
+			request.responseUserPK = tokenUser.thisPK
+			request.responseUserName = tokenUser.name
+			request.responseDate = Date()
+			request.responseType = FExtensions.ediStateToResponseType(mother.ediState)
+			requestRepository.save(request)
+		}
 		val stackTrace = Thread.currentThread().stackTrace
 		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "add response : ${responseData.thisPK}")
 		logRepository.save(logModel)

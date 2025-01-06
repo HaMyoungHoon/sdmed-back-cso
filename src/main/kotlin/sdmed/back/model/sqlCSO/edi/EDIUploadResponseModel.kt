@@ -13,7 +13,13 @@ data class EDIUploadResponseModel(
 	@Column(columnDefinition = "nvarchar(36)", updatable = false, nullable = false)
 	var ediPK: String = "",
 	@Column(columnDefinition = "nvarchar(36)", updatable = false, nullable = false)
+	var pharmaPK: String = "",
+	@Column(columnDefinition = "nvarchar(255)", updatable = false, nullable = false)
+	var pharmaName: String = "",
+	@Column(columnDefinition = "nvarchar(36)", updatable = false, nullable = false)
 	var userPK: String = "",
+	@Column(columnDefinition = "nvarchar(255)")
+	var userName: String = "",
 	@Column(columnDefinition = "nvarchar(max)")
 	var etc: String = "",
 	@Column(updatable = false, nullable = false)
