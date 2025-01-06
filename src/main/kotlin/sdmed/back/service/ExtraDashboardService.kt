@@ -86,11 +86,7 @@ class ExtraDashboardService: FServiceBase() {
 			this.name = howMuchModel.first().hospitalName
 			this.count = howMuchModel.sumOf { it.count }
 			this.price = howMuchModel.sumOf { it.count * it.price.toDouble() * it.charge / 100 }
-			this.ediState = if (howMuchModel.all { it.ediState == EDIState.OK }) EDIState.OK
-			else if (howMuchModel.any { it.ediState == EDIState.OK }) EDIState.Partial
-			else if (howMuchModel.any { it.ediState == EDIState.Pending }) EDIState.Pending
-			else if (howMuchModel.all { it.ediState == EDIState.Reject }) EDIState.Reject
-			else EDIState.None
+			this.ediState = FExtensions.ediStateParse(howMuchModel.map { it.ediState })
 		}
 	}
 	private fun gatheringItemByPharma(pharmaPK: String, howMuchModel: List<HowMuchModel>): HowMuchPharmaModel {
@@ -99,11 +95,7 @@ class ExtraDashboardService: FServiceBase() {
 			this.name = howMuchModel.first().pharmaName
 			this.count = howMuchModel.sumOf { it.count }
 			this.price = howMuchModel.sumOf { it.count * it.price.toDouble() * it.charge / 100 }
-			this.ediState = if (howMuchModel.all { it.ediState == EDIState.OK }) EDIState.OK
-			else if (howMuchModel.any { it.ediState == EDIState.OK }) EDIState.Partial
-			else if (howMuchModel.any { it.ediState == EDIState.Pending }) EDIState.Pending
-			else if (howMuchModel.all { it.ediState == EDIState.Reject }) EDIState.Reject
-			else EDIState.None
+			this.ediState = FExtensions.ediStateParse(howMuchModel.map { it.ediState })
 		}
 	}
 	private fun gatheringItemByMedicine(medicinePK: String, howMuchModel: List<HowMuchModel>): HowMuchMedicineModel {
@@ -112,11 +104,7 @@ class ExtraDashboardService: FServiceBase() {
 			this.name = howMuchModel.first().medicineName
 			this.count = howMuchModel.sumOf { it.count }
 			this.price = howMuchModel.sumOf { it.count * it.price.toDouble() * it.charge / 100 }
-			this.ediState = if (howMuchModel.all { it.ediState == EDIState.OK }) EDIState.OK
-			else if (howMuchModel.any { it.ediState == EDIState.OK }) EDIState.Partial
-			else if (howMuchModel.any { it.ediState == EDIState.Pending }) EDIState.Pending
-			else if (howMuchModel.all { it.ediState == EDIState.Reject }) EDIState.Reject
-			else EDIState.None
+			this.ediState = FExtensions.ediStateParse(howMuchModel.map { it.ediState })
 		}
 	}
 }
