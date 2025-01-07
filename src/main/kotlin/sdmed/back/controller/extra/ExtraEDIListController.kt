@@ -33,6 +33,6 @@ class ExtraEDIListController: FControllerBase() {
 	@PostMapping(value = ["/file/{thisPK}"])
 	fun postEDIUpload(@RequestHeader token: String,
 										@PathVariable thisPK: String,
-										@RequestBody ediUploadFileModel: EDIUploadFileModel) =
+										@RequestBody ediUploadFileModel: List<EDIUploadFileModel>) =
 		responseService.getResult(ediRequestService.postEDIFileUpload(token, thisPK, ediUploadFileModel))
 }
