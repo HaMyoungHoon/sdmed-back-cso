@@ -51,7 +51,7 @@ object FConstants {
 	const val MODEL_USER_COMPANY_ADDRESS = "회사주소"
 	const val MODEL_USER_BANK_ACCOUNT = "은행계좌번호"
 	const val MODEL_USER_COUNT = 12
-	const val MODEL_USER_INSERT_INTO = "INSERT INTO UserDataModel (thisPK, id, pw, name, mail, phoneNumber, role, dept, status, companyName, companyNumber, companyAddress, bankAccount, regDate, taxpayerImageUrl, bankAccountImageUrl) VALUES "
+	const val MODEL_USER_INSERT_INTO = "INSERT INTO UserDataModel (thisPK, id, pw, name, mail, phoneNumber, role, dept, status, companyName, companyNumber, companyAddress, bankAccount, regDate) VALUES "
 	const val MODEL_USER_CHILD_INSERT_INTO = "INSERT INTO UserChildPKModel (thisPK, motherPK, childPK) VALUES "
 	const val MODEL_USER_CHILD_DELETE_BY_MOTHER_PK = "DELETE FROM UserChildPKModel WHERE motherPK =  "
 
@@ -144,6 +144,8 @@ object FConstants {
 	const val MODEL_PHARMA_MEDICINE_PARSE_MEDICINE_CODE = "제품코드"
 	const val MODEL_PHARMA_MEDICINE_PARSE_COUNT = 4
 
+	const val NEW_HOSPITAL_CODE = "-99999"
+	const val NEW_HOSPITAL_NAME = "신규처"
 
 	// 숫자, 문자(영대소한글)
 	const val REGEX_CHECK_PASSWORD_0 = "^(?=.*[A-Za-z가-힣ㄱ-ㅎㅏ-ㅣ])(?=.*\\d)[A-Za-z가-힣ㄱ-ㅎㅏ-ㅣ\\d]{8,20}\$"

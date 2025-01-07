@@ -3,6 +3,7 @@ package sdmed.back.service
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.transaction.annotation.Transactional
 import sdmed.back.advice.exception.*
+import sdmed.back.config.FConstants
 import sdmed.back.config.FExtensions
 import sdmed.back.config.jpa.CSOJPAConfig
 import sdmed.back.model.common.RequestType
@@ -10,6 +11,7 @@ import sdmed.back.model.common.user.UserRole
 import sdmed.back.model.common.user.UserRoles
 import sdmed.back.model.sqlCSO.LogModel
 import sdmed.back.model.sqlCSO.edi.*
+import sdmed.back.model.sqlCSO.hospital.HospitalModel
 import sdmed.back.model.sqlCSO.medicine.MedicineModel
 import sdmed.back.model.sqlCSO.request.RequestModel
 import sdmed.back.repository.sqlCSO.IUserRelationRepository
@@ -191,6 +193,57 @@ class EDIRequestService: EDIService() {
 		logRepository.save(logModel)
 		return ret
 	}
+	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
+	fun postNewEDIData(token: String, ediUploadModel: EDIUploadModel): EDIUploadModel {
+		isValid(token)
+		val tokenUser = getUserDataByToken(token)
+		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.BusinessMan))) {
+			throw AuthenticationEntryPointException()
+		}
+
+		if (!canIUseApplyDate(token, ediUploadModel.year, ediUploadModel.month)) {
+			throw NotValidOperationException("${ediUploadModel.year}-${ediUploadModel.month}")
+		}
+
+		val serverTime = Date()
+		val serverTimeDay = FExtensions.parseDateTimeString(serverTime, "dd") ?: throw NotValidOperationException()
+		ediUploadModel.thisPK = UUID.randomUUID().toString()
+		ediUploadModel.day = serverTimeDay
+		ediUploadModel.regDate = serverTime
+		ediUploadModel.userPK = tokenUser.thisPK
+		ediUploadModel.name = tokenUser.name
+		var hospital = hospitalRepository.selectByNewHospital()
+		if (hospital == null) {
+			hospital = hospitalRepository.save(HospitalModel().apply {
+				code = FConstants.NEW_HOSPITAL_CODE
+				orgName = FConstants.NEW_HOSPITAL_NAME
+				innerName = FConstants.NEW_HOSPITAL_NAME
+			})
+		}
+
+		ediUploadModel.orgName = hospital.orgName
+		ediUploadModel.pharmaList = mutableListOf()
+		ediUploadModel.ediState = EDIState.None
+		ediUploadModel.regDate = serverTime
+		ediUploadModel.fileList.onEach {
+			it.thisPK = UUID.randomUUID().toString()
+			it.ediPK = ediUploadModel.thisPK
+		}
+
+		val ret = ediUploadRepository.save(ediUploadModel)
+		ediUploadFileRepository.saveAll(ediUploadModel.fileList)
+		requestRepository.save(RequestModel().apply {
+			requestUserPK = tokenUser.thisPK
+			requestItemPK = ediUploadModel.thisPK
+			requestUserName = tokenUser.name
+			requestType = RequestType.EDIUpload
+		})
+		val stackTrace = Thread.currentThread().stackTrace
+		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "add edi upload : ${ediUploadModel.thisPK} ${ediUploadModel.year}-${ediUploadModel.month}-${ediUploadModel.day}")
+		logRepository.save(logModel)
+		return ret
+	}
+
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
 	fun postEDIFileUpload(token: String, thisPK: String, ediUploadFileModel: List<EDIUploadFileModel>): List<EDIUploadFileModel> {
 		isValid(token)

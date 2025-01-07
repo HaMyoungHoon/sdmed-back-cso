@@ -3,6 +3,7 @@ package sdmed.back.repository.sqlCSO
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.stereotype.Repository
+import sdmed.back.config.FConstants
 import sdmed.back.model.sqlCSO.hospital.HospitalModel
 
 @Repository
@@ -26,4 +27,8 @@ interface IHospitalRepository: JpaRepository<HospitalModel, String> {
 			"WHERE a.inVisible = :inVisible " +
 			"ORDER BY a.code ASC")
 	fun selectAllByInVisibleOrderByCode(inVisible: Boolean = false): List<HospitalModel>
+
+	@Query("SELECT a FROM HospitalModel a " +
+			"WHERE a.code = :code AND a.orgName = :orgName")
+	fun selectByNewHospital(code: String = FConstants.NEW_HOSPITAL_CODE, orgName: String = FConstants.NEW_HOSPITAL_NAME): HospitalModel?
 }

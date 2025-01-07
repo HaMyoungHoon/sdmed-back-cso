@@ -47,4 +47,10 @@ class ExtraEDIRequestController: FControllerBase() {
 	fun postData(@RequestHeader token: String,
 							 @RequestBody ediUploadModel: EDIUploadModel) =
 		responseService.getResult(ediRequestService.postEDIData(token, ediUploadModel))
+
+	@Operation(summary = "edi 신규처 업로드")
+	@PostMapping(value = ["/data/new"])
+	fun postNewData(@RequestHeader token: String,
+									@RequestBody ediUploadModel: EDIUploadModel) =
+		responseService.getResult(ediRequestService.postNewEDIData(token, ediUploadModel))
 }
