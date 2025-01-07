@@ -16,7 +16,7 @@ data class PharmaModel(
 	@Id
 	@Column(columnDefinition = "nvarchar(36)", updatable = false, nullable = false)
 	var thisPK: String = UUID.randomUUID().toString(),
-	@Column(columnDefinition = "nvarchar(50)", nullable = false)
+	@Column(columnDefinition = "nvarchar(50)", nullable = false, unique = true)
 	var code: String = "",
 	@Column(columnDefinition = "nvarchar(255)", nullable = false)
 	var orgName: String = "",
