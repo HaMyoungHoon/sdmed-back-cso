@@ -48,19 +48,30 @@ class UserMappingService: UserService() {
 		var realPair = hosPharmaMedicinePairModel.filter { x -> x.hosPK in existHos.map { y -> y.thisPK } }
 		val existPharma = pharmaRepository.findAllByThisPKIn(realPair.map { it.pharmaPK })
 		realPair = realPair.filter { x -> x.pharmaPK in existPharma.map { y -> y.thisPK } }
+		val emptyMedicinePair = realPair.filter { x -> x.medicinePK == "" }
 		val existMedicine = medicineRepository.findAllByThisPKIn(realPair.map { it.medicinePK })
 		realPair = realPair.filter { x -> x.medicinePK in existMedicine.map { y -> y.thisPK } }
 
 		deleteRelationByUserPK(userData.thisPK)
-		if (realPair.isEmpty()) {
+		if (realPair.isEmpty() && emptyMedicinePair.isEmpty()) {
 			return userData
 		}
-		insertRelation(realPair.map { x -> UserHosPharmaMedicinePairModel().apply {
-			this.userPK = userData.thisPK
-			this.hosPK = x.hosPK
-			this.pharmaPK = x.pharmaPK
-			this.medicinePK = x.medicinePK
-		}})
+		if (realPair.isNotEmpty()) {
+			insertRelation(realPair.map { x -> UserHosPharmaMedicinePairModel().apply {
+				this.userPK = userData.thisPK
+				this.hosPK = x.hosPK
+				this.pharmaPK = x.pharmaPK
+				this.medicinePK = x.medicinePK
+			}})
+		}
+		if (emptyMedicinePair.isNotEmpty()) {
+			insertRelation(emptyMedicinePair.map { x -> UserHosPharmaMedicinePairModel().apply {
+				this.userPK = userData.thisPK
+				this.hosPK = x.hosPK
+				this.pharmaPK = x.pharmaPK
+				this.medicinePK = x.medicinePK
+			}})
+		}
 
 		val stackTrace = Thread.currentThread().stackTrace
 		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "${userData.id} hos-pharma-medicine relation change")
