@@ -13,6 +13,8 @@ import sdmed.back.model.sqlCSO.*
 import sdmed.back.model.sqlCSO.hospital.HospitalModel
 import sdmed.back.model.sqlCSO.request.RequestModel
 import sdmed.back.model.sqlCSO.user.UserDataModel
+import sdmed.back.model.sqlCSO.user.UserFileModel
+import sdmed.back.model.sqlCSO.user.UserFileType
 import sdmed.back.repository.sqlCSO.*
 import java.sql.Timestamp
 import java.util.*
@@ -54,6 +56,7 @@ class UserService: FServiceBase() {
 	}
 	fun getUserDataByPK(thisPK: String, childView: Boolean = false, relationView: Boolean = false, pharmaOwnMedicineView: Boolean = false): UserDataModel {
 		val ret = userDataRepository.findByThisPK(thisPK) ?: throw UserNotFoundException()
+		ret.fileList = userFileRepository.findAllByUserPK(ret.thisPK).toMutableList()
 		if (childView) {
 			userChildPKRepository.selectAllByMotherPK(thisPK).let {
 				if (it.isNotEmpty()) {
@@ -181,32 +184,31 @@ class UserService: FServiceBase() {
 	}
 
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
-	fun userTaxImageUrlModify(token: String, userPK: String, url: String): UserDataModel {
+	fun userFileUrlModify(token: String, userPK: String, blobModel: BlobUploadModel, userFileType: UserFileType): UserFileModel {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.UserChanger))) {
 			throw AuthenticationEntryPointException()
 		}
 		val user = getUserDataByPK(userPK)
-		user.taxpayerImageUrl = url
-		val ret = userDataRepository.save(user)
-		val stackTrace = Thread.currentThread().stackTrace
-		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "${user.id} taxImage : ${user.taxpayerImageUrl}")
-		logRepository.save(logModel)
-		return ret
-	}
-	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
-	fun userBankImageUrlModify(token: String, userPK: String, url: String): UserDataModel {
-		isValid(token)
-		val tokenUser = getUserDataByToken(token)
-		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.UserChanger))) {
-			throw AuthenticationEntryPointException()
+		val userFile = userFileRepository.findByUserPKAndUserFileType(user.thisPK, userFileType)
+		val ret = if (userFile == null) {
+			userFileRepository.save(UserFileModel().apply {
+				this.userPK = user.thisPK
+				this.blobUrl = blobModel.blobUrl
+				this.originalFilename = blobModel.originalFilename
+				this.mimeType = blobModel.mimeType
+				this.userFileType = userFileType
+			})
+		} else {
+			userFileRepository.save(userFile.apply {
+				this.blobUrl = blobModel.blobUrl
+				this.originalFilename = blobModel.originalFilename
+				this.mimeType = blobModel.mimeType
+			})
 		}
-		val user = getUserDataByPK(userPK)
-		user.bankAccountImageUrl = url
-		val ret = userDataRepository.save(user)
 		val stackTrace = Thread.currentThread().stackTrace
-		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "${user.id} bankImage : ${user.bankAccountImageUrl}")
+		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "${user.id} ${userFileType} : ${blobModel.blobUrl}")
 		logRepository.save(logModel)
 		return ret
 	}

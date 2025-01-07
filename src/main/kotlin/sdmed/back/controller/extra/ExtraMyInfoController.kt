@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*
 import sdmed.back.config.FControllerBase
 import sdmed.back.model.common.IRestResult
 import sdmed.back.model.sqlCSO.BlobUploadModel
+import sdmed.back.model.sqlCSO.user.UserFileType
 import sdmed.back.service.MyInfoService
 
 
@@ -32,20 +33,13 @@ class ExtraMyInfoController: FControllerBase() {
 	                      @RequestParam confirmPW: String) =
 		responseService.getResult(myInfoService.passwordChange(token, currentPW, afterPW, confirmPW))
 
-	@Operation(summary = "유저 세금계산서 이미지 url 변경")
-	@PutMapping(value = ["/file/{thisPK}/taxImage"])
-	fun putUserTaxImageUrl(@RequestHeader token: String,
-	                       @PathVariable thisPK: String,
-	                       @RequestBody blobModel: BlobUploadModel) =
-		responseService.getResult(myInfoService.userTaxImageUrlModify(token, thisPK, blobModel.blobUrl).apply {
-			azureBlobService.blobUploadSave(blobModel.newSave())
-		})
-	@Operation(summary = "유저 통장 이미지 url 변경")
-	@PutMapping(value = ["/file/{thisPK}/bankImage"])
-	fun putUserBankImageUrl(@RequestHeader token: String,
+	@Operation(summary = "유저 파일 이미지 url 변경")
+	@PutMapping(value = ["/file/{thisPK}"])
+	fun putUserFileImageUrl(@RequestHeader token: String,
 	                        @PathVariable thisPK: String,
+	                        @RequestParam userFileType: UserFileType,
 	                        @RequestBody blobModel: BlobUploadModel) =
-		responseService.getResult(myInfoService.userBankImageUrlModify(token, thisPK, blobModel.blobUrl).apply {
+		responseService.getResult(myInfoService.userFileUrlModify(token, thisPK, blobModel, userFileType).apply {
 			azureBlobService.blobUploadSave(blobModel.newSave())
 		})
 }

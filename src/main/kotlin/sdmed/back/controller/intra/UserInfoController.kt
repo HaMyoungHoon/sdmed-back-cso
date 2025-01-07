@@ -13,6 +13,7 @@ import sdmed.back.config.*
 import sdmed.back.model.common.IRestResult
 import sdmed.back.model.sqlCSO.BlobUploadModel
 import sdmed.back.model.sqlCSO.user.UserDataModel
+import sdmed.back.model.sqlCSO.user.UserFileType
 import sdmed.back.service.UserInfoService
 
 @Tag(name = "유저세팅/정보")
@@ -66,20 +67,13 @@ class UserInfoController: FControllerBase() {
 	fun putUser(@RequestHeader token: String,
 							@RequestBody userData: UserDataModel) =
 		responseService.getResult(userInfoService.userDataModify(token, userData))
-	@Operation(summary = "유저 세금계산서 이미지 url 변경")
-	@PutMapping(value = ["/file/{thisPK}/taxImage"])
-	fun putUserTaxImageUrl(@RequestHeader token: String,
-												 @PathVariable thisPK: String,
-												 @RequestBody blobModel: BlobUploadModel) =
-		responseService.getResult(userInfoService.userTaxImageUrlModify(token, thisPK, blobModel.blobUrl).apply {
-			azureBlobService.blobUploadSave(blobModel.newSave())
-		})
-	@Operation(summary = "유저 통장 이미지 url 변경")
-	@PutMapping(value = ["/file/{thisPK}/bankImage"])
-	fun putUserBankImageUrl(@RequestHeader token: String,
-	                        @PathVariable thisPK: String,
-	                        @RequestBody blobModel: BlobUploadModel) =
-		responseService.getResult(userInfoService.userBankImageUrlModify(token, thisPK, blobModel.blobUrl).apply {
+	@Operation(summary = "유저 파일 이미지 url 변경")
+	@PutMapping(value = ["/file/{thisPK}"])
+	fun putUserFileImageUrl(@RequestHeader token: String,
+													@PathVariable thisPK: String,
+	                        @RequestParam userFileType: UserFileType,
+													@RequestBody blobModel: BlobUploadModel) =
+		responseService.getResult(userInfoService.userFileUrlModify(token, thisPK, blobModel, userFileType).apply {
 			azureBlobService.blobUploadSave(blobModel.newSave())
 		})
 }

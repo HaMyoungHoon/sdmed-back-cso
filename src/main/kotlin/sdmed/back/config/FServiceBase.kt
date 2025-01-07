@@ -14,15 +14,13 @@ import sdmed.back.model.sqlCSO.medicine.MedicineIngredientModel
 import sdmed.back.model.sqlCSO.medicine.MedicineModel
 import sdmed.back.model.sqlCSO.medicine.MedicineSubModel
 import sdmed.back.model.sqlCSO.user.UserDataModel
-import sdmed.back.repository.sqlCSO.ILogRepository
-import sdmed.back.repository.sqlCSO.IRequestRepository
-import sdmed.back.repository.sqlCSO.IUserChildPKRepository
-import sdmed.back.repository.sqlCSO.IUserDataRepository
+import sdmed.back.repository.sqlCSO.*
 
 @Service
 open class FServiceBase {
 	@Autowired lateinit var jwtTokenProvider: JwtTokenProvider
 	@Autowired lateinit var userDataRepository: IUserDataRepository
+	@Autowired lateinit var userFileRepository: IUserFileRepository
 	@Autowired lateinit var userChildPKRepository: IUserChildPKRepository
 	@Autowired lateinit var requestRepository: IRequestRepository
 	@Autowired lateinit var logRepository: ILogRepository

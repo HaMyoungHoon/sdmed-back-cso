@@ -36,16 +36,12 @@ data class UserDataModel(
 	var dept: Int = UserDept.None.flag,
 	@Column
 	var status: UserStatus = UserStatus.None,
-	@Column(columnDefinition = "nvarchar(max)", nullable = false)
-	var taxpayerImageUrl: String = "",
 	@Column(columnDefinition = "nvarchar(255)", nullable = false)
 	var companyName: String = "",
 	@Column(columnDefinition = "nvarchar(255)", nullable = false)
 	var companyNumber: String = "",
 	@Column(columnDefinition = "nvarchar(255)", nullable = false)
 	var companyAddress: String = "",
-	@Column(columnDefinition = "nvarchar(max)", nullable = false)
-	var bankAccountImageUrl: String = "",
 	@Column(columnDefinition = "nvarchar(255)", nullable = false)
 	var bankAccount: String = "",
 	@Column
@@ -57,7 +53,9 @@ data class UserDataModel(
 	@Transient
 	var children: MutableList<UserDataModel> = mutableListOf(),
 	@Transient
-	var hosList: MutableList<HospitalModel> = mutableListOf()
+	var hosList: MutableList<HospitalModel> = mutableListOf(),
+	@Transient
+	var fileList: MutableList<UserFileModel> = mutableListOf(),
 ) {
 	fun safeCopy(data: UserDataModel): UserDataModel {
 		this.name = data.name
@@ -66,11 +64,9 @@ data class UserDataModel(
 		this.role = data.role
 		this.dept = data.dept
 		this.status = data.status
-		this.taxpayerImageUrl = data.taxpayerImageUrl
 		this.companyName = data.companyName
 		this.companyNumber = data.companyNumber
 		this.companyAddress = data.companyAddress
-		this.bankAccountImageUrl = data.bankAccountImageUrl
 		this.bankAccount = data.bankAccount
 		return this
 	}
@@ -203,7 +199,7 @@ data class UserDataModel(
 		val companyAddress = FExtensions.escapeString(companyAddress)
 		val bankAccount = FExtensions.escapeString(bankAccount)
 		val regDateString = FExtensions.parseDateTimeString(regDate, "yyyy-MM-dd HH:mm:ss")
-		return "('$thisPK', '$id', '$pw', '$name', '$mail', '$phoneNumber', '$role', '$dept', '${status.index}', '$companyName', '$companyNumber', '$companyAddress', '$bankAccount', '$regDateString', '$taxpayerImageUrl', '$bankAccountImageUrl')"
+		return "('$thisPK', '$id', '$pw', '$name', '$mail', '$phoneNumber', '$role', '$dept', '${status.index}', '$companyName', '$companyNumber', '$companyAddress', '$bankAccount', '$regDateString')"
 	}
 
 	override fun toString(): String {
@@ -215,11 +211,9 @@ data class UserDataModel(
 		ret += "role: ${role}, "
 		ret += "dept: ${dept}, "
 		ret += "status: ${status}, "
-		ret += "taxpayerImageUrl: ${taxpayerImageUrl}, "
 		ret += "companyName: ${companyName}, "
 		ret += "companyNumber: ${companyNumber}, "
 		ret += "companyAddress: ${companyAddress}, "
-		ret += "bankAccountImageUrl: ${bankAccountImageUrl}, "
 		ret += "bankAccount: ${bankAccount}"
 		return ret
 	}
