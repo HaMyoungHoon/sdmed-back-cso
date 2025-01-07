@@ -144,6 +144,13 @@ object FConstants {
 	const val MODEL_PHARMA_MEDICINE_PARSE_MEDICINE_CODE = "제품코드"
 	const val MODEL_PHARMA_MEDICINE_PARSE_COUNT = 4
 
+
+	// 숫자, 문자(영대소한글)
+	const val REGEX_CHECK_PASSWORD_0 = "^(?=.*[A-Za-z가-힣ㄱ-ㅎㅏ-ㅣ])(?=.*\\d)[A-Za-z가-힣ㄱ-ㅎㅏ-ㅣ\\d]{8,20}\$"
+	// 숫자, 특수문자, 문자(영대소한글)
+	const val REGEX_CHECK_PASSWORD_1 = "^(?=.*[A-Za-z가-힣ㄱ-ㅎㅏ-ㅣ])(?=.*\\d)(?=.*[@\$!%*#?&])[A-Za-z가-힣ㄱ-ㅎㅏ-ㅣ\\d@\$!%*#?&]{8,20}\$"
+	// 숫자, 대문자, 소문자
+	const val REGEX_CHECK_PASSWORD_2 = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{8,20}\$"
 	const val REGEX_ONLY_ALPHABET = "[^a-zA-Z0-9]"
 	const val REGEX_SPECIAL_CHAR_REMOVE = "[^가-힣a-zA-Z0-9\\s]"
 	const val REGEX_ESCAPE_SQL = "(['\"])"

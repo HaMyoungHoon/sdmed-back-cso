@@ -5,6 +5,7 @@ import sdmed.back.advice.exception.AuthenticationEntryPointException
 import sdmed.back.advice.exception.ConfirmPasswordUnMatchException
 import sdmed.back.advice.exception.CurrentPWNotMatchException
 import sdmed.back.advice.exception.SignUpPWConditionException
+import sdmed.back.config.FExtensions
 import sdmed.back.config.jpa.CSOJPAConfig
 import sdmed.back.model.common.user.UserRole
 import sdmed.back.model.common.user.UserRoles
@@ -29,7 +30,7 @@ class MyInfoService: UserService() {
 		if (tokenUser.pw != fAmhohwa.encrypt(currentPW)) {
 			throw CurrentPWNotMatchException()
 		}
-		if (afterPW.length < 4) {
+		if (FExtensions.regexPasswordCheck(afterPW) != true) {
 			throw SignUpPWConditionException()
 		}
 		if (afterPW != confirmPW) {

@@ -3,6 +3,7 @@ package sdmed.back.service
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.transaction.annotation.Transactional
 import sdmed.back.advice.exception.*
+import sdmed.back.config.FExtensions
 import sdmed.back.config.FServiceBase
 import sdmed.back.config.jpa.CSOJPAConfig
 import sdmed.back.model.common.RequestType
@@ -89,7 +90,7 @@ class UserService: FServiceBase() {
 		if (data.id.length < 3) {
 			throw SignUpIDConditionException()
 		}
-		if (data.pw.length < 3) {
+		if (FExtensions.regexPasswordCheck(data.pw) != true) {
 			throw SignUpFailedException()
 		}
 		if (data.pw != confirmPW) {
