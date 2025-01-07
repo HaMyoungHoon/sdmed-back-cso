@@ -3,10 +3,12 @@ package sdmed.back.controller.extra
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.web.bind.annotation.*
 import sdmed.back.config.FControllerBase
 import sdmed.back.model.sqlCSO.edi.EDIUploadModel
 import sdmed.back.service.EDIRequestService
+import java.util.Date
 
 @Tag(name = "EDI 요청")
 @RestController
@@ -21,15 +23,17 @@ class ExtraEDIRequestController: FControllerBase() {
 
 	@Operation(summary = "내가 가진 병원 목록")
 	@GetMapping(value = ["/list/hospital"])
-	fun getHospitalList(@RequestHeader token: String) =
-		responseService.getResult(ediRequestService.getHospitalList(token))
+	fun getHospitalList(@RequestHeader token: String,
+											@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) applyDate: Date) =
+		responseService.getResult(ediRequestService.getHospitalList(token, applyDate))
 
 	@Operation(summary = "내가 가진 병원의 제약사 목록")
 	@GetMapping(value = ["/list/pharma/{hosPK}"])
 	fun getPharmaList(@RequestHeader token: String,
 										@PathVariable hosPK: String,
+										@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) applyDate: Date,
 										@RequestParam(required = false) withMedicine: Boolean = true) =
-		responseService.getResult(ediRequestService.getPharmaList(token, hosPK, withMedicine))
+		responseService.getResult(ediRequestService.getPharmaList(token, hosPK, applyDate, withMedicine))
 
 	@Operation(summary = "내가 가진 병원의 제약사의 약품 목록")
 	@GetMapping(value = ["/list/medicine/{hosPK}"])

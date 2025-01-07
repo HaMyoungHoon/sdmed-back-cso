@@ -10,7 +10,6 @@ import sdmed.back.model.common.user.UserRole
 import sdmed.back.model.common.user.UserRoles
 import sdmed.back.model.sqlCSO.LogModel
 import sdmed.back.model.sqlCSO.edi.*
-import sdmed.back.model.sqlCSO.hospital.HospitalModel
 import sdmed.back.model.sqlCSO.medicine.MedicineModel
 import sdmed.back.model.sqlCSO.request.RequestModel
 import sdmed.back.repository.sqlCSO.IUserRelationRepository
@@ -27,28 +26,43 @@ class EDIRequestService: EDIService() {
 
 		return ediApplyDateRepository.selectAllByUse()
 	}
-	fun getHospitalList(token: String): List<HospitalModel> {
+	fun getHospitalList(token: String, applyDate: Date, withChild: Boolean = true): List<EDIHosBuffModel> {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.BusinessMan))) {
 			throw AuthenticationEntryPointException()
 		}
+		val year = FExtensions.parseDateTimeString(applyDate, "yyyy") ?: throw NotValidOperationException()
+		val month = FExtensions.parseDateTimeString(applyDate, "MM") ?: throw NotValidOperationException()
+		val ret = userRelationRepository.selectAllMyHospital(tokenUser.thisPK).distinctBy { it.thisPK }
+		val pharma = userRelationRepository.selectAllMyPharmaAbleIn(tokenUser.thisPK, ret.map { it.thisPK }, year, month).distinctBy { Pair(it.thisPK, it.hosPK) }
+		if (withChild) {
+			val medicine = userRelationRepository.selectAllMyMedicineIn(tokenUser.thisPK, ret.map { it.thisPK }).distinctBy { it.thisPK }.filter { it.pharmaPK in pharma.map { it.thisPK } }
+			mergePharmaMedicine(pharma, medicine)
+			mergeHosPharma(ret, pharma)
+			return ret.toMutableList().apply {
+				removeIf { it.pharmaList.isEmpty() }
+			}
+		}
 
-		return userRelationRepository.selectAllMyHospital(tokenUser.thisPK)
+		return ret
 	}
-	fun getPharmaList(token: String, hosPK: String, withMedicine: Boolean = true): List<EDIPharmaBuffModel> {
+	fun getPharmaList(token: String, hosPK: String, applyDate: Date, withMedicine: Boolean = true): List<EDIPharmaBuffModel> {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.BusinessMan))) {
 			throw AuthenticationEntryPointException()
 		}
 
-		val ret = userRelationRepository.selectAllMyPharma(tokenUser.thisPK, hosPK).distinctBy { it.thisPK }
+		val year = FExtensions.parseDateTimeString(applyDate, "yyyy") ?: throw NotValidOperationException()
+		val month = FExtensions.parseDateTimeString(applyDate, "MM") ?: throw NotValidOperationException()
+		val ret = userRelationRepository.selectAllMyPharmaAble(tokenUser.thisPK, hosPK, year, month).distinctBy { it.thisPK }
 		if (withMedicine) {
 			val pharmaPK = ret.map { it.thisPK }
 			val medicine = userRelationRepository.selectAllMyMedicine(tokenUser.thisPK, hosPK).distinctBy { it.thisPK }.filter { it.pharmaPK in pharmaPK }
 			mergePharmaMedicine(ret, medicine)
 		}
+
 		return ret
 	}
 	fun getMedicineList(token: String, hosPK: String, pharmaPK: List<String>): List<EDIMedicineBuffModel> {
@@ -114,7 +128,7 @@ class EDIRequestService: EDIService() {
 		val realPharma = realPharmaCheck(ediUploadModel.thisPK, ediUploadModel.pharmaList, existPharmaList)
 		val existMedicineList = medicineRepository.findAllByThisPKIn(realPharma.flatMap { x -> x.medicineList.map { y -> y.medicinePK } }).filter { !it.inVisible }
 
-		val kdCodeString = existMedicineList.map { it.kdCode }
+		val kdCodeString = existMedicineList.map { it.kdCode }.distinct()
 		val yearMonthDay = "${ediUploadModel.year}-${ediUploadModel.month}-${ediUploadModel.day}"
 		val medicinePriceList = medicinePriceRepository.selectAllByRecentDataKDCodeInAndYearMonth(kdCodeString, yearMonthDay)
 		val existMedicineNewData = mutableListOf<MedicineModel>()
@@ -154,7 +168,7 @@ class EDIRequestService: EDIService() {
 		}
 
 		// 지금 Reject 상태가 아닌 pharma, year, month 가 있을 경우 제거함.
-		ediUploadModel.pharmaList.removeIf { it.medicineList.isEmpty() }
+//		ediUploadModel.pharmaList.removeIf { it.medicineList.isEmpty() }
 		val notRejectPharma = ediUploadPharmaRepository.selectAllByMyNotReject(tokenUser.thisPK, ediUploadModel.year, ediUploadModel.month).map { Triple(it.pharmaPK, it.year, it.month) }
 		ediUploadModel.pharmaList = ediUploadModel.pharmaList.filterNot { Triple(it.pharmaPK, it.year, it.month) in notRejectPharma }.toMutableList()
 
@@ -178,7 +192,7 @@ class EDIRequestService: EDIService() {
 		return ret
 	}
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
-	fun postEDIFileUpload(token: String, thisPK: String, ediUploadFileModel: EDIUploadFileModel): EDIUploadFileModel {
+	fun postEDIFileUpload(token: String, thisPK: String, ediUploadFileModel: List<EDIUploadFileModel>): List<EDIUploadFileModel> {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.BusinessMan))) {
@@ -186,19 +200,19 @@ class EDIRequestService: EDIService() {
 		}
 
 		val data = ediUploadRepository.findByThisPK(thisPK) ?: throw EDIUploadNotExistException()
-		if (data.ediState == EDIState.OK) {
+		if (data.ediState == EDIState.OK || data.ediState == EDIState.Reject) {
 			throw NotValidOperationException()
 		}
 
-		val ret = ediUploadFileRepository.save(EDIUploadFileModel().apply {
+		val ret = ediUploadFileRepository.saveAll(ediUploadFileModel.map { x -> EDIUploadFileModel().apply {
 			ediPK = data.thisPK
-			blobUrl = ediUploadFileModel.blobUrl
-			originalFilename = ediUploadFileModel.originalFilename
-			mimeType = ediUploadFileModel.mimeType
-		})
+			blobUrl = x.blobUrl
+			originalFilename = x.originalFilename
+			mimeType = x.mimeType
+		}})
 
 		val stackTrace = Thread.currentThread().stackTrace
-		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "add edi file : ${ediUploadFileModel.blobUrl}")
+		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "add edi file : ${ediUploadFileModel.count()}")
 		logRepository.save(logModel)
 		return ret
 	}

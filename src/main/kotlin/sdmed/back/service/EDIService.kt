@@ -101,10 +101,19 @@ class EDIService: FServiceBase() {
 		}
 		return ret
 	}
+	protected fun mergeHosPharma(hosList: List<EDIHosBuffModel>, pharmaList: List<EDIPharmaBuffModel>) {
+		val pharmaMap = pharmaList.groupBy { it.hosPK }
+		for (hos in hosList) {
+			val buff = pharmaMap[hos.thisPK]
+			if (!buff.isNullOrEmpty()) {
+				hos.pharmaList.addAll(buff)
+			}
+		}
+	}
 	protected fun mergePharmaMedicine(pharmaList: List<EDIPharmaBuffModel>, medicineList: List<EDIMedicineBuffModel>) {
 		val medicineMap = medicineList.groupBy { it.pharmaPK }
 		for (pharma in pharmaList) {
-			val buff = medicineMap[pharma.thisPK]
+			val buff = medicineMap[pharma.thisPK]?.filter { it.hosPK == pharma.hosPK }
 			if (!buff.isNullOrEmpty()) {
 				pharma.medicineList.addAll(buff)
 			}

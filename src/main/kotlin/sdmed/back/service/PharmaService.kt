@@ -37,7 +37,7 @@ class PharmaService: FServiceBase() {
 		val ret = pharmaRepository.findByThisPK(pharmaPK) ?: throw PharmaNotFoundException()
 		if (pharmaOwnMedicineView) {
 			val relation = pharmaMedicineRelationRepository.findAllByPharmaPK(pharmaPK)
-			ret.medicineList = medicineRepository.findAllByThisPKIn(relation.map { it.medicinePK }).toMutableList()
+			ret.medicineList = medicineRepository.findAllByThisPKIn(relation.map { it.medicinePK }).sortedBy { it.code }.toMutableList()
 		}
 		return ret
 	}

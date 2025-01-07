@@ -6,5 +6,6 @@ data class EDIMedicineBuffModel(
 	var pharma: String = "",
 	var name: String = "",
 	var pharmaPK: String = "",
+	var hosPK: String = "",
 ) {
 }
