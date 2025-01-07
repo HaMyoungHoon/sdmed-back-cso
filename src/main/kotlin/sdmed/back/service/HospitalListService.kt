@@ -5,6 +5,7 @@ import org.springframework.web.multipart.MultipartFile
 import sdmed.back.advice.exception.AuthenticationEntryPointException
 import sdmed.back.advice.exception.HospitalExistException
 import sdmed.back.advice.exception.HospitalNotFoundException
+import sdmed.back.advice.exception.NotValidOperationException
 import sdmed.back.config.FConstants
 import sdmed.back.config.jpa.CSOJPAConfig
 import sdmed.back.model.common.user.UserRole
@@ -36,6 +37,9 @@ class HospitalListService: HospitalService() {
 		val tokenUser = getUserDataByToken(token)
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.HospitalChanger))) {
 			throw AuthenticationEntryPointException()
+		}
+		if (data.code == FConstants.NEW_HOSPITAL_CODE) {
+			throw NotValidOperationException()
 		}
 
 		val exist = hospitalRepository.findByCode(data.code)
@@ -74,6 +78,7 @@ class HospitalListService: HospitalService() {
 		if (hospitalDataModel.isEmpty()) {
 			return "count : 0"
 		}
+		hospitalDataModel.removeIf { x -> x.code == FConstants.NEW_HOSPITAL_CODE }
 		index = 0
 		var retCount = 0
 		while (true) {
@@ -97,6 +102,9 @@ class HospitalListService: HospitalService() {
 		val tokenUser = getUserDataByToken(token)
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.HospitalChanger))) {
 			throw AuthenticationEntryPointException()
+		}
+		if (data.code == FConstants.NEW_HOSPITAL_CODE) {
+			throw NotValidOperationException()
 		}
 
 		hospitalRepository.findByThisPK(data.thisPK) ?: throw HospitalNotFoundException()
