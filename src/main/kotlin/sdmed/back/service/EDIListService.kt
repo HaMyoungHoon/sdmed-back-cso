@@ -224,4 +224,21 @@ class EDIListService: EDIService() {
 		logRepository.save(logModel)
 		return "count: ${deletableData.count()}"
 	}
+	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
+	fun deleteEDIFile(token: String, thisPK: String): EDIUploadFileModel {
+		isValid(token)
+		val tokenUser = getUserDataByToken(token)
+		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.EdiChanger))) {
+			throw AuthenticationEntryPointException()
+		}
+
+		val data = ediUploadFileRepository.findByThisPK(thisPK) ?: throw EDIFileNotExistException()
+		data.inVisible = true
+		ediUploadFileRepository.save(data)
+//		ediUploadFileRepository.delete(data)
+		val stackTrace = Thread.currentThread().stackTrace
+		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "del edi file : ${data.originalFilename}")
+		logRepository.save(logModel)
+		return data
+	}
 }

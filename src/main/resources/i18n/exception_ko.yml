@@ -169,3 +169,7 @@ ediPharmaDueDateNotExistException:
 ediUploadPharmaExistException:
   code: "-10040"
   msg: "EDI 데이터-제약사가 이미 존재합니다."
+
+ediFileNotExistException:
+  code: "-10041"
+  msg: "EDI 파일이 존재하지 않습니다."

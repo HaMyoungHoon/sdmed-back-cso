@@ -79,4 +79,9 @@ class EDIListController: FControllerBase() {
 															 @RequestParam thisPK: List<String>) =
 		responseService.getResult(ediListService.deleteEDIMedicine(token, thisPK))
 
+	@Operation(summary = "edi file 삭제")
+	@DeleteMapping(value = ["/data/file/{thisPK}"])
+	fun deleteEDIFile(@RequestHeader token: String,
+										@PathVariable thisPK: String) =
+		responseService.getResult(ediListService.deleteEDIFile(token, thisPK))
 }

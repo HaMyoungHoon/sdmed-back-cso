@@ -17,7 +17,9 @@ data class BlobUploadModel(
 	@Column(columnDefinition = "nvarchar(max)")
 	var originalFilename: String = "",
 	@Column(columnDefinition = "nvarchar(100)")
-	var mimeType: String = ""
+	var mimeType: String = "",
+	@Column
+	var regDate: Date = Date()
 	) {
 
 	fun newSave(): BlobUploadModel {

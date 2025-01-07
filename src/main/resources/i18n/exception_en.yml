@@ -169,3 +169,7 @@ ediPharmaDueDateNotExistException:
 ediUploadPharmaExistException:
   code: "-10040"
   msg: "already exist EDI Pharma"
+
+ediFileNotExistException:
+  code: "-10041"
+  msg: "not exist EDI file"

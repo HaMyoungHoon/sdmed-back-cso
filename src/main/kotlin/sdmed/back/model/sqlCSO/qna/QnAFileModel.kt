@@ -18,5 +18,7 @@ data class QnAFileModel(
 	var originalFilename: String = "",
 	@Column(columnDefinition = "nvarchar(100)")
 	var mimeType: String = "",
+	@Column
+	var regDate: Date = Date()
 ) {
 }

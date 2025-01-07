@@ -19,6 +19,8 @@ data class UserFileModel(
 	@Column(columnDefinition = "nvarchar(100)")
 	var mimeType: String = "",
 	@Column
+	var regDate: Date = Date(),
+	@Column
 	var userFileType: UserFileType = UserFileType.Taxpayer
 ) {
 }
