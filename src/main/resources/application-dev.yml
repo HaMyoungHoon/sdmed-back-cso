@@ -77,8 +77,8 @@ str:
     connectionString: DefaultEndpointsProtocol=https;AccountName=mhhablob1;AccountKey=y85lApcIsXQ5znb9/G2axqe8V/dwKfcg0dn8WTtd35vPrFbj/XNv7qOi6aOVBi0Qx8DxLh4ZZMF3+ASt/K9zPA==;EndpointSuffix=core.windows.net
 
 mqtt:
-  brokerUrl1: tcp://back-cso.sdmed.kr:18883
-  brokerUrl2: wss://back-cso.sdemd.kr:18884
+  brokerUrl1: tcp://mqtt-cos.sdmed.co.kr:18883
+  brokerUrl2: wss://mqtt-cso.sdemd.co.kr:18884
   clientId: def-cso-mqtt
   username: cso
   password: csoMQ1234
