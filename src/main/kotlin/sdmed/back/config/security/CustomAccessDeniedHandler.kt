@@ -12,6 +12,6 @@ import java.io.IOException
 class CustomAccessDeniedHandler: AccessDeniedHandler {
 	@Throws(IOException::class, ServletException::class)
 	override fun handle(request: HttpServletRequest, response: HttpServletResponse, accessDeniedException: AccessDeniedException) {
-		response.sendRedirect("/v1/exception/accessDenied")
+		response.sendRedirect("/exception/accessDenied")
 	}
 }

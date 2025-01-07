@@ -6,6 +6,7 @@ import sdmed.back.service.*
 
 @Configuration
 class FServiceConfig {
+	@Bean fun mqttService() = MqttService()
 	@Bean fun dashboardService() = DashboardService()
 	@Bean fun extraDashboardService() = ExtraDashboardService()
 

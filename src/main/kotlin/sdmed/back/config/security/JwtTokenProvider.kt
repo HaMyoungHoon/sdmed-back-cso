@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletRequest
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
+import sdmed.back.advice.exception.UserNotFoundException
 import sdmed.back.config.FConstants
 import sdmed.back.model.sqlCSO.user.UserDataModel
 import sdmed.back.repository.sqlCSO.IUserDataRepository
@@ -29,6 +30,9 @@ class JwtTokenProvider {
 //        secretKey = Base64.getEncoder().encodeToString(secretKey.toByteArray())
 	}
 
+	fun getUserDataID(id: String) = userDataRepository.selectById(id) ?: throw UserNotFoundException()
+	fun getUserDataPK(thisPK: String) = userDataRepository.selectByPK(thisPK) ?: throw UserNotFoundException()
+	fun getUserDataByToken(token: String) = getUserDataID(getAllClaimsFromToken(token).subject)
 	fun getSignKey(): Key = SecretKeySpec(secretKey.toByteArray(), "HmacSHA256")
 	fun getSecretKey(): SecretKey = SecretKeySpec(secretKey.toByteArray(), "HmacSHA256")
 	fun createToken(user: UserDataModel, validTime: Long = tokenValidMS): String {
