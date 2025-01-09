@@ -173,3 +173,7 @@ ediUploadPharmaExistException:
 ediFileNotExistException:
   code: "-10041"
   msg: "EDI 파일이 존재하지 않습니다."
+
+signUpIDExistException:
+  code: "-10042"
+  msg: "이미 존재하는 아이디 입니다."

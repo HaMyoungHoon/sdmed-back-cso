@@ -173,3 +173,7 @@ ediUploadPharmaExistException:
 ediFileNotExistException:
   code: "-10041"
   msg: "not exist EDI file"
+
+signUpIDExistException:
+  code: "-10042"
+  msg: "already exist id"

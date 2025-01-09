@@ -101,7 +101,8 @@ class EDIService: FServiceBase() {
 		}
 		return ret
 	}
-	protected fun mergeHosPharma(hosList: List<EDIHosBuffModel>, pharmaList: List<EDIPharmaBuffModel>) {
+	protected fun mergeHosPharma(hosList: List<EDIHosBuffModel>, pharmaList: MutableList<EDIPharmaBuffModel>) {
+		pharmaList.removeIf { it.medicineList.isEmpty() }
 		val pharmaMap = pharmaList.groupBy { it.hosPK }
 		for (hos in hosList) {
 			val buff = pharmaMap[hos.thisPK]

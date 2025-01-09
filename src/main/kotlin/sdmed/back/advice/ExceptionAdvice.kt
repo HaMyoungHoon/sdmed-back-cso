@@ -238,6 +238,11 @@ class ExceptionAdvice {
 	protected fun ediFileNotExistException(request: HttpServletRequest, exception: EDIFileNotExistException) =
 		responseService.getFailResult(getMessage("ediFileNotExistException.code").toInt(), getMessageMerge("ediFileNotExistException.msg", exception.message))
 
+	@ExceptionHandler(SignUpIDExistException::class)
+	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+	protected fun signUpIDExistException(request: HttpServletRequest, exception: SignUpIDExistException) =
+		responseService.getFailResult(getMessage("signUpIDExistException.code").toInt(), getMessageMerge("signUpIDExistException.msg", exception.message))
+
 	@ExceptionHandler(AsyncRequestTimeoutException::class)
 	@ResponseStatus(HttpStatus.OK)
 	protected fun asyncRequestTimeoutException(request: HttpServletRequest, exception: AsyncRequestTimeoutException): AsyncContext =

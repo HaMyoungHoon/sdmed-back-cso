@@ -39,9 +39,9 @@ class EDIRequestService: EDIService() {
 		val ret = userRelationRepository.selectAllMyHospital(tokenUser.thisPK).distinctBy { it.thisPK }
 		val pharma = userRelationRepository.selectAllMyPharmaAbleIn(tokenUser.thisPK, ret.map { it.thisPK }, year, month).distinctBy { Pair(it.thisPK, it.hosPK) }
 		if (withChild) {
-			val medicine = userRelationRepository.selectAllMyMedicineIn(tokenUser.thisPK, ret.map { it.thisPK }).distinctBy { it.thisPK }.filter { it.pharmaPK in pharma.map { it.thisPK } }
+			val medicine = userRelationRepository.selectAllMyMedicineIn(tokenUser.thisPK, ret.map { it.thisPK }).distinctBy { Triple(it.thisPK, it.pharmaPK, it.hosPK) }.filter { it.pharmaPK in pharma.map { it.thisPK } }
 			mergePharmaMedicine(pharma, medicine)
-			mergeHosPharma(ret, pharma)
+			mergeHosPharma(ret, pharma.toMutableList())
 			return ret.toMutableList().apply {
 				removeIf { it.pharmaList.isEmpty() }
 			}
@@ -170,9 +170,10 @@ class EDIRequestService: EDIService() {
 		}
 
 		// 지금 Reject 상태가 아닌 pharma, year, month 가 있을 경우 제거함.
+		// 아 병원 같은 경우도 있네
 //		ediUploadModel.pharmaList.removeIf { it.medicineList.isEmpty() }
-		val notRejectPharma = ediUploadPharmaRepository.selectAllByMyNotReject(tokenUser.thisPK, ediUploadModel.year, ediUploadModel.month).map { Triple(it.pharmaPK, it.year, it.month) }
-		ediUploadModel.pharmaList = ediUploadModel.pharmaList.filterNot { Triple(it.pharmaPK, it.year, it.month) in notRejectPharma }.toMutableList()
+//		val notRejectPharma = ediUploadPharmaRepository.selectAllByMyNotReject(tokenUser.thisPK, ediUploadModel.year, ediUploadModel.month).map { Triple(it.pharmaPK, it.year, it.month) }
+//		ediUploadModel.pharmaList = ediUploadModel.pharmaList.filterNot { Triple(it.pharmaPK, it.year, it.month) in notRejectPharma }.toMutableList()
 
 		if (ediUploadModel.pharmaList.isEmpty()) {
 			throw EDIUploadPharmaExistException()

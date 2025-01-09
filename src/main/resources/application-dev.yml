@@ -7,8 +7,8 @@ spring:
 #      driver-class-name: com.mysql.jdbc.Driver
 #      jdbc-url: jdbc:mysql://db.mhha.kr:33066/cso
       driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+      #      jdbc-url: jdbc:sqlserver://127.0.0.1:1433;encrypt=true;trustServerCertificate=true
       jdbc-url: jdbc:sqlserver://db.mhha.kr:14333;encrypt=true;trustServerCertificate=true
-#      jdbc-url: jdbc:sqlserver://127.0.0.1:1433;encrypt=true;trustServerCertificate=true
       username: cso
       password: 1234
 
@@ -41,8 +41,8 @@ spring:
 server:
   port: 25800
   ssl:
-    key-store: back.cso.mhha.kr.jks
-    key-store-password: 'back_cso_mhha_ssl'
+    key-store: back-cso.sdmed.co.kr.jks
+    key-store-password: 'back_cso_sdmed_ssl'
   shutdown: immediate
   forward-headers-strategy: native
 
@@ -71,14 +71,15 @@ str:
   version: 1.0.0
   profile: dev
   blob:
+    blobUrl: https://mhhablob1.blob.core.windows.net
     containerName: mhhablob1
     defaultKey: y85lApcIsXQ5znb9/G2axqe8V/dwKfcg0dn8WTtd35vPrFbj/XNv7qOi6aOVBi0Qx8DxLh4ZZMF3+ASt/K9zPA==
     subKey: 04pB8z/clKXfA8ezNU/waivZJzyEaEGNtok5WapPABEFnAFJwyy1mwv/s3QypzO2ojZXwrqAmoRI+AStGeD1BA==
     connectionString: DefaultEndpointsProtocol=https;AccountName=mhhablob1;AccountKey=y85lApcIsXQ5znb9/G2axqe8V/dwKfcg0dn8WTtd35vPrFbj/XNv7qOi6aOVBi0Qx8DxLh4ZZMF3+ASt/K9zPA==;EndpointSuffix=core.windows.net
 
 mqtt:
-  brokerUrl1: tcp://mqtt-cos.sdmed.co.kr:18883
-  brokerUrl2: wss://mqtt-cso.sdemd.co.kr:18884
+  brokerUrl1: tcp://mqtt-cso.sdmed.co.kr:18883
+  brokerUrl2: wss://mqtt-cso.sdmed.co.kr:18884
   clientId: def-cso-mqtt
   username: cso
   password: csoMQ1234

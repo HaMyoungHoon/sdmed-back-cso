@@ -89,7 +89,7 @@ class UserService: FServiceBase() {
 		return jwtTokenProvider.createToken(user)
 	}
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
-	fun signUp(confirmPW: String, data: UserDataModel): UserDataModel {
+	fun newUser(confirmPW: String, data: UserDataModel): UserDataModel {
 		if (data.id.length < 3) {
 			throw SignUpIDConditionException()
 		}
@@ -101,7 +101,7 @@ class UserService: FServiceBase() {
 		}
 		val existUser = userDataRepository.selectById(data.id)
 		if (existUser != null) {
-			throw SignUpFailedException()
+			throw SignUpIDExistException()
 		}
 
 		data.thisPK = UUID.randomUUID().toString()
@@ -122,6 +122,45 @@ class UserService: FServiceBase() {
 		})
 		val stackTrace = Thread.currentThread().stackTrace
 		val logModel = LogModel().build(null, stackTrace[1].className, stackTrace[1].methodName, "${data.id} ${data.name} signUp")
+		logRepository.save(logModel)
+		return ret
+	}
+	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
+	fun newUser(token: String, confirmPW: String, data: UserDataModel): UserDataModel {
+		isValid(token)
+		val tokenUser = getUserDataByToken(token)
+		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.UserChanger))) {
+			throw AuthenticationEntryPointException()
+		}
+
+		if (data.id.length < 3) {
+			throw SignUpIDConditionException()
+		}
+		if (FExtensions.regexPasswordCheck(data.pw) != true) {
+			throw SignUpFailedException()
+		}
+		if (data.pw != confirmPW) {
+			throw SignUpPWConditionException()
+		}
+		val existUser = userDataRepository.selectById(data.id)
+		if (existUser != null) {
+			throw SignUpIDExistException()
+		}
+
+		data.thisPK = UUID.randomUUID().toString()
+		data.pw = fAmhohwa.encrypt(data.pw)
+		var mask = UserRole.Admin.flag
+		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin))) {
+			mask = mask or UserRole.CsoAdmin.flag
+		}
+		data.role = data.role and mask.inv()
+		if (data.id == "mhha") {
+			data.role = UserRole.Admin.flag
+			data.status = UserStatus.Live
+		}
+		val ret = userDataRepository.save(data)
+		val stackTrace = Thread.currentThread().stackTrace
+		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "${data.id} ${data.name} new user")
 		logRepository.save(logModel)
 		return ret
 	}

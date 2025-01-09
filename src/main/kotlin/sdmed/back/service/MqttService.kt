@@ -1,23 +1,18 @@
 package sdmed.back.service
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import org.eclipse.paho.client.mqttv3.IMqttClient
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.stereotype.Service
 import org.springframework.integration.mqtt.core.MqttPahoClientFactory
 import org.springframework.integration.support.MessageBuilder
 import org.springframework.messaging.MessageChannel
-import sdmed.back.advice.exception.AuthenticationEntryPointException
 import sdmed.back.advice.exception.NotValidOperationException
 import sdmed.back.config.FServiceBase
-import sdmed.back.config.security.JwtTokenProvider
 import sdmed.back.model.common.MqttConnectModel
 import sdmed.back.model.common.MqttContentModel
 import sdmed.back.model.common.user.UserRole
-import sdmed.back.model.common.user.UserRole.Companion.getFlag
 import sdmed.back.model.common.user.UserRoles
-import sdmed.back.model.sqlCSO.user.UserDataModel
-import java.nio.charset.StandardCharsets
 
 class MqttService: FServiceBase() {
 	@Value(value = "\${mqtt.brokerUrl1}") lateinit var brokerUrl1: String
@@ -27,6 +22,7 @@ class MqttService: FServiceBase() {
 	@Value(value = "\${mqtt.password}") lateinit var password: String
 	@Autowired lateinit var mqttOutputChannel: MessageChannel
 	@Autowired lateinit var mqttClientFactory: MqttPahoClientFactory
+	@Autowired lateinit var objectMapper: ObjectMapper
 
 	fun getMqttConnectData(token: String): MqttConnectModel = MqttConnectModel().apply {
 		this.brokerUrl = getBrokerUrl()
@@ -46,11 +42,11 @@ class MqttService: FServiceBase() {
 		payload.senderPK = tokenUser.thisPK
 		payload.senderName = tokenUser.name
 		val msg = if (haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee))) {
-			MessageBuilder.withPayload(payload)
+			MessageBuilder.withPayload(objectMapper.writeValueAsBytes(payload))
 				.setHeader("mqtt_topic", topic)
 				.build()
 		} else if (haveRole(tokenUser, UserRole.BusinessMan.toS())) {
-			MessageBuilder.withPayload(payload)
+			MessageBuilder.withPayload(objectMapper.writeValueAsBytes(payload))
 				.setHeader("mqtt_topic", "private/${tokenUser.thisPK}")
 				.build()
 		} else {

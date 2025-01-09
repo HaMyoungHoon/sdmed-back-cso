@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
 import sdmed.back.config.FExtensions
+import sdmed.back.model.sqlCSO.BlobStorageInfoModel
 import sdmed.back.model.sqlCSO.BlobUploadModel
 import sdmed.back.repository.sqlCSO.IBlobUploadRepository
 import java.time.OffsetDateTime
@@ -18,6 +19,7 @@ import java.util.*
 
 @Service
 class AzureBlobService {
+	@Value(value = "\${str.blob.blobUrl}") var blobUrl: String = ""
 	@Value(value = "\${str.blob.containerName}") var containerName: String = ""
 	@Value(value = "\${str.blob.connectionString}") var connectionString: String = ""
 	@Autowired lateinit var blobUploadRepository: IBlobUploadRepository
@@ -39,14 +41,14 @@ class AzureBlobService {
 	}
 
 	fun uploadFile(file: MultipartFile, section: String, uploaderPK: String): String {
-		val blobUrl = "$section/${UUID.randomUUID()}.${FExtensions.getFileExt(file)}"
+		val blobName = "$section/${UUID.randomUUID()}.${FExtensions.getFileExt(file)}"
 		val mimeType = FExtensions.detectFileMimeType(file)
 		val containerClient = blobServiceClient.createBlobContainerIfNotExists(containerName)
-		val blobClient = containerClient.getBlobClient(blobUrl)
+		val blobClient = containerClient.getBlobClient(blobName)
 		blobClient.upload(file.inputStream, file.size, true)
 		blobClient.setHttpHeaders(BlobHttpHeaders().setContentType(mimeType))
 		blobUploadRepository.save(BlobUploadModel().apply {
-			this.blobUrl = blobUrl
+			this.blobUrl = blobName
 			this.uploaderPK = uploaderPK
 			this.originalFilename = file.originalFilename ?: ""
 			this.mimeType = mimeType
@@ -54,12 +56,12 @@ class AzureBlobService {
 		return blobClient.blobUrl
 	}
 	fun uploadString(content: String, section: String, uploaderPK: String): String {
-		val blobUrl = "$section/${UUID.randomUUID()}.html"
+		val blobName = "$section/${UUID.randomUUID()}.html"
 		val containerClient = blobServiceClient.createBlobContainerIfNotExists(containerName)
-		val blobClient = containerClient.getBlobClient(blobUrl)
+		val blobClient = containerClient.getBlobClient(blobName)
 		blobClient.upload(BinaryData.fromString(content))
 		blobUploadRepository.save(BlobUploadModel().apply {
-			this.blobUrl = blobUrl
+			this.blobUrl = blobName
 			this.uploaderPK = uploaderPK
 			this.originalFilename = "${section}.html"
 			this.mimeType = "application/octet-stream"
@@ -67,16 +69,24 @@ class AzureBlobService {
 		return blobClient.blobUrl
 	}
 
-	fun generateSas(containerName: String, blobUrl: String): String {
+	fun getBlobStorageInfo() = BlobStorageInfoModel().apply {
+		this.blobUrl = this@AzureBlobService.blobUrl
+		this.blobContainerName = this@AzureBlobService.containerName
+	}
+	fun generateSas(containerName: String, blobName: String): BlobStorageInfoModel {
 		val containerClient = if (containerName.isBlank()) {
 			blobServiceClient.createBlobContainerIfNotExists(this.containerName)
 		} else {
 			blobServiceClient.createBlobContainerIfNotExists(containerName)
 		}
-		val blobClient = containerClient.getBlobClient(blobUrl)
+		val blobClient = containerClient.getBlobClient(blobName)
 		val expiryTime = OffsetDateTime.now().plusHours(10)
 		val sasPermission = BlobSasPermission().apply { setWritePermission(true) }
-		return blobClient.generateSas(BlobServiceSasSignatureValues(expiryTime, sasPermission))
+		return BlobStorageInfoModel().apply {
+			this.blobUrl = this@AzureBlobService.blobUrl
+			this.blobContainerName = this@AzureBlobService.containerName
+			this.sasKey = blobClient.generateSas(BlobServiceSasSignatureValues(expiryTime, sasPermission))
+		}
 //		return "${blobClient.blobUrl}?$sasToken"
 	}
 	fun blobUploadSave(blobModel: BlobUploadModel) = blobUploadRepository.save(blobModel)

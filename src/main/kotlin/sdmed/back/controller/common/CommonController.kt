@@ -1,11 +1,13 @@
 package sdmed.back.controller.common
 
+import io.swagger.v3.oas.annotations.Hidden
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.multipart.MultipartFile
 import sdmed.back.advice.exception.AuthenticationEntryPointException
 import sdmed.back.advice.exception.NotFoundLanguageException
 import sdmed.back.config.FControllerBase
@@ -33,7 +35,13 @@ class CommonController: FControllerBase() {
 	@PostMapping(value = ["/signUp"])
 	fun signUp(@RequestParam confirmPW: String,
 	           @RequestBody data: UserDataModel) =
-		responseService.getResult(userService.signUp(confirmPW, data))
+		responseService.getResult(userService.newUser(confirmPW, data))
+	@Operation(summary = "유저 만들기")
+	@PostMapping(value = ["/newUser"])
+	fun newUser(@RequestHeader token: String,
+							@RequestParam confirmPW: String,
+							@RequestBody data: UserDataModel) =
+		responseService.getResult(userService.newUser(token, confirmPW, data))
 	@Operation(summary = "로그인 토큰 새로고침")
 	@PostMapping(value = ["/tokenRefresh"])
 	fun tokenRefresh(@RequestHeader token: String) =
@@ -62,30 +70,35 @@ class CommonController: FControllerBase() {
 	@GetMapping(value = ["/myState"])
 	fun getMyState(@RequestHeader token: String) =
 		responseService.getResult(userService.getUserDataByToken(token).status)
+	@GetMapping(value = ["/blobStorageInfo"])
+	fun getBlobStorageInfo(@RequestHeader token: String): IRestResult {
+		userService.isValid(token)
+		val tokenUser = userService.getUserDataByToken(token)
+		if (!userService.haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee, UserRole.BusinessMan))) {
+			throw AuthenticationEntryPointException()
+		}
+		return responseService.getResult(azureBlobService.getBlobStorageInfo())
+	}
 	@GetMapping(value = ["/generate/sas"])
 	fun getGenerateSas(@RequestHeader token: String,
 										 @RequestParam(required = false) containerName: String = "",
-										 @RequestParam blobUrl: String = ""): IRestResult {
+										 @RequestParam blobName: String = ""): IRestResult {
 		userService.isValid(token)
 		val tokenUser = userService.getUserDataByToken(token)
 		if (!userService.haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee, UserRole.BusinessMan))) {
 			throw AuthenticationEntryPointException()
 		}
 
-		val key = azureBlobService.generateSas(containerName, blobUrl)
+		val key = azureBlobService.generateSas(containerName, blobName)
 		return responseService.getResult(key)
 	}
 
-	@PostMapping("/test")
-	fun test(@RequestHeader token: String,
-					 @RequestBody content: String): IRestResult {
-		userService.isValid(token)
-		val tokenUser = userService.getUserDataByToken(token)
-		if (!userService.haveRole(tokenUser, UserRoles.of(UserRole.Admin))) {
-			throw AuthenticationEntryPointException()
-		}
-
-		val key = azureBlobService.uploadString(content, "String", tokenUser.thisPK)
+	@Hidden
+	@PostMapping("/test", consumes = ["multipart/form-data"])
+	fun test(@RequestParam file: MultipartFile): IRestResult {
+		throw AuthenticationEntryPointException()
+		val key = azureBlobService.uploadFile(file, "test", "fc1b9a2e-ae8a-437d-8074-a19d3acd1813")
 		return responseService.getResult(key)
 	}
+
 }
