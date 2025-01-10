@@ -189,7 +189,7 @@ class EDIListService: EDIService() {
 
 		val data = ediUploadPharmaMedicineRepository.findByThisPK(thisPK) ?: throw EDIUploadPharmaMedicineNotExistException()
 		val edi = ediUploadRepository.findByThisPK(data.ediPK) ?: throw EDIUploadNotExistException()
-		if (edi.ediState == EDIState.OK) {
+		if (edi.ediState == EDIState.OK || edi.ediState == EDIState.Reject) {
 			throw NotValidOperationException()
 		}
 
@@ -233,6 +233,10 @@ class EDIListService: EDIService() {
 		}
 
 		val data = ediUploadFileRepository.findByThisPK(thisPK) ?: throw EDIFileNotExistException()
+		val edi = ediUploadRepository.findByThisPK(data.ediPK) ?: throw EDIUploadNotExistException()
+		if (edi.ediState == EDIState.OK || edi.ediState == EDIState.Reject) {
+			throw NotValidOperationException()
+		}
 		data.inVisible = true
 		ediUploadFileRepository.save(data)
 //		ediUploadFileRepository.delete(data)

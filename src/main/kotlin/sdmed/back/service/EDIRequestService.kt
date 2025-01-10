@@ -270,4 +270,29 @@ class EDIRequestService: EDIService() {
 		logRepository.save(logModel)
 		return ret
 	}
+	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
+	fun deleteEDIFile(token: String, thisPK: String): EDIUploadFileModel {
+		isValid(token)
+		val tokenUser = getUserDataByToken(token)
+		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.EdiChanger, UserRole.BusinessMan))) {
+			throw AuthenticationEntryPointException()
+		}
+
+		val data = ediUploadFileRepository.findByThisPK(thisPK) ?: throw EDIFileNotExistException()
+		val edi = ediUploadRepository.findByThisPK(data.ediPK) ?: throw EDIUploadNotExistException()
+		if (edi.userPK != tokenUser.thisPK) {
+			throw NotValidOperationException()
+		}
+		if (edi.ediState == EDIState.OK || edi.ediState == EDIState.Reject) {
+			throw NotValidOperationException()
+		}
+
+		data.inVisible = true
+		ediUploadFileRepository.save(data)
+//		ediUploadFileRepository.delete(data)
+		val stackTrace = Thread.currentThread().stackTrace
+		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "del edi file : ${data.originalFilename}")
+		logRepository.save(logModel)
+		return data
+	}
 }

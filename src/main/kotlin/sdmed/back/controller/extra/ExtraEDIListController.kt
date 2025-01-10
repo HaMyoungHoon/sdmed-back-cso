@@ -35,4 +35,10 @@ class ExtraEDIListController: FControllerBase() {
 										@PathVariable thisPK: String,
 										@RequestBody ediUploadFileModel: List<EDIUploadFileModel>) =
 		responseService.getResult(ediRequestService.postEDIFileUpload(token, thisPK, ediUploadFileModel))
+
+	@Operation(summary = "edi file 삭제")
+	@DeleteMapping(value = ["/data/file/{thisPK}"])
+	fun deleteEDIFile(@RequestHeader token: String,
+	                  @PathVariable thisPK: String) =
+		responseService.getResult(ediRequestService.deleteEDIFile(token, thisPK))
 }
