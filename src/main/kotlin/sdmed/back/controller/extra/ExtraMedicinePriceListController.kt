@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*
 import sdmed.back.config.FControllerBase
 import sdmed.back.service.MedicinePriceListService
 
-@Tag(name = "약제급여목록표")
+@Tag(name = "extra 약제급여목록표")
 @RestController
 @RequestMapping(value = ["/extra/medicinePriceList"])
 class ExtraMedicinePriceListController: FControllerBase() {

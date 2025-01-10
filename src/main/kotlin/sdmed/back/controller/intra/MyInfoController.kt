@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*
 import sdmed.back.config.FControllerBase
 import sdmed.back.service.MyInfoService
 
-@Tag(name = "내정보")
+@Tag(name = "intra 내정보")
 @RestController
 @RequestMapping(value = ["/intra/myInfo"])
 class MyInfoController: FControllerBase() {

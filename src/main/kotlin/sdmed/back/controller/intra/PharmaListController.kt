@@ -19,7 +19,7 @@ import sdmed.back.model.sqlCSO.pharma.PharmaModel
 import sdmed.back.service.PharmaListService
 
 
-@Tag(name = "제약사목록")
+@Tag(name = "intra 제약사목록")
 @RestController
 @RequestMapping(value = ["/intra/pharmaList"])
 class PharmaListController: FControllerBase() {

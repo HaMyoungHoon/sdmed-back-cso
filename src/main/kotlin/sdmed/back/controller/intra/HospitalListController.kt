@@ -18,7 +18,7 @@ import sdmed.back.model.sqlCSO.BlobUploadModel
 import sdmed.back.model.sqlCSO.hospital.HospitalModel
 import sdmed.back.service.HospitalListService
 
-@Tag(name = "병원목록")
+@Tag(name = "intra 병원목록")
 @RestController
 @RequestMapping(value = ["/intra/hospitalList"])
 class HospitalListController: FControllerBase() {

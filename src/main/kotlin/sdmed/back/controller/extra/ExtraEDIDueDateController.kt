@@ -9,7 +9,7 @@ import sdmed.back.config.FControllerBase
 import sdmed.back.service.EDIDueDateService
 import java.util.*
 
-@Tag(name = "EDI 마감일")
+@Tag(name = "extra EDI 마감일")
 @RestController
 @RequestMapping(value = ["/extra/ediDueDate"])
 class ExtraEDIDueDateController: FControllerBase() {

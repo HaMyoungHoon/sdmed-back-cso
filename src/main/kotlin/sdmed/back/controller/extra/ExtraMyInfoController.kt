@@ -11,7 +11,7 @@ import sdmed.back.model.sqlCSO.user.UserFileType
 import sdmed.back.service.MyInfoService
 
 
-@Tag(name = "내정보")
+@Tag(name = "extra 내정보")
 @RestController
 @RequestMapping(value = ["/extra/myInfo"])
 class ExtraMyInfoController: FControllerBase() {

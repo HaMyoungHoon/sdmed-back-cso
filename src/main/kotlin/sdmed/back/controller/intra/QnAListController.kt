@@ -10,7 +10,7 @@ import sdmed.back.model.sqlCSO.qna.QnAReplyModel
 import sdmed.back.service.QnAListService
 import java.util.Date
 
-@Tag(name = "QnA 목록")
+@Tag(name = "intra QnA 목록")
 @RestController
 @RequestMapping(value = ["/intra/qnaList"])
 class QnAListController: FControllerBase() {

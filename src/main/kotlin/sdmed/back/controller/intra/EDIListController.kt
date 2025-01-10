@@ -10,7 +10,7 @@ import sdmed.back.model.sqlCSO.edi.*
 import sdmed.back.service.EDIListService
 import java.util.Date
 
-@Tag(name = "EDI 리스트")
+@Tag(name = "intra EDI 리스트")
 @RestController
 @RequestMapping(value = ["/intra/ediList"])
 class EDIListController: FControllerBase() {

@@ -10,7 +10,7 @@ import sdmed.back.model.sqlCSO.edi.EDIUploadModel
 import sdmed.back.service.EDIRequestService
 import java.util.Date
 
-@Tag(name = "EDI 요청")
+@Tag(name = "extra EDI 요청")
 @RestController
 @RequestMapping(value = ["/extra/ediRequest"])
 class ExtraEDIRequestController: FControllerBase() {

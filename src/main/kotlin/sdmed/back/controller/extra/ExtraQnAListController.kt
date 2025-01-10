@@ -9,7 +9,7 @@ import sdmed.back.model.sqlCSO.qna.QnAContentModel
 import sdmed.back.model.sqlCSO.qna.QnAReplyModel
 import sdmed.back.service.QnAListService
 
-@Tag(name = "QnA 목록")
+@Tag(name = "extra QnA 목록")
 @RestController
 @RequestMapping(value = ["/extra/qnaList"])
 class ExtraQnAListController: FControllerBase() {

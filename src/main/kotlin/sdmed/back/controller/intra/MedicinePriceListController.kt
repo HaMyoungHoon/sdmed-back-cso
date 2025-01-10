@@ -10,7 +10,7 @@ import sdmed.back.config.FControllerBase
 import sdmed.back.service.MedicinePriceListService
 import java.util.*
 
-@Tag(name = "약제급여목록표")
+@Tag(name = "intra 약제급여목록표")
 @RestController
 @RequestMapping(value = ["/intra/medicinePriceList"])
 class MedicinePriceListController: FControllerBase() {

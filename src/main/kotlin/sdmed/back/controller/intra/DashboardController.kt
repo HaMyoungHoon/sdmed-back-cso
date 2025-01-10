@@ -10,7 +10,7 @@ import sdmed.back.model.common.ResponseType
 import sdmed.back.service.DashboardService
 import java.util.*
 
-@Tag(name = "대시보드")
+@Tag(name = "intra 대시보드")
 @RestController
 @RequestMapping(value = ["/intra/dashboard"])
 class DashboardController: FControllerBase() {

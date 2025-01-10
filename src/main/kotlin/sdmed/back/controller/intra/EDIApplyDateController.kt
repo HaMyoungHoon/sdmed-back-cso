@@ -10,7 +10,7 @@ import sdmed.back.model.sqlCSO.edi.EDIApplyDateState
 import sdmed.back.service.EDIApplyDateService
 import java.util.*
 
-@Tag(name = "EDI 등록 적용일")
+@Tag(name = "intra EDI 등록 적용일")
 @RestController
 @RequestMapping(value = ["/intra/ediApplyDate"])
 class EDIApplyDateController: FControllerBase() {

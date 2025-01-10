@@ -11,7 +11,7 @@ import sdmed.back.service.EDIListService
 import sdmed.back.service.EDIRequestService
 import java.util.*
 
-@Tag(name = "EDI 리스트")
+@Tag(name = "extra EDI 리스트")
 @RestController
 @RequestMapping(value = ["/extra/ediList"])
 class ExtraEDIListController: FControllerBase() {

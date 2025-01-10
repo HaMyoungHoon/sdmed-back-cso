@@ -8,7 +8,7 @@ import sdmed.back.config.FControllerBase
 import sdmed.back.model.sqlCSO.user.HosPharmaMedicinePairModel
 import sdmed.back.service.UserMappingService
 
-@Tag(name = "유저매핑")
+@Tag(name = "intra 유저매핑")
 @RestController
 @RequestMapping(value = ["/intra/userMapping"])
 class UserMappingController: FControllerBase() {
