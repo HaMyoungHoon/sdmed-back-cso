@@ -25,4 +25,18 @@ interface IEDIUploadPharmaMedicineRepository: JpaRepository<EDIUploadPharmaMedic
 			"WHERE a.inVisible = false AND b.ediState = 1 AND c.userPK = :userPK AND b.year = :year AND b.month = :month " +
 			"ORDER BY a.name ASC ")
 	fun selectAllByUserYearMonthOK(userPK: String, year: String, month: String): List<HowMuchModel>
+
+	@Query("SELECT new sdmed.back.model.sqlCSO.HowMuchModel(c.hospitalPK, c.orgName, b.pharmaPK, b.orgName, a.medicinePK, a.name, a.count, a.charge, a.price, c.ediState) FROM EDIUploadPharmaMedicineModel a " +
+			"LEFT JOIN EDIUploadPharmaModel b ON a.pharmaPK = b.pharmaPK " +
+			"LEFT JOIN EDIUploadModel c ON a.ediPK = c.thisPK " +
+			"WHERE a.inVisible = false AND b.ediState != 2 AND c.userPK = :userPK AND c.hospitalPK = :hosPK AND b.year = :year AND b.month = :month " +
+			"ORDER BY a.name ASC ")
+	fun selectAllByUserHosYearMonth(userPK: String, hosPK: String ,year: String, month: String): List<HowMuchModel>
+
+	@Query("SELECT new sdmed.back.model.sqlCSO.HowMuchModel(c.hospitalPK, c.orgName, b.pharmaPK, b.orgName, a.medicinePK, a.name, a.count, a.charge, a.price, c.ediState) FROM EDIUploadPharmaMedicineModel a " +
+			"LEFT JOIN EDIUploadPharmaModel b ON a.pharmaPK = b.pharmaPK " +
+			"LEFT JOIN EDIUploadModel c ON a.ediPK = c.thisPK " +
+			"WHERE a.inVisible = false AND b.ediState != 2 AND c.userPK = :userPK AND b.pharmaPK = :pharmaPK AND b.year = :year AND b.month = :month " +
+			"ORDER BY a.name ASC ")
+	fun selectAllByUserPharmaYearMonth(userPK: String, pharmaPK: String ,year: String, month: String): List<HowMuchModel>
 }

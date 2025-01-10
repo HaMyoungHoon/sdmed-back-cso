@@ -79,6 +79,30 @@ class ExtraDashboardService: FServiceBase() {
 		ediGroup.forEach { x -> ret.add(gatheringItemByMedicine(x.key, x.value)) }
 		return ret
 	}
+	fun getMoneyHosDetailList(token: String, hosPK: String, date: Date): List<HowMuchModel> {
+		isValid(token)
+		val tokenUser = getUserDataByToken(token)
+		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.BusinessMan))) {
+			throw AuthenticationEntryPointException()
+		}
+
+		val year = FExtensions.parseDateTimeString(date, "yyyy") ?: throw NotValidOperationException()
+		val month = FExtensions.parseDateTimeString(date, "MM") ?: throw NotValidOperationException()
+
+		return ediPharmaMedicineRepository.selectAllByUserHosYearMonth(tokenUser.thisPK, hosPK, year, month)
+	}
+	fun getMoneyPharmaDetailList(token: String, hosPK: String, date: Date): List<HowMuchModel> {
+		isValid(token)
+		val tokenUser = getUserDataByToken(token)
+		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.BusinessMan))) {
+			throw AuthenticationEntryPointException()
+		}
+
+		val year = FExtensions.parseDateTimeString(date, "yyyy") ?: throw NotValidOperationException()
+		val month = FExtensions.parseDateTimeString(date, "MM") ?: throw NotValidOperationException()
+
+		return ediPharmaMedicineRepository.selectAllByUserPharmaYearMonth(tokenUser.thisPK, hosPK, year, month)
+	}
 
 	private fun gatheringItemByHos(hosPK: String, howMuchModel: List<HowMuchModel>): HowMuchHospitalModel {
 		return HowMuchHospitalModel().apply {
