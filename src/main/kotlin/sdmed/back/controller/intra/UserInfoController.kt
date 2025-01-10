@@ -16,7 +16,7 @@ import sdmed.back.model.sqlCSO.user.UserDataModel
 import sdmed.back.model.sqlCSO.user.UserFileType
 import sdmed.back.service.UserInfoService
 
-@Tag(name = "유저세팅/정보")
+@Tag(name = "intra 유저세팅/정보")
 @RestController
 @RequestMapping(value = ["/intra/userInfo"])
 class UserInfoController: FControllerBase() {
@@ -76,4 +76,10 @@ class UserInfoController: FControllerBase() {
 		responseService.getResult(userInfoService.userFileUrlModify(token, thisPK, blobModel, userFileType).apply {
 			azureBlobService.blobUploadSave(blobModel.newSave())
 		})
+
+	@Operation(summary = "비밀번호 초기화")
+	@PutMapping(value = ["/passwordInit"])
+	fun putPasswordInit(@RequestHeader token: String,
+											@RequestParam userPK: String) =
+		responseService.getResult(userInfoService.passwordInit(token, userPK))
 }

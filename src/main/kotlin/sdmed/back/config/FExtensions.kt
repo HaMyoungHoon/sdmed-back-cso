@@ -157,6 +157,7 @@ object FExtensions {
 		return ContentsType.findContentType(ext)
 	}
 
+	fun regexIdCheck(data: String?) = data?.let { Regex(FConstants.REGEX_CHECK_ID).matches(it) }
 	fun regexPasswordCheck(data: String?) = data?.let { Regex(FConstants.REGEX_CHECK_PASSWORD_0).matches(it) }
 
 	fun regexSpecialCharRemove(data: String?) = data?.let { Regex(FConstants.REGEX_SPECIAL_CHAR_REMOVE).replace(it, "") } ?: ""

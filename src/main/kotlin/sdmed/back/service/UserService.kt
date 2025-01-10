@@ -90,7 +90,7 @@ class UserService: FServiceBase() {
 	}
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
 	fun newUser(confirmPW: String, data: UserDataModel): UserDataModel {
-		if (data.id.length < 3) {
+		if (FExtensions.regexIdCheck(data.id) != true) {
 			throw SignUpIDConditionException()
 		}
 		if (FExtensions.regexPasswordCheck(data.pw) != true) {
@@ -133,7 +133,7 @@ class UserService: FServiceBase() {
 			throw AuthenticationEntryPointException()
 		}
 
-		if (data.id.length < 3) {
+		if (FExtensions.regexIdCheck(data.id) != true) {
 			throw SignUpIDConditionException()
 		}
 		if (FExtensions.regexPasswordCheck(data.pw) != true) {
@@ -167,7 +167,7 @@ class UserService: FServiceBase() {
 
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
 	fun passwordChangeByID(token: String, id: String, changePW: String): UserDataModel {
-		if (changePW.length < 4) {
+		if (FExtensions.regexPasswordCheck(changePW) != true) {
 			throw AuthenticationEntryPointException()
 		}
 
@@ -187,7 +187,7 @@ class UserService: FServiceBase() {
 	}
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
 	fun passwordChangeByPK(token: String, userPK: String, changePW: String): UserDataModel {
-		if (changePW.length < 4) {
+		if (FExtensions.regexPasswordCheck(changePW) != true) {
 			throw AuthenticationEntryPointException()
 		}
 
@@ -250,6 +250,20 @@ class UserService: FServiceBase() {
 		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "${user.id} ${userFileType} : ${blobModel.blobUrl}")
 		logRepository.save(logModel)
 		return ret
+	}
+	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
+	fun passwordInit(token: String, userPK: String): String {
+		isValid(token)
+		val tokenUser = getUserDataByToken(token)
+		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.UserChanger))) {
+			throw AuthenticationEntryPointException()
+		}
+
+		val password = "123456789a"
+		val user = getUserDataByPK(userPK)
+		user.pw = fAmhohwa.encrypt(password)
+		userDataRepository.save(user)
+		return password
 	}
 
 	fun mergeRel(userPK: String, pharmaOwnMedicineView: Boolean = false): MutableList<HospitalModel> {
