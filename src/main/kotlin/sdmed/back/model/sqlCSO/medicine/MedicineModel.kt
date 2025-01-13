@@ -20,11 +20,11 @@ data class MedicineModel(
 	var kdCode: String = "",
 	@Column
 	var standardCode: Long = 0L,
-	@Column(columnDefinition = "nvarchar(max)")
-	var makerName: String = "",
 	@Column(columnDefinition = "nvarchar(50)", nullable = false)
 	var makerCode: String = "",
-	@Column(columnDefinition = "nvarchar(max)")
+	// mysql
+	@Column(columnDefinition = "text")
+//	@Column(columnDefinition = "nvarchar(max)")
 	var name: String = "",
 	@Column
 	var customPrice: Int = 0,
@@ -88,7 +88,6 @@ data class MedicineModel(
 			1 -> mainIngredientCode = data ?: ""
 			2 -> kdCode = data ?: ""
 			3 -> standardCode = data?.toLongOrNull() ?: 0
-			4 -> makerName = data ?: ""
 			5 -> makerCode = data ?: ""
 			6 -> name = data ?: ""
 			7 -> medicineSubModel.standard = data ?: ""
@@ -148,9 +147,8 @@ data class MedicineModel(
 	fun errorString() = "${FConstants.MODEL_MEDICINE_CODE} : ${code}\n${FConstants.MODEL_MEDICINE_NAME} : ${name}"
 	fun insertString(): String {
 		val mainIngredientCode = FExtensions.escapeString(mainIngredientCode)
-		val makerName = FExtensions.escapeString(makerName)
 		val name = FExtensions.escapeString(name)
-		return "('$thisPK', '$code', '$mainIngredientCode', '$kdCode', '$standardCode', '$makerName', '$makerCode', '$name', '$customPrice', '$charge', '$inVisible')"
+		return "('$thisPK', '$code', '$mainIngredientCode', '$kdCode', '$standardCode', '$makerCode', '$name', '$customPrice', '$charge', ${if (inVisible) 1 else 0})"
 	}
 	fun insertSubString() = medicineSubModel.insertString()
 }

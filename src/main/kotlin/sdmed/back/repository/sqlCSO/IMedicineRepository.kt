@@ -19,7 +19,8 @@ interface IMedicineRepository: JpaRepository<MedicineModel, String> {
 	fun selectAllByCodeLikeOrKdCodeLike(code: String, kdCode: String, inVisible: Boolean = false): List<MedicineModel>
 
 	@Query("SELECT a FROM MedicineModel a " +
-			"WHERE a.inVisible = :inVisible AND (a.name LIKE %:name% OR a.makerName LIKE %:pharma%) " +
+			"LEFT JOIN PharmaModel b on a.makerCode = b.code " +
+			"WHERE a.inVisible = :inVisible AND (a.name LIKE %:name% OR b.innerName LIKE %:pharma%) " +
 			"ORDER BY a.code ASC")
 	fun selectAllByNameContainingOrPharmaContaining(name: String, pharma: String, inVisible: Boolean = false): List<MedicineModel>
 

@@ -36,11 +36,17 @@ data class MedicineSubModel(
 	var medicineStorageBox: MedicineStorageBox = MedicineStorageBox.Confidential,
 	@Column
 	var packageUnit: Int = 0,
-	@Column(columnDefinition = "nvarchar(max)")
+	// mysql
+	@Column(columnDefinition = "text")
+//	@Column(columnDefinition = "nvarchar(max)")
 	var unit: String = "",
-	@Column(columnDefinition = "nvarchar(max)")
+	// mysql
+	@Column(columnDefinition = "text")
+//	@Column(columnDefinition = "nvarchar(max)")
 	var etc1: String = "",
-	@Column(columnDefinition = "nvarchar(max)")
+	// mysql
+	@Column(columnDefinition = "text")
+//	@Column(columnDefinition = "nvarchar(max)")
 	var etc2: String = "",
 	) {
 

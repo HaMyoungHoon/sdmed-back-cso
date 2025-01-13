@@ -16,7 +16,9 @@ data class MedicineIngredientModel(
 	var thisPK: String = UUID.randomUUID().toString(),
 	@Column(columnDefinition = "nvarchar(255)", unique = true)
 	var mainIngredientCode: String = "",
-	@Column(columnDefinition = "nvarchar(max)")
+	// mysql
+	@Column(columnDefinition = "text")
+//	@Column(columnDefinition = "nvarchar(max)")
 	var mainIngredientName: String = "",
 	@JsonIgnore
 	@Transient

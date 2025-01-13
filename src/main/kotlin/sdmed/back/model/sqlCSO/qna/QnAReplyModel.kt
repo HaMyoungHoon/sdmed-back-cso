@@ -16,7 +16,9 @@ data class QnAReplyModel(
 	var userPK: String = "",
 	@Column(columnDefinition = "nvarchar(255)", updatable = false, nullable = false)
 	var name: String = "",
-	@Column(columnDefinition = "nvarchar(max)", updatable = false, nullable = false)
+	// mysql
+	@Column(columnDefinition = "text", updatable = false, nullable = false)
+//	@Column(columnDefinition = "nvarchar(max)", updatable = false, nullable = false)
 	var content: String = "",
 	@Column
 	var regDate: Date = Date(),

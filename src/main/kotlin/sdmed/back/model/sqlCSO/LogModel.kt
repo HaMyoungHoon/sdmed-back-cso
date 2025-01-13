@@ -17,7 +17,9 @@ data class LogModel(
 	var className: String = "",
 	@Column(columnDefinition = "nvarchar(255)", updatable = false)
 	var funcName: String = "",
-	@Column(columnDefinition = "nvarchar(max)", updatable = false)
+	// mysql
+	@Column(columnDefinition = "text", updatable = false)
+//	@Column(columnDefinition = "nvarchar(max)", updatable = false)
 	var content: String = "",
 	@Column(updatable = false, nullable = false)
 	var regDate: Timestamp = Timestamp(Date().time)

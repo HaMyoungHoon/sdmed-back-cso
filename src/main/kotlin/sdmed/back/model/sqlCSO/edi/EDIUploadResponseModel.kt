@@ -20,7 +20,9 @@ data class EDIUploadResponseModel(
 	var userPK: String = "",
 	@Column(columnDefinition = "nvarchar(255)")
 	var userName: String = "",
-	@Column(columnDefinition = "nvarchar(max)")
+	// mysql
+	@Column(columnDefinition = "text")
+//	@Column(columnDefinition = "nvarchar(max)")
 	var etc: String = "",
 	@Column(updatable = false, nullable = false)
 	var ediState: EDIState = EDIState.None,

@@ -60,11 +60,17 @@ data class HospitalModel(
 	var openDate: Date? = null,
 	@Column
 	var closeDate: Date? = null,
-	@Column(columnDefinition = "nvarchar(max)", nullable = false)
+	// mysql
+	@Column(columnDefinition = "text", nullable = false)
+//	@Column(columnDefinition = "nvarchar(max)", nullable = false)
 	var etc1: String = "",
-	@Column(columnDefinition = "nvarchar(max)", nullable = false)
+	// mysql
+	@Column(columnDefinition = "text", nullable = false)
+//	@Column(columnDefinition = "nvarchar(max)", nullable = false)
 	var etc2: String = "",
-	@Column(columnDefinition = "nvarchar(max)", nullable = false)
+	// mysql
+	@Column(columnDefinition = "text", nullable = false)
+//	@Column(columnDefinition = "nvarchar(max)", nullable = false)
 	var imageUrl: String = "",
 	@Column(columnDefinition = "bit default 0", nullable = false)
 	var inVisible: Boolean = false,
@@ -232,6 +238,6 @@ data class HospitalModel(
 		val closeDateString: String = closeDate?.let { "'${FExtensions.parseDateTimeString(it, "yyyy-MM-dd")}'" } ?: "null"
 		val etc1 = FExtensions.escapeString(etc1)
 		val etc2 = FExtensions.escapeString(etc2)
-		return "('$thisPK', '$code', '$orgName', '$innerName', '$ownerName', '$taxpayerNumber', '$phoneNumber', '$faxNumber', '$zipCode', '$address', '$addressDetail', '$businessType', '$businessItem', '${billType.index}', '$licenseNumber', '$nursingHomeNumber', '${contractType.index}', '${deliveryDiv.index}', '$mail', '$mobilePhone', $openDateString, $closeDateString, '$etc1', '$etc2', '$imageUrl', '$inVisible')"
+		return "('$thisPK', '$code', '$orgName', '$innerName', '$ownerName', '$taxpayerNumber', '$phoneNumber', '$faxNumber', '$zipCode', '$address', '$addressDetail', '$businessType', '$businessItem', '${billType.index}', '$licenseNumber', '$nursingHomeNumber', '${contractType.index}', '${deliveryDiv.index}', '$mail', '$mobilePhone', $openDateString, $closeDateString, '$etc1', '$etc2', '$imageUrl', ${if (inVisible) 1 else 0})"
 	}
 }

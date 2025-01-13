@@ -14,7 +14,9 @@ data class QnAContentModel(
 	var headerPK: String = "",
 	@Column(columnDefinition = "nvarchar(36)", updatable = false, nullable = false)
 	var userPK: String = "",
-	@Column(columnDefinition = "nvarchar(max)", updatable = false, nullable = false)
+	// mysql
+	@Column(columnDefinition = "text", updatable = false, nullable = false)
+//	@Column(columnDefinition = "nvarchar(max)", updatable = false, nullable = false)
 	var content: String = "",
 	@Transient
 	var fileList: MutableList<QnAFileModel> = mutableListOf(),
