@@ -222,6 +222,7 @@ class EDIRequestService: EDIService() {
 			})
 		}
 
+		ediUploadModel.hospitalPK = hospital.thisPK
 		ediUploadModel.orgName = hospital.orgName
 		ediUploadModel.pharmaList = mutableListOf()
 		ediUploadModel.ediState = EDIState.None
