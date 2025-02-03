@@ -154,7 +154,7 @@ class UserService: FServiceBase() {
 		data.thisPK = UUID.randomUUID().toString()
 		data.pw = fAmhohwa.encrypt(data.pw)
 		var mask = UserRole.Admin.flag
-		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin))) {
+		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin))) {
 			mask = mask or UserRole.CsoAdmin.flag
 		}
 		data.role = data.role and mask.inv()

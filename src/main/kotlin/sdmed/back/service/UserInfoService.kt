@@ -64,7 +64,7 @@ class UserInfoService: UserService() {
 		buff.safeCopy(userData)
 
 		var mask = UserRole.Admin.flag
-		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin))) {
+		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin))) {
 			mask = mask or UserRole.CsoAdmin.flag
 		}
 
