@@ -47,6 +47,8 @@ data class EDIUploadModel(
 	var ediState: EDIState = EDIState.None,
 	@Column(updatable = false, nullable = false)
 	var regDate: Date = Date(),
+	@Column(columnDefinition = "nvarchar(255)")
+	var etc: String = "",
 	@Transient
 	var pharmaList: MutableList<EDIUploadPharmaModel> = mutableListOf(),
 	@Transient
