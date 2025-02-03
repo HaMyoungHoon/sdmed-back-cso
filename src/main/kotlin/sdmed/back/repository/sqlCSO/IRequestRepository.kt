@@ -32,6 +32,6 @@ interface IRequestRepository: JpaRepository<RequestModel, String> {
 	@Query("SELECT count(a.requestUserName) as count, a.requestUserName as requestUserName FROM RequestModel a " +
 			"WHERE a.requestDate BETWEEN :startDate AND :endDate " +
 			"GROUP BY a.requestUserName " +
-			"ORDER BY count DESC LIMIT 10")
+			"ORDER BY count(10) DESC ")
 	fun selectTop10RequestUser(startDate: Date, endDate: Date): List<RequestUserCountModel>
 }
