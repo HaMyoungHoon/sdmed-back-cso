@@ -27,18 +27,20 @@ class MyInfoService: UserService() {
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee, UserRole.BusinessMan))) {
 			throw AuthenticationEntryPointException()
 		}
+		val pwBuff = afterPW.trim()
+		val pwBuffConfirm = confirmPW.trim()
 		if (tokenUser.pw != fAmhohwa.encrypt(currentPW)) {
 			throw CurrentPWNotMatchException()
 		}
 		if (FExtensions.regexPasswordCheck(afterPW) != true) {
 			throw SignUpPWConditionException()
 		}
-		if (afterPW != confirmPW) {
+		if (pwBuff != pwBuffConfirm) {
 			throw ConfirmPasswordUnMatchException()
 		}
 
 		val user = getUserDataByPK(tokenUser.thisPK)
-		user.pw = fAmhohwa.encrypt(afterPW)
+		user.pw = fAmhohwa.encrypt(pwBuff)
 		val ret = userDataRepository.save(user)
 		val stackTrace = Thread.currentThread().stackTrace
 		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "${user.id} password change")

@@ -90,6 +90,8 @@ class UserService: FServiceBase() {
 	}
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
 	fun newUser(confirmPW: String, data: UserDataModel): UserDataModel {
+		data.id = data.id.trim()
+		data.pw = data.pw.trim()
 		if (FExtensions.regexIdCheck(data.id) != true) {
 			throw SignUpIDConditionException()
 		}
@@ -127,6 +129,8 @@ class UserService: FServiceBase() {
 	}
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
 	fun newUser(token: String, confirmPW: String, data: UserDataModel): UserDataModel {
+		data.id = data.id.trim()
+		data.pw = data.pw.trim()
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.UserChanger))) {
@@ -177,8 +181,9 @@ class UserService: FServiceBase() {
 			throw AuthenticationEntryPointException()
 		}
 
+		val pwBuff = changePW.trim()
 		val user = getUserDataByID(id)
-		user.pw = fAmhohwa.encrypt(changePW)
+		user.pw = fAmhohwa.encrypt(pwBuff)
 		val ret = userDataRepository.save(user)
 		val stackTrace = Thread.currentThread().stackTrace
 		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "${user.id} password change")
@@ -197,8 +202,9 @@ class UserService: FServiceBase() {
 			throw AuthenticationEntryPointException()
 		}
 
+		val pwBuff = changePW.trim()
 		val user = getUserDataByPK(userPK)
-		user.pw = fAmhohwa.encrypt(changePW)
+		user.pw = fAmhohwa.encrypt(pwBuff)
 		val ret = userDataRepository.save(user)
 		val stackTrace = Thread.currentThread().stackTrace
 		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "${user.id} password change")
