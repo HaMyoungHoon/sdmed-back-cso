@@ -13,7 +13,7 @@ interface IEDIApplyDateRepository: JpaRepository<EDIApplyDateModel, String> {
 
 	@Query("SELECT a FROM EDIApplyDateModel a " +
 			"WHERE a.applyDateState = :applyDateState " +
-			"ORDER BY a.year, a.month DESC ")
+			"ORDER BY a.year DESC, a.month DESC ")
 	fun selectAllByUse(applyDateState: EDIApplyDateState = EDIApplyDateState.Use): List<EDIApplyDateModel>
 
 	@Query("SELECT a FROM EDIApplyDateModel a " +
