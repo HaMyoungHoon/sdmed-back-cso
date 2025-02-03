@@ -45,12 +45,22 @@ interface IUserRelationRepository: JpaRepository<UserRelationModel, String> {
 			"FROM PharmaModel a " +
 			"LEFT JOIN UserRelationModel b ON a.thisPK = b.pharmaPK " +
 			"WHERE a.inVisible = false AND b.userPK = :userPK AND b.hosPK IN (:hosPK) " +
-			"AND (b.hosPK, a.thisPK) NOT IN (" +
-			"SELECT d.hospitalPK, c.pharmaPK FROM EDIUploadPharmaModel c " +
+			"AND NOT EXISTS (" +
+			"SELECT 1 FROM EDIUploadPharmaModel c " +
 			"LEFT JOIN EDIUploadModel d ON c.ediPK = d.thisPK " +
 			"WHERE d.userPK = :userPK AND d.year = :year AND d.month = :month AND c.ediState != 2) " +
 			"ORDER BY a.code ASC ")
 	fun selectAllMyPharmaAbleIn(userPK: String, hosPK: List<String>, year: String, month: String): List<EDIPharmaBuffModel>
+//	@Query("SELECT new sdmed.back.model.sqlCSO.edi.EDIPharmaBuffModel(a.thisPK, b.hosPK, a.code, a.orgName, a.innerName) " +
+//			"FROM PharmaModel a " +
+//			"LEFT JOIN UserRelationModel b ON a.thisPK = b.pharmaPK " +
+//			"WHERE a.inVisible = false AND b.userPK = :userPK AND b.hosPK IN (:hosPK) " +
+//			"AND (b.hosPK, a.thisPK) NOT IN (" +
+//			"SELECT d.hospitalPK, c.pharmaPK FROM EDIUploadPharmaModel c " +
+//			"LEFT JOIN EDIUploadModel d ON c.ediPK = d.thisPK " +
+//			"WHERE d.userPK = :userPK AND d.year = :year AND d.month = :month AND c.ediState != 2) " +
+//			"ORDER BY a.code ASC ")
+//	fun selectAllMyPharmaAbleIn(userPK: String, hosPK: List<String>, year: String, month: String): List<EDIPharmaBuffModel>
 
 	@Query("SELECT new sdmed.back.model.sqlCSO.edi.EDIMedicineBuffModel(a.thisPK, a.code, c.orgName, a.name, b.pharmaPK, b.hosPK) FROM MedicineModel a " +
 			"LEFT JOIN UserRelationModel b ON a.thisPK = b.medicinePK " +
