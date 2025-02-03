@@ -85,6 +85,37 @@ class EDIListService: EDIService() {
 		return ret
 	}
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
+	fun postEDINewResponseData(token: String, ediPK: String, responseData: EDIUploadResponseModel): EDIUploadModel {
+		isValid(token)
+		val tokenUser = getUserDataByToken(token)
+		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee))) {
+			throw AuthenticationEntryPointException()
+		}
+
+		val ret = ediUploadRepository.findByThisPK(ediPK) ?: throw EDIUploadNotExistException()
+		ret.ediState = responseData.ediState
+		ediUploadResponseRepository.save(EDIUploadResponseModel().apply {
+			this.ediPK = ediPK
+			this.pharmaName = "신규처"
+			this.userPK = tokenUser.thisPK
+			this.userName = tokenUser.name
+			this.etc = responseData.etc
+			this.ediState = responseData.ediState
+		})
+		val request = requestRepository.findByRequestItemPK(ediPK)
+		if (request != null) {
+			request.responseUserPK = tokenUser.thisPK
+			request.responseUserName = tokenUser.name
+			request.responseDate = Date()
+			request.responseType = FExtensions.ediStateToResponseType(responseData.ediState)
+			requestRepository.save(request)
+		}
+		val stackTrace = Thread.currentThread().stackTrace
+		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "add response : ${responseData.thisPK}")
+		logRepository.save(logModel)
+		return ret
+	}
+	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
 	fun putEDIUpload(token: String, thisPK: String, ediUploadModel: EDIUploadModel): EDIUploadModel {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
