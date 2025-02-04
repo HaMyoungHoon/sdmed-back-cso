@@ -243,6 +243,11 @@ class ExceptionAdvice {
 	protected fun signUpIDExistException(request: HttpServletRequest, exception: SignUpIDExistException) =
 		responseService.getFailResult(getMessage("signUpIDExistException.code").toInt(), getMessageMerge("signUpIDExistException.msg", exception.message))
 
+	@ExceptionHandler(VersionCheckNotExistException::class)
+	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+	protected fun versionCheckNotExistException(request: HttpServletRequest, exception: VersionCheckNotExistException) =
+		responseService.getFailResult(getMessage("versionCheckNotExistException.code").toInt(), getMessageMerge("versionCheckNotExistException.msg", exception.message))
+
 	@ExceptionHandler(AsyncRequestTimeoutException::class)
 	@ResponseStatus(HttpStatus.OK)
 	protected fun asyncRequestTimeoutException(request: HttpServletRequest, exception: AsyncRequestTimeoutException): AsyncContext =

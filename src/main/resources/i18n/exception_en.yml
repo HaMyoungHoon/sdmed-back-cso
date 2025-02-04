@@ -177,3 +177,7 @@ ediFileNotExistException:
 signUpIDExistException:
   code: "-10042"
   msg: "already exist id"
+
+versionCheckNotExistException:
+  code: "-10043"
+  msg: "version not exist"

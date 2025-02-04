@@ -14,7 +14,9 @@ import sdmed.back.config.FControllerBase
 import sdmed.back.model.common.IRestResult
 import sdmed.back.model.common.user.UserRole
 import sdmed.back.model.common.user.UserRoles
+import sdmed.back.model.sqlCSO.common.VersionCheckType
 import sdmed.back.model.sqlCSO.user.UserDataModel
+import sdmed.back.service.CommonService
 import sdmed.back.service.UserService
 import java.util.*
 
@@ -23,6 +25,7 @@ import java.util.*
 @RequestMapping(value = ["/common"])
 class CommonController: FControllerBase() {
 	@Autowired lateinit var userService: UserService
+	@Autowired lateinit var commonService: CommonService
 	@Value(value = "\${str.version}") lateinit var strVersion: String
 	@Value(value = "\${str.profile}") lateinit var strprofile: String
 
@@ -59,6 +62,8 @@ class CommonController: FControllerBase() {
 	}
 	@GetMapping(value = ["/version"])
 	fun version() = responseService.getResult("$strprofile $strVersion")
+	@GetMapping(value = ["/versionCheck"])
+	fun versionCheck(@RequestParam versionCheckType: VersionCheckType) = responseService.getResult(commonService.getAbleVersion(versionCheckType))
 	@GetMapping(value = ["/serverTime"])
 	fun serverTime() = responseService.getResult(Date())
 

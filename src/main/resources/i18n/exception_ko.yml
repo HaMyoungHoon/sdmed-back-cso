@@ -177,3 +177,7 @@ ediFileNotExistException:
 signUpIDExistException:
   code: "-10042"
   msg: "이미 존재하는 아이디 입니다."
+
+versionCheckNotExistException:
+  code: "-10043"
+  msg: "버전이 없습니다."
