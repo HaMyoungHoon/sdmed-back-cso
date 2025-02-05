@@ -48,7 +48,7 @@ interface IUserRelationRepository: JpaRepository<UserRelationModel, String> {
 			"AND NOT EXISTS (" +
 			"SELECT 1 FROM EDIUploadPharmaModel c " +
 			"LEFT JOIN EDIUploadModel d ON c.ediPK = d.thisPK " +
-			"WHERE d.userPK = :userPK AND d.year = :year AND d.month = :month AND c.ediState != 2) " +
+			"WHERE d.userPK = :userPK AND d.year = :year AND d.month = :month AND c.ediState != 2 AND d.hospitalPK = b.hosPK AND c.pharmaPK = a.thisPK) " +
 			"ORDER BY a.code ASC ")
 	fun selectAllMyPharmaAbleIn(userPK: String, hosPK: List<String>, year: String, month: String): List<EDIPharmaBuffModel>
 //	@Query("SELECT new sdmed.back.model.sqlCSO.edi.EDIPharmaBuffModel(a.thisPK, b.hosPK, a.code, a.orgName, a.innerName) " +
