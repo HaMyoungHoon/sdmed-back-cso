@@ -149,12 +149,15 @@ object FConstants {
 
 	const val REGEX_CHECK_ID = "^[A-Za-z0-9가-힣]{3,20}\$"
 	// 숫자, 문자(영대소한글)
-	const val REGEX_CHECK_PASSWORD_0 = "^(?=.*[A-Za-z가-힣ㄱ-ㅎㅏ-ㅣ])(?=.*\\d)[A-Za-z가-힣ㄱ-ㅎㅏ-ㅣ\\d@\$()!%*#?&]{8,20}\$"
+	const val REGEX_CHECK_PASSWORD_0 = "^(?=.*[A-Za-z가-힣ㄱ-ㅎㅏ-ㅣ])(?=.*\\d)[A-Za-z가-힣ㄱ-ㅎㅏ-ㅣ\\d@\$!@#\$%^&*()]{8,20}\$"
 	// 숫자, 특수문자, 문자(영대소한글)
-	const val REGEX_CHECK_PASSWORD_1 = "^(?=.*[A-Za-z가-힣ㄱ-ㅎㅏ-ㅣ])(?=.*\\d)(?=.*[@\$()!%*#?&])[A-Za-z가-힣ㄱ-ㅎㅏ-ㅣ\\d@\$()!%*#?&]{8,20}\$"
+	const val REGEX_CHECK_PASSWORD_1 = "^(?=.*[A-Za-z가-힣ㄱ-ㅎㅏ-ㅣ])(?=.*\\d)(?=.*[@\$!@#\$%^&*()])[A-Za-z가-힣ㄱ-ㅎㅏ-ㅣ\\d@\$!@#\$%^&*()]{8,20}\$"
 	// 숫자, 대문자, 소문자
 	const val REGEX_CHECK_PASSWORD_2 = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{8,20}\$"
+	const val REGEX_ONLY_NUMBER = "[^0-9]"
 	const val REGEX_ONLY_ALPHABET = "[^a-zA-Z0-9]"
 	const val REGEX_SPECIAL_CHAR_REMOVE = "[^가-힣a-zA-Z0-9\\s]"
 	const val REGEX_ESCAPE_SQL = "(['\"])"
+
+	const val REGEX_PHONE_NUMBER = "^\\s*(010|011|016|017|018|019)(-|\\)|\\s)*(\\d{3,4})(-|\\s)*(\\d{4})\\s*$"
 }

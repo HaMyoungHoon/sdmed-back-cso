@@ -49,6 +49,24 @@ class CommonController: FControllerBase() {
 	@PostMapping(value = ["/tokenRefresh"])
 	fun tokenRefresh(@RequestHeader token: String) =
 		responseService.getResult(userService.tokenRefresh(token))
+
+	@Operation(summary = "아이디 까먹음")
+	@GetMapping(value = ["/findIDAuthNumber"])
+	fun getFindIDAuthNumber(@RequestParam name: String, @RequestParam phoneNumber: String) =
+		responseService.getSuccessResult().apply {
+			commonService.getFindIDAuthNumber(name, phoneNumber)
+		}
+	@Operation(summary = "비밀번호 까먹음")
+	@GetMapping(value = ["/findPWAuthNumber"])
+	fun getFindPWAuthNumber(@RequestParam id: String, @RequestParam phoneNumber: String) =
+		responseService.getSuccessResult().apply {
+			commonService.getFindPWAuthNumber(id, phoneNumber)
+		}
+	@Operation(summary = "check auth number")
+	@GetMapping(value = ["/checkAuthNumber"])
+	fun getCheckAuthNumber(@RequestParam authNumber: String, @RequestParam phoneNumber: String) =
+		responseService.getResult(commonService.getCheckAuthNumber(authNumber, phoneNumber))
+
 	@Operation(summary = "language set", description = "")
 	@PostMapping(value = ["/lang"])
 	fun setLanguage(@RequestParam lang: String): IRestResult {

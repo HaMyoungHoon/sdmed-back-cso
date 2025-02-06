@@ -248,6 +248,21 @@ class ExceptionAdvice {
 	protected fun versionCheckNotExistException(request: HttpServletRequest, exception: VersionCheckNotExistException) =
 		responseService.getFailResult(getMessage("versionCheckNotExistException.code").toInt(), getMessageMerge("versionCheckNotExistException.msg", exception.message))
 
+	@ExceptionHandler(AuthNumberCheckException::class)
+	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+	protected fun authNumberCheckException(request: HttpServletRequest, exception: AuthNumberCheckException) =
+		responseService.getFailResult(getMessage("authNumberCheckException.code").toInt(), getMessageMerge("authNumberCheckException.msg", exception.message))
+
+	@ExceptionHandler(PhoneNumberFormatException::class)
+	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+	protected fun phoneNumberFormatException(request: HttpServletRequest, exception: PhoneNumberFormatException) =
+		responseService.getFailResult(getMessage("phoneNumberFormatException.code").toInt(), getMessageMerge("phoneNumberFormatException.msg", exception.message))
+
+	@ExceptionHandler(UserQuarantineException::class)
+	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+	protected fun userQuarantineException(request: HttpServletRequest, exception: UserQuarantineException) =
+		responseService.getFailResult(getMessage("userQuarantineException.code").toInt(), getMessageMerge("userQuarantineException.msg", exception.message))
+
 	@ExceptionHandler(AsyncRequestTimeoutException::class)
 	@ResponseStatus(HttpStatus.OK)
 	protected fun asyncRequestTimeoutException(request: HttpServletRequest, exception: AsyncRequestTimeoutException): AsyncContext =

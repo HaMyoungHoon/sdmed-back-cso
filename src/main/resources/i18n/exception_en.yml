@@ -181,3 +181,15 @@ signUpIDExistException:
 versionCheckNotExistException:
   code: "-10043"
   msg: "version not exist"
+
+authNumberCheckException:
+  code: "-10044"
+  msg: "auth number unmatched or expired"
+
+phoneNumberFormatException:
+  code: "-10045"
+  msg: "phone number format is weird"
+
+userQuarantineException:
+  code: "-10046"
+  msg: "has been quarantine"

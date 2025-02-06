@@ -14,6 +14,7 @@ interface IUserDataRepository: JpaRepository<UserDataModel, String> {
 	fun findAllByIdIn(ids: List<String>): List<UserDataModel>
 	fun findByThisPK(thisPK: String): UserDataModel?
 	fun findAllByThisPKIn(thisPK: List<String>): List<UserDataModel>
+	fun findByName(name: String): List<UserDataModel>
 
 	@Query("SELECT a FROM UserDataModel a " +
 			"WHERE a.id = :id")

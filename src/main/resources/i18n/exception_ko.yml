@@ -181,3 +181,15 @@ signUpIDExistException:
 versionCheckNotExistException:
   code: "-10043"
   msg: "버전이 없습니다."
+
+authNumberCheckException:
+  code: "-10044"
+  msg: "인증번호가 맞지 않거나 만료되었습니다."
+
+phoneNumberFormatException:
+  code: "-10045"
+  msg: "폰 번호 형식이 이상합니다."
+
+userQuarantineException:
+  code: "-10046"
+  msg: "격리 되었습니다."

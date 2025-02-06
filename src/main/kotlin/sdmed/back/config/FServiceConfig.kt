@@ -9,6 +9,7 @@ class FServiceConfig {
 	@Bean fun mqttService() = MqttService()
 	@Bean fun dashboardService() = DashboardService()
 	@Bean fun extraDashboardService() = ExtraDashboardService()
+	@Bean fun commonService() = CommonService()
 
 	@Bean fun userService() = UserService()
 	@Bean fun myInfoService() = MyInfoService()

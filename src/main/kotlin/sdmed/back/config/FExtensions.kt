@@ -16,6 +16,7 @@ import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.*
+import kotlin.math.pow
 
 @Component
 object FExtensions {
@@ -161,6 +162,11 @@ object FExtensions {
 	fun regexPasswordCheck(data: String?) = data?.let { Regex(FConstants.REGEX_CHECK_PASSWORD_0).matches(it) }
 
 	fun regexSpecialCharRemove(data: String?) = data?.let { Regex(FConstants.REGEX_SPECIAL_CHAR_REMOVE).replace(it, "") } ?: ""
+	fun regexOnlyNumber(data: String?) = data?.let { Regex(FConstants.REGEX_ONLY_NUMBER).replace(it, "") } ?: ""
 	fun regexOnlyAlphabet(data: String?) = data?.let { Regex(FConstants.REGEX_ONLY_ALPHABET).replace(it, "") } ?: ""
 	fun escapeString(data: String?) = data?.let { it.replace(Regex(FConstants.REGEX_ESCAPE_SQL)) { "" } } ?: ""
+
+	fun isPhoneNumber(data: String?) = data?.let { Regex(FConstants.REGEX_PHONE_NUMBER).matches(it) }
+
+	fun getRandomNumberString(digits: Int = 6) = String.format("%0${digits}d", (Math.random() * 10.0.pow(digits.toDouble())).toLong())
 }
