@@ -115,10 +115,10 @@ class CommonController: FControllerBase() {
 		val key = azureBlobService.generateSas(containerName, blobName)
 		return responseService.getResult(key)
 	}
-	@GetMapping(value = ["/generate/sas/list"])
-	fun getGenerateSasList(@RequestHeader token: String,
-	                       @RequestParam(required = false) containerName: String = "",
-	                       @RequestParam blobName: List<String> = mutableListOf()): IRestResult {
+	@PostMapping(value = ["/generate/sas/list"])
+	fun postGenerateSasList(@RequestHeader token: String,
+	                        @RequestParam(required = false) containerName: String = "",
+	                        @RequestBody blobName: List<String> = mutableListOf()): IRestResult {
 		userService.isValid(token)
 		val tokenUser = userService.getUserDataByToken(token)
 		if (!userService.haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee, UserRole.BusinessMan))) {
