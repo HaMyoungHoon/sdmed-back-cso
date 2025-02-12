@@ -83,6 +83,7 @@ class AzureBlobService {
 		val expiryTime = OffsetDateTime.now().plusHours(10)
 		val sasPermission = BlobSasPermission().apply { setWritePermission(true) }
 		return BlobStorageInfoModel().apply {
+			this.blobName = blobName
 			this.blobUrl = this@AzureBlobService.blobUrl
 			this.blobContainerName = this@AzureBlobService.containerName
 			this.sasKey = blobClient.generateSas(BlobServiceSasSignatureValues(expiryTime, sasPermission))
@@ -102,6 +103,7 @@ class AzureBlobService {
 			val expiryTime = OffsetDateTime.now().plusHours(10)
 			val sasPermission = BlobSasPermission().apply { setWritePermission(true) }
 			ret.add(BlobStorageInfoModel().apply {
+				this.blobName = blobName
 				this.blobUrl = this@AzureBlobService.blobUrl
 				this.blobContainerName = this@AzureBlobService.containerName
 				this.sasKey = blobClient.generateSas(BlobServiceSasSignatureValues(expiryTime, sasPermission))
