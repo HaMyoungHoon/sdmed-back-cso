@@ -89,5 +89,25 @@ class AzureBlobService {
 		}
 //		return "${blobClient.blobUrl}?$sasToken"
 	}
+	fun generateSasList(containerName: String, blobNames: List<String>): List<BlobStorageInfoModel> {
+		val containerClient = if (containerName.isBlank()) {
+			blobServiceClient.createBlobContainerIfNotExists(this.containerName)
+		} else {
+			blobServiceClient.createBlobContainerIfNotExists(containerName)
+		}
+
+		val ret: MutableList<BlobStorageInfoModel> = mutableListOf()
+		blobNames.forEach { blobName ->
+			val blobClient = containerClient.getBlobClient(blobName)
+			val expiryTime = OffsetDateTime.now().plusHours(10)
+			val sasPermission = BlobSasPermission().apply { setWritePermission(true) }
+			ret.add(BlobStorageInfoModel().apply {
+				this.blobUrl = this@AzureBlobService.blobUrl
+				this.blobContainerName = this@AzureBlobService.containerName
+				this.sasKey = blobClient.generateSas(BlobServiceSasSignatureValues(expiryTime, sasPermission))
+			})
+		}
+		return ret
+	}
 	fun blobUploadSave(blobModel: BlobUploadModel) = blobUploadRepository.save(blobModel)
 }
