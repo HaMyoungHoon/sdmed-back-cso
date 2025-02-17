@@ -29,7 +29,7 @@ class EDIService: FServiceBase() {
 
 	protected fun parseEDIUploadModel(data: EDIUploadModel, inVisible: Boolean = false) = data.apply {
 		this.responseList = ediUploadResponseRepository.findAllByEdiPKOrderByRegDate(thisPK).toMutableList()
-		this.fileList = ediUploadFileRepository.findAllByEdiPKAndInVisibleOrderByThisPK(thisPK).toMutableList()
+		this.fileList = ediUploadFileRepository.findAllByEdiPKAndInVisibleOrderByRegDateDesc(thisPK).toMutableList()
 		val pharmaList = ediUploadPharmaRepository.findALlByEdiPKOrderByPharmaPK(thisPK)
 		val medicineList = ediUploadPharmaMedicineRepository.findAllByEdiPKAndInVisibleAndPharmaPKInOrderByMedicinePK(thisPK, inVisible, pharmaList.map { it.pharmaPK })
 		val newData: MutableList<EDIUploadPharmaModel> = mutableListOf()

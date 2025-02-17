@@ -7,5 +7,5 @@ import sdmed.back.model.sqlCSO.edi.EDIUploadFileModel
 @Repository
 interface IEDIUploadFileRepository: JpaRepository<EDIUploadFileModel, String> {
 	fun findByThisPK(thisPK: String): EDIUploadFileModel?
-	fun findAllByEdiPKAndInVisibleOrderByThisPK(ediPK: String, inVisible: Boolean = false): List<EDIUploadFileModel>
+	fun findAllByEdiPKAndInVisibleOrderByRegDateDesc(ediPK: String, inVisible: Boolean = false): List<EDIUploadFileModel>
 }
