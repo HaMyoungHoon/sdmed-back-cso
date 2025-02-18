@@ -6,7 +6,6 @@ import org.springframework.stereotype.Repository
 import sdmed.back.model.sqlCSO.edi.EDIHosBuffModel
 import sdmed.back.model.sqlCSO.edi.EDIMedicineBuffModel
 import sdmed.back.model.sqlCSO.edi.EDIPharmaBuffModel
-import sdmed.back.model.sqlCSO.hospital.HospitalModel
 import sdmed.back.model.sqlCSO.user.UserRelationModel
 
 @Repository
