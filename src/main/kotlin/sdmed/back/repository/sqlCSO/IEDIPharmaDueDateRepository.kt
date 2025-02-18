@@ -20,7 +20,7 @@ interface IEDIPharmaDueDateRepository: JpaRepository<EDIPharmaDueDateModel, Stri
 			"ORDER BY a.year, a.month DESC")
 	fun selectAllByThisYearMonthDueDate(year: String, month: String): List<EDIPharmaDueDateModel>
 	@Query("SELECT a.* FROM EDIPharmaDueDateModel a " +
-			"WHERE CONVERT(DATE, CONCAT(a.year, '-', a.month, '-', a.day)) BETWEEN :startDate AND :endDate " +
+			"WHERE STR_TO_DATE(CONCAT(a.year, '-', a.month, '-', a.day), '%Y-%m-%d') BETWEEN :startDate AND :endDate " +
 			"ORDER BY a.year, a.month DESC", nativeQuery = true)
 	fun selectAllByThisYearMonthRangeDueDate(startDate: Date, endDate: Date): List<EDIPharmaDueDateModel>
 	@Query("SELECT a FROM PharmaModel a " +
