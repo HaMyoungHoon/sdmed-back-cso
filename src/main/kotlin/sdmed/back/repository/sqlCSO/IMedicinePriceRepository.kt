@@ -22,7 +22,8 @@ interface IMedicinePriceRepository: JpaRepository<MedicinePriceModel, String> {
 			"SELECT * FROM RankedMedicinePrice as MedicinePriceModel WHERE RN = 1 AND kdCode IN (:kdCodeString) ", nativeQuery = true)
 	fun selectAllByRecentDataKDCodeInAndYearMonth(kdCodeString: List<String>, yearMonthDay: String): List<MedicinePriceModel>
 
-	@Query("SELECT TOP 1 applyDate FROM MedicinePriceModel " +
-			"ORDER BY applyDate DESC", nativeQuery = true)
+	@Query("SELECT applyDate FROM MedicinePriceModel " +
+			"ORDER BY applyDate DESC " +
+			"LIMIT 1", nativeQuery = true)
 	fun selectLatestDate(): String
 }
