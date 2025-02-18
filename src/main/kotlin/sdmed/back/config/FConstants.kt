@@ -144,6 +144,10 @@ object FConstants {
 	const val MODEL_PHARMA_MEDICINE_PARSE_MEDICINE_CODE = "제품코드"
 	const val MODEL_PHARMA_MEDICINE_PARSE_COUNT = 4
 
+	const val MODEL_EDI_DUE_DATE_DATE = "날짜"
+	const val MODEL_EDI_DUE_DATE_PHARMA_CODE = "제약사코드"
+	const val MODEL_EDI_DUE_DATE_COUNT = 2
+
 	const val NEW_HOSPITAL_CODE = "-99999"
 	const val NEW_HOSPITAL_NAME = "신규처"
 

@@ -192,4 +192,8 @@ phoneNumberFormatException:
 
 userQuarantineException:
   code: "-10046"
-  msg: "has been quarantine"
+  msg:
+
+ediDueDateFileUploadException:
+  code: "-10047"
+  msg: "edi due date upload failed."

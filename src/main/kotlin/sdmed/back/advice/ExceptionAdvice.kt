@@ -263,6 +263,11 @@ class ExceptionAdvice {
 	protected fun userQuarantineException(request: HttpServletRequest, exception: UserQuarantineException) =
 		responseService.getFailResult(getMessage("userQuarantineException.code").toInt(), getMessageMerge("userQuarantineException.msg", exception.message))
 
+	@ExceptionHandler(EDIDueDateFileUploadException::class)
+	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+	protected fun ediDueDateFileUploadException(request: HttpServletRequest, exception: EDIDueDateFileUploadException) =
+		responseService.getFailResult(getMessage("ediDueDateFileUploadException.code").toInt(), getMessageMerge("ediDueDateFileUploadException.msg", exception.message))
+
 	@ExceptionHandler(AsyncRequestTimeoutException::class)
 	@ResponseStatus(HttpStatus.OK)
 	protected fun asyncRequestTimeoutException(request: HttpServletRequest, exception: AsyncRequestTimeoutException): AsyncContext =

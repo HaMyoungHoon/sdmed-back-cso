@@ -2,10 +2,8 @@ package sdmed.back.config
 
 import org.springframework.stereotype.Component
 import org.springframework.web.multipart.MultipartFile
-import sdmed.back.advice.exception.HosDataFileUploadException
-import sdmed.back.advice.exception.MedicineDataFileUploadException
-import sdmed.back.advice.exception.PharmaDataFileUploadException
-import sdmed.back.advice.exception.UserDataFileUploadException
+import sdmed.back.advice.exception.*
+import sdmed.back.model.sqlCSO.edi.EDIPharmaDueDateModel
 import sdmed.back.model.sqlCSO.hospital.HospitalModel
 import sdmed.back.model.sqlCSO.medicine.MedicineIngredientModel
 import sdmed.back.model.sqlCSO.medicine.MedicineModel
@@ -201,6 +199,32 @@ class FExcelFileParser {
 				return@forEach
 			}
 			model.applyDate = applyDate
+			ret.add(model)
+		}
+
+		return ret
+	}
+	fun ediDueDateUploadExcelParse(uploaderID: String, file: MultipartFile): MutableList<EDIPharmaDueDateModel> {
+		FExtensions.folderExist(FExcelParserType.EDI_DUE_DATE)
+		val copiedLocation = FExtensions.fileCopy(file, FExcelParserType.EDI_DUE_DATE, uploaderID)
+		val excelSheetHandler = ExcelSheetHandler.readExcel(copiedLocation.toFile())
+
+		if (!EDIPharmaDueDateModel().findHeader(excelSheetHandler.header)) {
+			FExtensions.fileDelete(copiedLocation)
+			throw EDIDueDateFileUploadException()
+		}
+
+		val ret: MutableList<EDIPharmaDueDateModel> = mutableListOf()
+		excelSheetHandler.rows.forEach { x ->
+			val model = EDIPharmaDueDateModel()
+			val setRowRet = model.rowSet(x)
+			if (setRowRet == null) {
+				FExtensions.fileDelete(copiedLocation)
+				throw EDIDueDateFileUploadException(model.errorString())
+			}
+			if (setRowRet == false) {
+				return@forEach
+			}
 			ret.add(model)
 		}
 

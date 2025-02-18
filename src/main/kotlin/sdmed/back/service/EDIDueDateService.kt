@@ -2,6 +2,7 @@ package sdmed.back.service
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.transaction.annotation.Transactional
+import org.springframework.web.multipart.MultipartFile
 import sdmed.back.advice.exception.*
 import sdmed.back.config.FExtensions
 import sdmed.back.config.jpa.CSOJPAConfig
@@ -101,6 +102,53 @@ class EDIDueDateService: EDIService() {
 		val month = FExtensions.parseDateTimeString(date, "MM") ?: throw NotValidOperationException()
 		val day = FExtensions.parseDateTimeString(date, "dd") ?: throw NotValidOperationException()
 		return postEDIPharmaDueDate(token, pharmaPK, year, month, day)
+	}
+	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
+	fun ediDueDateUpload(token: String, file: MultipartFile): List<EDIPharmaDueDateModel> {
+		isValid(token)
+		val tokenUser = getUserDataByToken(token)
+		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.EdiChanger))) {
+			throw AuthenticationEntryPointException()
+		}
+
+		val excelModel = excelFileParser.ediDueDateUploadExcelParse(tokenUser.id, file).distinctBy { it.pharmaCode to it.year to it.month }
+		val pharmaList = pharmaRepository.findAllByCodeIn(excelModel.map { it.pharmaCode })
+		if (pharmaList.isEmpty()) {
+			throw EDIDueDateFileUploadException("pharma is empty\ncode : ${excelModel.joinToString(",") { it.pharmaCode }}")
+		}
+
+		val excelMap = excelModel.groupBy { it.pharmaCode }
+		pharmaList.forEach { x ->
+			val mapBuff = excelMap[x.code]
+			if (!mapBuff.isNullOrEmpty()) {
+				mapBuff.forEach { y ->
+					y.pharmaPK = x.thisPK
+					y.orgName = x.orgName
+				}
+			}
+		}
+		val saveList = mutableListOf<EDIPharmaDueDateModel>()
+		val dateMap = excelModel.filter { it.pharmaPK.isNotEmpty() }.groupBy { Pair(it.year, it.month) }
+		dateMap.forEach { x ->
+			val existDueDate = ediPharmaDueDateRepository.selectAllByPharmaInThisYearMonthDueDate(x.key.first, x.key.second).filter { y -> y.pharmaPK in x.value.map { z -> z.pharmaPK } }
+			val buff = x.value.filterNot { y -> y.pharmaPK in existDueDate.map { it.pharmaPK } }.map { z ->
+				EDIPharmaDueDateModel().apply {
+					this.pharmaPK = z.pharmaPK
+					this.orgName = z.orgName
+					this.year = z.year
+					this.month = z.month
+					this.day = z.day
+				}
+			}
+			saveList.addAll(buff)
+		}
+
+		val ret = ediPharmaDueDateRepository.saveAll(saveList)
+		val stackTrace = Thread.currentThread().stackTrace
+		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "add edi due date : ${saveList.joinToString(",") { it.pharmaPK }}")
+		logRepository.save(logModel)
+
+		return ret
 	}
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
 	fun postEDIPharmaDueDate(token: String, pharmaPK: String, year: String, month: String, day: String): EDIPharmaDueDateModel {

@@ -8,4 +8,5 @@ enum class FExcelParserType {
 	MEDICINE,
 	MEDICINE_INGREDIENT,
 	MEDICINE_PRICE,
+	EDI_DUE_DATE,
 }

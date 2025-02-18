@@ -193,3 +193,7 @@ phoneNumberFormatException:
 userQuarantineException:
   code: "-10046"
   msg: "격리 되었습니다."
+
+ediDueDateFileUploadException:
+  code: "-10047"
+  msg: "edi 마감일 업로드에 실패했습니다."
