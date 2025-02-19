@@ -66,12 +66,15 @@ open class MedicineService: FServiceBase() {
 		return ret
 	}
 	protected fun insertMedicineSubAll(data: List<MedicineSubModel>): Int {
-		val values = data.stream().map{it.insertString()}.collect(joining(","))
-		val sqlString = "${FConstants.MODEL_MEDICINE_SUB_INSERT_INTO}$values"
-		val ret = entityManager.createNativeQuery(sqlString).executeUpdate()
-		entityManager.flush()
-		entityManager.clear()
-		return ret
+		val already = medicineSubRepository.findALlByCodeInOrderByCode(data.map { it.code })
+		val buff = data.filterNot { it.code in already.map { it.code } }
+		return medicineSubRepository.saveAll(buff).size
+//		val values = data.stream().map{it.insertString()}.collect(joining(","))
+//		val sqlString = "${FConstants.MODEL_MEDICINE_SUB_INSERT_INTO}$values"
+//		val ret = entityManager.createNativeQuery(sqlString).executeUpdate()
+//		entityManager.flush()
+//		entityManager.clear()
+//		return ret
 	}
 	protected fun insertMedicineIngredientAll(data: List<MedicineIngredientModel>): Int {
 		val values = data.stream().map{it.insertString()}.collect(joining(","))
