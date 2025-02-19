@@ -1,14 +1,15 @@
 package sdmed.back.service
 
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.stereotype.Service
-import sdmed.back.advice.exception.PhoneNumberFormatException
-import sdmed.back.advice.exception.UserNotFoundException
-import sdmed.back.advice.exception.UserQuarantineException
-import sdmed.back.advice.exception.VersionCheckNotExistException
-import sdmed.back.config.FAmhohwa
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Pageable
+import sdmed.back.advice.exception.*
 import sdmed.back.config.FExtensions
 import sdmed.back.config.FServiceBase
+import sdmed.back.model.common.user.UserRole
+import sdmed.back.model.common.user.UserRoles
+import sdmed.back.model.sqlCSO.LogViewModel
 import sdmed.back.model.sqlCSO.common.CheckAuthNumberModel
 import sdmed.back.model.sqlCSO.common.QuarantineAuthNumberModel
 import sdmed.back.model.sqlCSO.common.VersionCheckModel
@@ -109,5 +110,14 @@ class CommonService: FServiceBase() {
 		}
 
 		return findBuff.first().content
+	}
+	fun getLogViewModel(token: String, page: Int = 0, size: Int = 1000): Page<LogViewModel> {
+		isValid(token)
+		val tokenUser = getUserDataByToken(token)
+		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee))) {
+			throw AuthenticationEntryPointException()
+		}
+		val pageable = PageRequest.of(page, size)
+		return logRepository.selectLogViewModel(pageable)
 	}
 }

@@ -9,6 +9,7 @@ import sdmed.back.config.jpa.CSOJPAConfig
 import sdmed.back.model.common.ResponseType
 import sdmed.back.model.common.user.UserRole
 import sdmed.back.model.common.user.UserRoles
+import sdmed.back.model.sqlCSO.LogModel
 import sdmed.back.model.sqlCSO.request.RequestModel
 import sdmed.back.model.sqlCSO.request.RequestUserCountModel
 import sdmed.back.model.sqlCSO.request.ResponseCountModel
@@ -105,7 +106,11 @@ class DashboardService: FServiceBase() {
 		requestModel.responseUserPK = tokenUser.thisPK
 		requestModel.responseUserName = tokenUser.name
 		requestModel.responseDate = Date()
-		return requestRepository.save(requestModel)
+		val ret = requestRepository.save(requestModel)
+		val stackTrace = Thread.currentThread().stackTrace
+		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "request recep : ${requestModel.thisPK}, ${requestModel.requestUserName}")
+		logRepository.save(logModel)
+		return ret
 	}
 
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
@@ -122,6 +127,10 @@ class DashboardService: FServiceBase() {
 		data.responseDate = Date()
 		data.responseUserPK = tokenUser.thisPK
 		data.responseUserName = tokenUser.name
-		return requestRepository.save(data)
+		val ret = requestRepository.save(data)
+		val stackTrace = Thread.currentThread().stackTrace
+		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "request response : ${data.thisPK}, ${data.requestUserName}")
+		logRepository.save(logModel)
+		return ret
 	}
 }

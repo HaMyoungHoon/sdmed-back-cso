@@ -80,7 +80,7 @@ class EDIListService: EDIService() {
 			requestRepository.save(request)
 		}
 		val stackTrace = Thread.currentThread().stackTrace
-		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "add response : ${responseData.thisPK}")
+		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "add response : ${responseData.thisPK}, ${responseData.ediState}")
 		logRepository.save(logModel)
 		return ret
 	}
@@ -128,10 +128,11 @@ class EDIListService: EDIService() {
 		ediUploadPharmaMedicineRepository.saveAll(data.pharmaList.flatMap { it.medicineList })
 		ediUploadPharmaRepository.saveAll(data.pharmaList)
 
+		val ret = ediUploadRepository.save(data)
 		val stackTrace = Thread.currentThread().stackTrace
 		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "modify edi : ${data.thisPK}")
 		logRepository.save(logModel)
-		return ediUploadRepository.save(data)
+		return ret
 	}
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
 	fun putEDIPharma(token: String, thisPK: String, pharma: EDIUploadPharmaModel): EDIUploadPharmaModel {

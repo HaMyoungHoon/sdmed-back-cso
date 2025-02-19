@@ -269,6 +269,9 @@ class UserService: FServiceBase() {
 		val user = getUserDataByPK(userPK)
 		user.pw = fAmhohwa.encrypt(password)
 		userDataRepository.save(user)
+		val stackTrace = Thread.currentThread().stackTrace
+		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "password init : ${user.id}")
+		logRepository.save(logModel)
 		return password
 	}
 

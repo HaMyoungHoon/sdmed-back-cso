@@ -11,7 +11,7 @@ data class LogModel(
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(updatable = false, nullable = false)
 	var thisIndex: Long = 0,
-	@Column(updatable = false)
+	@Column(columnDefinition = "nvarchar(36)", updatable = false)
 	var userPK: String? = null,
 	@Column(columnDefinition = "nvarchar(255)", updatable = false)
 	var className: String = "",
@@ -24,10 +24,10 @@ data class LogModel(
 	@Column(updatable = false, nullable = false)
 	var regDate: Timestamp = Timestamp(Date().time)
 ) {
-	fun build(user: String?, className: String, func: String, content: String): LogModel {
-		userPK = user
+	fun build(userPK: String?, className: String, funcName: String, content: String): LogModel {
+		this.userPK = userPK
 		this.className = className
-		funcName = func
+		this.funcName = funcName
 		this.content = content
 		return this
 	}
