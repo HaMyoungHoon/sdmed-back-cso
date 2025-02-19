@@ -2,6 +2,7 @@ package sdmed.back.service
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.transaction.annotation.Transactional
+import org.springframework.web.multipart.MultipartFile
 import sdmed.back.advice.exception.AuthenticationEntryPointException
 import sdmed.back.config.FConstants
 import sdmed.back.config.jpa.CSOJPAConfig
@@ -88,6 +89,53 @@ class UserMappingService: UserService() {
 		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "${userData.id} hos-pharma-medicine relation change")
 		logRepository.save(logModel)
 		return getUserDataWithRelationByPK(userPK)
+	}
+	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
+	fun userRelationUpload(token: String, file: MultipartFile): Int {
+		isValid(token)
+		val tokenUser = getUserDataByToken(token)
+		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.EdiChanger))) {
+			throw AuthenticationEntryPointException()
+		}
+
+		val saveBuff = mutableListOf<UserHosPharmaMedicinePairModel>()
+		val excelModel = excelFileParser.userMappingDateUploadExcelParse(tokenUser.id, file).distinctBy { it.id to it.hospitalCode to it.pharmaCode to it.medicineCode }
+		val userGroup = excelModel.groupBy { it.id }
+		userGroup.forEach { (id, model) ->
+			val user = userDataRepository.selectById(id) ?: return@forEach
+			val existHos = hospitalRepository.findAllByCodeIn(model.map { it.hospitalCode }).associateBy { it.code }
+			val existPharma = pharmaRepository.findAllByCodeIn(model.map { it.pharmaCode }).associateBy { it.code }
+			val existMedicine = medicineRepository.findAllByCodeIn(model.map { it.medicineCode }).associateBy { it.code }
+			val filterModel = model.filter { code ->
+				existHos.containsKey(code.hospitalCode) &&
+						existPharma.containsKey(code.pharmaCode) &&
+						existMedicine.containsKey(code.medicineCode)
+			}
+
+			saveBuff.addAll(filterModel.map { x -> UserHosPharmaMedicinePairModel().apply {
+				this.userPK = user.thisPK
+				this.hosPK = existHos[x.hospitalCode]!!.thisPK
+				this.pharmaPK = existPharma[x.pharmaCode]!!.thisPK
+				this.medicinePK = existMedicine[x.medicineCode]!!.thisPK
+			}})
+		}
+
+		deleteRelationByUserPKIn(saveBuff.map { it.userPK })
+		if (saveBuff.isEmpty()) {
+			return 0
+		}
+		insertRelation(saveBuff)
+		val stackTrace = Thread.currentThread().stackTrace
+		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "${saveBuff.size} hos-pharma-medicine relation change")
+		logRepository.save(logModel)
+		return saveBuff.size
+	}
+	fun deleteRelationByUserPKIn(userPK: List<String>) {
+		val joinString = userPK.joinToString(",") { "'${it}'" }
+		val sqlString = "${FConstants.MODEL_USER_RELATIONS_DELETE_WHERE_USER_PK_IN} ($joinString)"
+		entityManager.createNativeQuery(sqlString).executeUpdate()
+		entityManager.flush()
+		entityManager.clear()
 	}
 	fun deleteRelationByUserPK(userPK: String) {
 		val sqlString = "${FConstants.MODEL_USER_RELATIONS_DELETE_WHERE_USER_PK} '$userPK'"

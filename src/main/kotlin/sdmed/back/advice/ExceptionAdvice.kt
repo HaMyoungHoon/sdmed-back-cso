@@ -268,6 +268,11 @@ class ExceptionAdvice {
 	protected fun ediDueDateFileUploadException(request: HttpServletRequest, exception: EDIDueDateFileUploadException) =
 		responseService.getFailResult(getMessage("ediDueDateFileUploadException.code").toInt(), getMessageMerge("ediDueDateFileUploadException.msg", exception.message))
 
+	@ExceptionHandler(UserMappingFileUploadException::class)
+	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+	protected fun userMappingFileUploadException(request: HttpServletRequest, exception: UserMappingFileUploadException) =
+		responseService.getFailResult(getMessage("userMappingFileUploadException.code").toInt(), getMessageMerge("userMappingFileUploadException.msg", exception.message))
+
 	@ExceptionHandler(AsyncRequestTimeoutException::class)
 	@ResponseStatus(HttpStatus.OK)
 	protected fun asyncRequestTimeoutException(request: HttpServletRequest, exception: AsyncRequestTimeoutException): AsyncContext =

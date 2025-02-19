@@ -7,6 +7,7 @@ import jakarta.persistence.Id
 import jakarta.persistence.Transient
 import sdmed.back.config.FConstants
 import sdmed.back.config.FExtensions
+import sdmed.back.model.sqlCSO.FExcelParseModel
 import java.util.*
 
 @Entity
@@ -23,45 +24,17 @@ data class MedicineIngredientModel(
 	@JsonIgnore
 	@Transient
 	var name: String = ""
-) {
-	fun findHeader(data: List<String>): Boolean {
-		if (data.size < FConstants.MODEL_MEDICINE_PRICE_COUNT) {
-			return false
-		}
-
-		for (index in 0 until FConstants.MODEL_MEDICINE_PRICE_COUNT) {
-			if (data[index] != titleGet(index)) {
-				return false
-			}
-		}
-
-		return true
-	}
-	fun rowSet(data: List<String>): Boolean? {
-		if (data.size <= 1) {
-			return false
-		}
-
-		return try {
-			for ((index, value) in data.withIndex()) {
-				indexSet(value, index)
-			}
-			if (errorCondition()) {
-				return false
-			}
-			true
-		} catch (_: Exception) {
-			null
-		}
-	}
-	fun indexSet(data: String?, index: Int) {
+): FExcelParseModel() {
+	@Transient
+	override var dataCount = FConstants.MODEL_MEDICINE_PRICE_COUNT
+	override fun indexSet(data: String?, index: Int) {
 		when (index) {
 			3 -> mainIngredientCode = data ?: ""
 			4 -> mainIngredientName = data ?: ""
 			5 -> name = data ?: ""
 		}
 	}
-	fun titleGet(index: Int): String {
+	override fun titleGet(index: Int): String {
 		return when (index) {
 			0 -> FConstants.MODEL_MEDICINE_PRICE_INDEX
 			1 -> FConstants.MODEL_MEDICINE_PRICE_METHOD
@@ -79,7 +52,7 @@ data class MedicineIngredientModel(
 			else -> ""
 		}
 	}
-	fun errorCondition(): Boolean {
+	override fun errorCondition(): Boolean {
 		if (mainIngredientCode.isBlank()) {
 			return true
 		} else if(mainIngredientName.isBlank()) {
@@ -90,7 +63,7 @@ data class MedicineIngredientModel(
 
 		return false
 	}
-	fun errorString() = "${FConstants.MODEL_MEDICINE_PRICE_KD_CODE} : ${mainIngredientCode}\n${FConstants.MODEL_MEDICINE_PRICE_MAX_PRICE} : ${mainIngredientName}"
+	override fun errorString() = "${FConstants.MODEL_MEDICINE_PRICE_KD_CODE} : ${mainIngredientCode}\n${FConstants.MODEL_MEDICINE_PRICE_MAX_PRICE} : ${mainIngredientName}"
 
 	fun insertString(): String {
 		val mainIngredientCode = FExtensions.escapeString(mainIngredientCode)

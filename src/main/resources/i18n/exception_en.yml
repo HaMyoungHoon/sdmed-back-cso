@@ -197,3 +197,7 @@ userQuarantineException:
 ediDueDateFileUploadException:
   code: "-10047"
   msg: "edi due date upload failed."
+
+userMappingFileUploadException:
+  code: "-10048"
+  msg: "user mapping upload failed."

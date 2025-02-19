@@ -3,8 +3,16 @@ package sdmed.back.controller.intra
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.core.io.Resource
+import org.springframework.http.HttpHeaders
+import org.springframework.http.MediaType
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.multipart.MultipartFile
+import sdmed.back.config.ContentsType
 import sdmed.back.config.FControllerBase
+import sdmed.back.config.FExcelParserType
+import sdmed.back.config.FExtensions
 import sdmed.back.model.sqlCSO.user.HosPharmaMedicinePairModel
 import sdmed.back.service.UserMappingService
 
@@ -51,4 +59,20 @@ class UserMappingController: FControllerBase() {
 	                              @PathVariable userPK: String,
 	                              @RequestBody hosPharmaMedicinePairModel: List<HosPharmaMedicinePairModel>) =
 		responseService.getResult(userMappingService.userRelationModify(token, userPK, hosPharmaMedicinePairModel))
+
+	@Operation(summary = "유저-병원-제약사-약품 관계 샘플 다운로드")
+	@GetMapping(value = ["/file/sample"])
+	fun getExcelSample(): ResponseEntity<Resource> {
+		val ret = FExtensions.sampleFileDownload(FExcelParserType.USER_MAPPING)
+		return ResponseEntity.ok()
+			.contentType(MediaType.parseMediaType(ContentsType.type_xlsx))
+			.contentLength(ret.file.length())
+			.header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=\"excel_upload_sample.xlsx\"")
+			.body(ret)
+	}
+	@Operation(summary = "유저-병원-제약사-약품 관계 엑셀 파일 업로드")
+	@PostMapping(value = ["/file/excel"], consumes = ["multipart/form-data"])
+	fun postExcel(@RequestHeader token: String,
+	              @RequestParam file: MultipartFile) =
+		responseService.getResult(userMappingService.userRelationUpload(token, file))
 }

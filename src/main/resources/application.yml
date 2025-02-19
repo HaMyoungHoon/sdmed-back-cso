@@ -66,6 +66,7 @@ file:
   medicineIngredientExcelDir: C:/FTP/STORAGE/EXCEL/MEDICINE_INGREDIENT
   medicinePriceExcelDir: C:/FTP/STORAGE/EXCEL/MEDICINE_PRICE
   ediDueDateExcelDir: C:/FTP/STORAGE/EXCEL/EDI_DUE_DATE
+  userMappingExcelDir: C:/FTP/STORAGE/EXCEL/USER_MAPPING
 
 str:
   version: 1.0.0

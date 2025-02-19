@@ -5,6 +5,7 @@ import jakarta.persistence.Entity
 import jakarta.persistence.Id
 import sdmed.back.config.FConstants
 import sdmed.back.config.FExtensions
+import sdmed.back.model.sqlCSO.FExcelParseModel
 import java.util.*
 
 @Entity
@@ -26,55 +27,30 @@ data class EDIPharmaDueDateModel(
 	var regDate: Date = Date(),
 	@Transient
 	var pharmaCode: String = ""
-) {
-	fun findHeader(data: List<String>): Boolean {
-		if (data.size < FConstants.MODEL_EDI_DUE_DATE_COUNT) {
-			return false
-		}
-		for (index in 0 until FConstants.MODEL_EDI_DUE_DATE_COUNT) {
-			if (data[index] != titleGet(index)) {
-				return false
-			}
-		}
-		return true
-	}
-	fun rowSet(data: List<String>): Boolean? {
-		if (data.size <= 1) {
-			return false
-		}
-		return try {
-			for ((index, value) in data.withIndex()) {
-				indexSet(value, index)
-			}
-			if (errorCondition()) {
-				return false
-			}
-			true
-		} catch (_: Exception) {
-			null
-		}
-	}
-	fun indexSet(data: String?, index: Int) {
+): FExcelParseModel() {
+	@Transient
+	override var dataCount = FConstants.MODEL_EDI_DUE_DATE_COUNT
+	override fun indexSet(data: String?, index: Int) {
 		when (index) {
 			0 -> yyyyMMddSet(data)
 			1 -> pharmaCode = data ?: ""
 		}
 	}
-	fun titleGet(index: Int): String {
+	override fun titleGet(index: Int): String {
 		return when (index) {
 			0 -> FConstants.MODEL_EDI_DUE_DATE_DATE
 			1 -> FConstants.MODEL_EDI_DUE_DATE_PHARMA_CODE
 			else -> ""
 		}
 	}
-	fun errorCondition(): Boolean {
+	override fun errorCondition(): Boolean {
 		if (pharmaCode.isBlank()) return true
 		if (year.isBlank()) return true
 		if (month.isBlank()) return true
 		if (day.isBlank()) return true
 		return false
 	}
-	fun errorString() = "${FConstants.MODEL_EDI_DUE_DATE_DATE} : ${year}-${month}-${day}\n${FConstants.MODEL_EDI_DUE_DATE_PHARMA_CODE} : ${pharmaCode}"
+	override fun errorString() = "${FConstants.MODEL_EDI_DUE_DATE_DATE} : ${year}-${month}-${day}\n${FConstants.MODEL_EDI_DUE_DATE_PHARMA_CODE} : ${pharmaCode}"
 	fun insertString(): String {
 		val regDate = FExtensions.parseDateTimeString(this.regDate, "yyyy-MM-dd")
 		return "('$thisPK', '$pharmaPK', '$orgName', '$year', '$month', '$day', '$regDate')"

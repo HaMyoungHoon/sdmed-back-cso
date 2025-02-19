@@ -8,6 +8,7 @@ import sdmed.back.config.FExtensions
 import sdmed.back.model.common.user.UserDept
 import sdmed.back.model.common.user.UserRole
 import sdmed.back.model.common.user.UserStatus
+import sdmed.back.model.sqlCSO.FExcelParseModel
 import sdmed.back.model.sqlCSO.hospital.HospitalModel
 import java.lang.Exception
 import java.lang.StringBuilder
@@ -56,7 +57,9 @@ data class UserDataModel(
 	var hosList: MutableList<HospitalModel> = mutableListOf(),
 	@Transient
 	var fileList: MutableList<UserFileModel> = mutableListOf(),
-) {
+): FExcelParseModel() {
+	@Transient
+	override var dataCount = FConstants.MODEL_USER_COUNT
 	fun safeCopy(data: UserDataModel): UserDataModel {
 		this.name = data.name
 		this.mail = data.mail
@@ -88,39 +91,6 @@ data class UserDataModel(
 		return false
 	}
 
-	fun findHeader(data: List<String>): Boolean {
-		if (data.size < FConstants.MODEL_USER_COUNT) {
-			return false
-		}
-
-		if (data[0] != titleGet(0) || data[1] != titleGet(1) ||
-			data[2] != titleGet(2) || data[3] != titleGet(3) ||
-			data[4] != titleGet(4) || data[5] != titleGet(5) ||
-			data[6] != titleGet(6) || data[7] != titleGet(7) ||
-			data[8] != titleGet(8) || data[9] != titleGet(9) ||
-			data[10] != titleGet(10) || data[11] != titleGet(11)) {
-			return false
-		}
-
-		return true
-	}
-	fun rowSet(data: List<String>): Boolean? {
-		if (data.size <= 1) {
-			return false
-		}
-
-		return try {
-			for (i in 0 until FConstants.MODEL_USER_COUNT) {
-				indexSet(data[i], i)
-			}
-			if (errorCondition()) {
-				return false
-			}
-			true
-		} catch (_: Exception) {
-			null
-		}
-	}
 	fun indexGet(index: Int): String {
 		return when (index) {
 			0 -> id
@@ -138,7 +108,7 @@ data class UserDataModel(
 			else -> ""
 		}
 	}
-	fun indexSet(data: String?, index: Int) {
+	override fun indexSet(data: String?, index: Int) {
 		when (index) {
 			0 -> id = data ?: ""
 			1 -> pw = data ?: ""
@@ -154,7 +124,7 @@ data class UserDataModel(
 			11 -> bankAccount = data ?: ""
 		}
 	}
-	fun titleGet(index: Int): String {
+	override fun titleGet(index: Int): String {
 		return when (index) {
 			0 -> FConstants.MODEL_USER_ID
 			1 -> FConstants.MODEL_USER_PW
@@ -171,7 +141,7 @@ data class UserDataModel(
 			else -> ""
 		}
 	}
-	fun errorCondition(): Boolean {
+	override fun errorCondition(): Boolean {
 		if (indexGet(0).isEmpty()) {
 			return true
 		} else if (indexGet(1).isEmpty()) {
@@ -181,7 +151,7 @@ data class UserDataModel(
 		}
 		return false
 	}
-	fun errorString(): String {
+	override fun errorString(): String {
 		val ret = StringBuilder()
 		for (i in 0..FConstants.MODEL_USER_COUNT) {
 			ret.append("${titleGet(i)} : ${indexGet(i)}\n")

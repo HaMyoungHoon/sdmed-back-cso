@@ -5,6 +5,7 @@ import org.hibernate.annotations.ColumnDefault
 import sdmed.back.config.FConstants
 import sdmed.back.config.FExtensions
 import sdmed.back.model.common.medicine.*
+import sdmed.back.model.sqlCSO.FExcelParseModel
 import java.util.*
 
 @Entity
@@ -41,7 +42,9 @@ data class MedicineModel(
 	var medicineIngredientModel: MedicineIngredientModel = MedicineIngredientModel(),
 	@Transient
 	var medicinePriceModel: MutableList<MedicinePriceModel> = mutableListOf(),
-) {
+): FExcelParseModel() {
+	@Transient
+	override var dataCount = FConstants.MODEL_MEDICINE_COUNT
 	fun genSub() {
 		medicineSubModel.thisPK = UUID.randomUUID().toString()
 		medicineSubModel.code = code
@@ -49,37 +52,7 @@ data class MedicineModel(
 	fun init() {
 		maxPrice = medicinePriceModel.maxByOrNull { it.applyDate }?.maxPrice ?: customPrice
 	}
-	fun findHeader(data: List<String>): Boolean {
-		if (data.size < FConstants.MODEL_MEDICINE_COUNT) {
-			return false
-		}
-
-		for (index in 0 until FConstants.MODEL_MEDICINE_COUNT) {
-			if (data[index] != titleGet(index)) {
-				return false
-			}
-		}
-
-		return true
-	}
-	fun rowSet(data: List<String>): Boolean? {
-		if (data.size <= 1) {
-			return false
-		}
-
-		return try {
-			for ((index, value) in data.withIndex()) {
-				indexSet(value, index)
-			}
-			if (errorCondition()) {
-				return false
-			}
-			true
-		} catch (_: Exception) {
-			null
-		}
-	}
-	fun indexSet(data: String?, index: Int) {
+	override fun indexSet(data: String?, index: Int) {
 		when (index) {
 			0 -> {
 				code = data ?: ""
@@ -108,7 +81,7 @@ data class MedicineModel(
 			22 -> medicineSubModel.etc2 = data ?: ""
 		}
 	}
-	fun titleGet(index: Int): String {
+	override fun titleGet(index: Int): String {
 		return when (index) {
 			0 -> FConstants.MODEL_MEDICINE_CODE
 			1 -> FConstants.MODEL_MEDICINE_MAIN_INGREDIENT_CODE
@@ -136,7 +109,7 @@ data class MedicineModel(
 			else -> ""
 		}
 	}
-	fun errorCondition(): Boolean {
+	override fun errorCondition(): Boolean {
 		if (code.isBlank()) {
 			return true
 		} else if (name.isBlank()) {
@@ -144,7 +117,7 @@ data class MedicineModel(
 		}
 		return false
 	}
-	fun errorString() = "${FConstants.MODEL_MEDICINE_CODE} : ${code}\n${FConstants.MODEL_MEDICINE_NAME} : ${name}"
+	override fun errorString() = "${FConstants.MODEL_MEDICINE_CODE} : ${code}\n${FConstants.MODEL_MEDICINE_NAME} : ${name}"
 	fun insertString(): String {
 		val mainIngredientCode = FExtensions.escapeString(mainIngredientCode)
 		val name = FExtensions.escapeString(name)

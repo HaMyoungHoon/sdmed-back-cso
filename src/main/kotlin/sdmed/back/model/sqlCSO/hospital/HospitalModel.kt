@@ -6,6 +6,7 @@ import sdmed.back.config.FExtensions
 import sdmed.back.model.common.BillType
 import sdmed.back.model.common.ContractType
 import sdmed.back.model.common.DeliveryDiv
+import sdmed.back.model.sqlCSO.FExcelParseModel
 import sdmed.back.model.sqlCSO.pharma.PharmaModel
 import java.lang.StringBuilder
 import java.sql.Date
@@ -75,41 +76,10 @@ data class HospitalModel(
 	@Column(columnDefinition = "bit default 0", nullable = false)
 	var inVisible: Boolean = false,
 	@Transient
-	var pharmaList: MutableList<PharmaModel> = mutableListOf(),
-	) {
-	fun findHeader(data: List<String>): Boolean {
-		if (data.size < FConstants.MODEL_HOS_COUNT) {
-			return false
-		}
-
-		if (data[0] != titleGet(0) || data[1] != titleGet(1) || data[2] != titleGet(2) || data[3] != titleGet(3) ||
-			data[4] != titleGet(4) || data[5] != titleGet(5) ||	data[6] != titleGet(6) || data[7] != titleGet(7) ||
-			data[8] != titleGet(8) || data[9] != titleGet(9) ||	data[10] != titleGet(10) || data[11] != titleGet(11) ||
-			data[12] != titleGet(12) || data[13] != titleGet(13) ||	data[14] != titleGet(14) || data[15] != titleGet(15) ||
-			data[16] != titleGet(16) || data[17] != titleGet(17) ||	data[18] != titleGet(18) || data[19] != titleGet(19) ||
-			data[20] != titleGet(20) || data[21] != titleGet(21) ||	data[22] != titleGet(22)) {
-			return false
-		}
-
-		return true
-	}
-	fun rowSet(data: List<String>): Boolean? {
-		if (data.size <= 1) {
-			return false
-		}
-
-		return try {
-			for ((index, value) in data.withIndex()) {
-				indexSet(value, index)
-			}
-			if (errorCondition()) {
-				return false
-			}
-			true
-		} catch (_: Exception) {
-			null
-		}
-	}
+	var pharmaList: MutableList<PharmaModel> = mutableListOf()
+): FExcelParseModel() {
+	@Transient
+	override var dataCount = FConstants.MODEL_HOS_COUNT
 	fun indexGet(index: Int): String {
 		return when (index) {
 			0 -> code
@@ -138,7 +108,7 @@ data class HospitalModel(
 			else -> ""
 		}
 	}
-	fun indexSet(data: String?, index: Int) {
+	override fun indexSet(data: String?, index: Int) {
 		when (index) {
 			0 -> code = data ?: ""
 			1 -> orgName = data ?: ""
@@ -165,7 +135,7 @@ data class HospitalModel(
 			22 -> etc2 = data ?: ""
 		}
 	}
-	fun titleGet(index: Int): String {
+	override fun titleGet(index: Int): String {
 		return when (index) {
 			0 -> FConstants.MODEL_CODE
 			1 -> FConstants.MODEL_ORG_NAME
@@ -193,7 +163,7 @@ data class HospitalModel(
 			else -> ""
 		}
 	}
-	fun errorCondition(): Boolean {
+	override fun errorCondition(): Boolean {
 		if (indexGet(0).isBlank()) {
 			return true
 		} else if (indexGet(1).isEmpty()) {
@@ -211,7 +181,7 @@ data class HospitalModel(
 		}
 		return false
 	}
-	fun errorString(): String {
+	override fun errorString(): String {
 		val ret = StringBuilder()
 		for (i in 0 until FConstants.MODEL_HOS_COUNT) {
 			ret.append("${titleGet(i)} : ${indexGet(i)}\n")

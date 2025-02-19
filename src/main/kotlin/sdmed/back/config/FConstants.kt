@@ -135,9 +135,6 @@ object FConstants {
 	const val MODEL_MEDICINE_PRICE_INSERT_INTO = "INSERT INTO MedicinePriceModel (thisPK, kdCode, maxPrice, ancestorCode, applyDate) VALUES "
 	const val MODEL_MEDICINE_INGREDIENT_INSERT_INTO = "INSERT INTO MedicineIngredientModel (thisPK, mainIngredientCode, mainIngredientName) VALUES "
 
-	const val MODEL_USER_RELATIONS_DELETE_WHERE_USER_PK = "DELETE FROM UserRelationModel WHERE userPK = "
-	const val MODEL_USER_RELATIONS_INSERT_INTO = "INSERT INTO UserRelationModel (thisPK, userPK, hosPK, pharmaPK, medicinePK) VALUES "
-
 	const val MODEL_PHARMA_MEDICINE_PARSE_PHARMA_NAME = "발주처"
 	const val MODEL_PHARMA_MEDICINE_PARSE_MEDICINE_NAME = "제품명"
 	const val MODEL_PHARMA_MEDICINE_PARSE_PHARMA_CODE = "발주처코드"
@@ -147,6 +144,15 @@ object FConstants {
 	const val MODEL_EDI_DUE_DATE_DATE = "날짜"
 	const val MODEL_EDI_DUE_DATE_PHARMA_CODE = "제약사코드"
 	const val MODEL_EDI_DUE_DATE_COUNT = 2
+
+	const val MODEL_USER_RELATION_ID = "아이디"
+	const val MODEL_USER_RELATION_HOSPITAL_CODE = "병원코드"
+	const val MODEL_USER_RELATION_PHARMA_CODE = "제약사코드"
+	const val MODEL_USER_RELATION_MEDICINE_CODE = "약품코드"
+	const val MODEL_USER_RELATION_COUNT = 4
+	const val MODEL_USER_RELATIONS_DELETE_WHERE_USER_PK = "DELETE FROM UserRelationModel WHERE userPK = "
+	const val MODEL_USER_RELATIONS_DELETE_WHERE_USER_PK_IN = "DELETE FROM UserRelationModel WHERE userPK IN "
+	const val MODEL_USER_RELATIONS_INSERT_INTO = "INSERT INTO UserRelationModel (thisPK, userPK, hosPK, pharmaPK, medicinePK) VALUES "
 
 	const val NEW_HOSPITAL_CODE = "-99999"
 	const val NEW_HOSPITAL_NAME = "신규처"

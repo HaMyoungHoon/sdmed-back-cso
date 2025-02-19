@@ -11,6 +11,7 @@ import sdmed.back.model.sqlCSO.medicine.MedicinePriceModel
 import sdmed.back.model.sqlCSO.pharma.PharmaMedicineExcelParsingModel
 import sdmed.back.model.sqlCSO.pharma.PharmaModel
 import sdmed.back.model.sqlCSO.user.UserDataModel
+import sdmed.back.model.sqlCSO.user.UserMappingBuffModel
 import java.util.*
 
 @Component
@@ -221,6 +222,32 @@ class FExcelFileParser {
 			if (setRowRet == null) {
 				FExtensions.fileDelete(copiedLocation)
 				throw EDIDueDateFileUploadException(model.errorString())
+			}
+			if (setRowRet == false) {
+				return@forEach
+			}
+			ret.add(model)
+		}
+
+		return ret
+	}
+	fun userMappingDateUploadExcelParse(uploaderID: String, file: MultipartFile): MutableList<UserMappingBuffModel> {
+		FExtensions.folderExist(FExcelParserType.USER_MAPPING)
+		val copiedLocation = FExtensions.fileCopy(file, FExcelParserType.USER_MAPPING, uploaderID)
+		val excelSheetHandler = ExcelSheetHandler.readExcel(copiedLocation.toFile())
+
+		if (!UserMappingBuffModel().findHeader(excelSheetHandler.header)) {
+			FExtensions.fileDelete(copiedLocation)
+			throw UserMappingFileUploadException()
+		}
+
+		val ret: MutableList<UserMappingBuffModel> = mutableListOf()
+		excelSheetHandler.rows.forEach { x ->
+			val model = UserMappingBuffModel()
+			val setRowRet = model.rowSet(x)
+			if (setRowRet == null) {
+				FExtensions.fileDelete(copiedLocation)
+				throw UserMappingFileUploadException(model.errorString())
 			}
 			if (setRowRet == false) {
 				return@forEach
