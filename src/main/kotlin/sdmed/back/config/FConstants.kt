@@ -46,7 +46,7 @@ object FConstants {
 	const val MODEL_USER_ROLE = "권한"
 	const val MODEL_USER_DEPT = "부서"
 	const val MODEL_USER_STATUS = "상태"
-	const val MODEL_USER_COMPANY_NAME = "회사명"
+	const val MODEL_USER_COMPANY_NAME = "사업자"
 	const val MODEL_USER_COMPANY_NUMBER = "사업자등록번호"
 	const val MODEL_USER_COMPANY_ADDRESS = "회사주소"
 	const val MODEL_USER_BANK_ACCOUNT = "은행계좌번호"
@@ -159,9 +159,9 @@ object FConstants {
 
 	const val REGEX_CHECK_ID = "^[A-Za-z0-9가-힣]{3,20}\$"
 	// 숫자, 문자(영대소한글)
-	const val REGEX_CHECK_PASSWORD_0 = "^(?=.*[A-Za-z가-힣ㄱ-ㅎㅏ-ㅣ])(?=.*\\d)[A-Za-z가-힣ㄱ-ㅎㅏ-ㅣ\\d@\$!@#\$%^&*()]{8,20}\$"
+	const val REGEX_CHECK_PASSWORD_0 = "^(?=.*[A-Za-z가-힣ㄱ-ㅎㅏ-ㅣ!@#\$%^&*()])(?=.*\\d)[A-Za-z가-힣ㄱ-ㅎㅏ-ㅣ\\d@\$!@#\$%^&*()]{8,20}\$"
 	// 숫자, 특수문자, 문자(영대소한글)
-	const val REGEX_CHECK_PASSWORD_1 = "^(?=.*[A-Za-z가-힣ㄱ-ㅎㅏ-ㅣ])(?=.*\\d)(?=.*[@\$!@#\$%^&*()])[A-Za-z가-힣ㄱ-ㅎㅏ-ㅣ\\d@\$!@#\$%^&*()]{8,20}\$"
+	const val REGEX_CHECK_PASSWORD_1 = "^(?=.*[A-Za-z가-힣ㄱ-ㅎㅏ-ㅣ!@#\$%^&*()])(?=.*\\d)(?=.*[@\$!@#\$%^&*()])[A-Za-z가-힣ㄱ-ㅎㅏ-ㅣ\\d@\$!@#\$%^&*()]{8,20}\$"
 	// 숫자, 대문자, 소문자
 	const val REGEX_CHECK_PASSWORD_2 = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{8,20}\$"
 	const val REGEX_ONLY_NUMBER = "[^0-9]"

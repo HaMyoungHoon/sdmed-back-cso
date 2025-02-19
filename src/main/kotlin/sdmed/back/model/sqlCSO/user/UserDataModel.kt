@@ -110,8 +110,16 @@ data class UserDataModel(
 	}
 	override fun indexSet(data: String?, index: Int) {
 		when (index) {
-			0 -> id = data ?: ""
-			1 -> pw = data ?: ""
+			0 -> {
+				if (FExtensions.regexIdCheck(data) == true) {
+					id = data ?: ""
+				}
+			}
+			1 -> {
+				if (FExtensions.regexPasswordCheck(data) == true) {
+					pw = data ?: ""
+				}
+			}
 			2 -> name = data ?: ""
 			3 -> mail = data ?: ""
 			4 -> phoneNumber = data ?: ""
@@ -142,9 +150,9 @@ data class UserDataModel(
 		}
 	}
 	override fun errorCondition(): Boolean {
-		if (indexGet(0).isEmpty()) {
+		if (indexGet(0).length < 3) {
 			return true
-		} else if (indexGet(1).isEmpty()) {
+		} else if (indexGet(1).length < 8) {
 			return true
 		} else if (indexGet(2).isEmpty()) {
 			return true
@@ -159,8 +167,6 @@ data class UserDataModel(
 		return ret.toString()
 	}
 	fun insertString(): String {
-		val id = FExtensions.regexSpecialCharRemove(id)
-		val pw = FExtensions.regexSpecialCharRemove(pw)
 		val name = FExtensions.regexSpecialCharRemove(name)
 		val mail = FExtensions.escapeString(mail)
 		val phoneNumber = FExtensions.escapeString(phoneNumber)
