@@ -80,33 +80,26 @@ class PharmaListService: PharmaService() {
 			throw AuthenticationEntryPointException()
 		}
 
-		val pharmaDataModel = excelFileParser.pharmaUploadExcelParse(tokenUser.id, file)
-		var index = 0
+		val excelModel = excelFileParser.pharmaUploadExcelParse(tokenUser.id, file)
 		val already: MutableList<PharmaModel> = mutableListOf()
-		while (true) {
-			if (pharmaDataModel.count() > index + 500) {
-				already.addAll(pharmaRepository.findAllByCodeIn(pharmaDataModel.subList(index, index + 500).map { it.code }))
-			} else {
-				already.addAll(pharmaRepository.findAllByCodeIn(pharmaDataModel.subList(index, pharmaDataModel.count()).map { it.code }))
-				break
-			}
-			index += 500
-		}
-		pharmaDataModel.removeIf { x -> x.code in already.map { y -> y.code } }
-		if (pharmaDataModel.isEmpty()) {
-			return "count : 0"
-		}
-		index = 0
+		excelModel.chunked(500).forEach { x -> already.addAll(pharmaRepository.findAllByCodeIn(x.map { y -> y.code })) }
 		var retCount = 0
-		while (true) {
-			if (pharmaDataModel.count() > index + 500) {
-				retCount += insertAll(pharmaDataModel.subList(index, index + 500))
-			} else {
-				retCount += insertAll(pharmaDataModel.subList(index, pharmaDataModel.count()))
-				break
+		val saveList = excelModel.toMutableList()
+		saveList.removeIf { x -> x.code in already.map { y -> y.code } }
+		saveList.chunked(500).forEach { x -> retCount += insertAll(x) }
+		if (already.isNotEmpty()) {
+			val buffMap = excelModel.associateBy { it.code }
+			if (already.isNotEmpty()) {
+				already.forEach { x ->
+					val buff = buffMap[x.code]
+					if (buff != null) {
+						x.safeCopy(buff)
+					}
+				}
 			}
-			index += 500
 		}
+		already.chunked(500).forEach { x -> retCount += updateAll(x) }
+
 		val stackTrace = Thread.currentThread().stackTrace
 		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "add pharma count : $retCount")
 		logRepository.save(logModel)
@@ -226,11 +219,26 @@ class PharmaListService: PharmaService() {
 	}
 
 	private fun insertAll(data: List<PharmaModel>): Int {
+		if (data.isEmpty()) {
+			return 0
+		}
 		val values: String = data.stream().map{it.insertString()}.collect(Collectors.joining(","))
 		val sqlString = "${FConstants.MODEL_PHARMA_INSERT_INTO}$values"
 		val ret = entityManager.createNativeQuery(sqlString).executeUpdate()
 		entityManager.flush()
 		entityManager.clear()
 		return ret
+	}
+	private fun updateAll(data: List<PharmaModel>): Int {
+		if (data.isEmpty()) {
+			return 0
+		}
+
+		data.forEach { x ->
+			entityManager.merge(x)
+		}
+		entityManager.flush()
+		entityManager.clear()
+		return data.size
 	}
 }

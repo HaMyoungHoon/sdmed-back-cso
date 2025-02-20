@@ -76,10 +76,13 @@ object FConstants {
 	const val MODEL_MOBILE_PHONE = "담당자번호"
 	const val MODEL_OPEN_DATE = "거래개시일"
 	const val MODEL_CLOSE_DATE = "거래종료일"
+	const val MODEL_RETROACTIVE_RULE = "소급기준"
+	const val MODEL_INNER_SETTLEMENT_RULE = "내부정산기준"
+	const val MODEL_OUTER_SETTLEMENT_RULE = "외부정산기준"
 	const val MODEL_ETC1 = "비고1"
 	const val MODEL_ETC2 = "비고2"
-	const val MODEL_PHARMA_COUNT = 23
-	const val MODEL_PHARMA_INSERT_INTO = "INSERT INTO PharmaModel (thisPK, code, orgName, innerName, ownerName, taxpayerNumber, phoneNumber, faxNumber, zipCode, address, addressDetail, businessType, businessItem, billType, pharmaType, pharmaGroup, contractType, deliveryDiv, mail, mobilePhone, openDate, closeDate, etc1, etc2, imageUrl, inVisible) VALUES "
+	const val MODEL_PHARMA_COUNT = 26
+	const val MODEL_PHARMA_INSERT_INTO = "INSERT INTO PharmaModel (thisPK, code, orgName, innerName, ownerName, taxpayerNumber, phoneNumber, faxNumber, zipCode, address, addressDetail, businessType, businessItem, billType, pharmaType, pharmaGroup, contractType, deliveryDiv, mail, mobilePhone, openDate, closeDate, retroactiveRule, innerSettlementRule, outerSettlementRule, etc1, etc2, imageUrl, inVisible) VALUES "
 
 	const val MODEL_PHARMA_MEDICINE_RELATIONS_DELETE_WHERE_PHARMA_PK = "DELETE FROM PharmaMedicineRelationModel WHERE pharmaPK = "
 	const val MODEL_PHARMA_MEDICINE_RELATIONS_INSERT_INTO = "INSERT INTO PharmaMedicineRelationModel (thisPK, pharmaPK, medicinePK) VALUES "

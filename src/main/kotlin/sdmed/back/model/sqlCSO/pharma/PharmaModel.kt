@@ -59,6 +59,12 @@ data class PharmaModel(
 	var openDate: Date? = null,
 	@Column
 	var closeDate: Date? = null,
+	@Column(columnDefinition = "text", nullable = false)
+	var retroactiveRule: String = "",
+	@Column(columnDefinition = "text", nullable = false)
+	var innerSettlementRule: String = "",
+	@Column(columnDefinition = "text", nullable = false)
+	var outerSettlementRule: String = "",
 	// mysql
 	@Column(columnDefinition = "text", nullable = false)
 //	@Column(columnDefinition = "nvarchar(max)", nullable = false)
@@ -103,8 +109,11 @@ data class PharmaModel(
 			18 -> mobilePhone
 			19 -> FExtensions.parseDateTimeString(openDate, "yyyy-MM-dd")
 			20 -> FExtensions.parseDateTimeString(closeDate, "yyyy-MM-dd")
-			21 -> etc1
-			22 -> etc2
+			21 -> retroactiveRule
+			22 -> innerSettlementRule
+			23 -> outerSettlementRule
+			24 -> etc1
+			25 -> etc2
 			else -> ""
 		}
 	}
@@ -131,8 +140,11 @@ data class PharmaModel(
 			18 -> mobilePhone = data ?: ""
 			19 -> openDate = if (data.isNullOrEmpty()) null else FExtensions.parseStringToSqlDate(data, "yyyy-MM-dd")
 			20 -> closeDate = if (data.isNullOrEmpty()) null else FExtensions.parseStringToSqlDate(data, "yyyy-MM-dd")
-			21 -> etc1 = data ?: ""
-			22 -> etc2 = data ?: ""
+			21 -> retroactiveRule = data ?: ""
+			22 -> innerSettlementRule = data ?: ""
+			23 -> outerSettlementRule = data ?: ""
+			24 -> etc1 = data ?: ""
+			25 -> etc2 = data ?: ""
 		}
 	}
 	override fun titleGet(index: Int): String {
@@ -158,8 +170,11 @@ data class PharmaModel(
 			18 -> FConstants.MODEL_MOBILE_PHONE
 			19 -> FConstants.MODEL_OPEN_DATE
 			20 -> FConstants.MODEL_CLOSE_DATE
-			21 -> FConstants.MODEL_ETC1
-			22 -> FConstants.MODEL_ETC2
+			21 -> FConstants.MODEL_RETROACTIVE_RULE
+			22 -> FConstants.MODEL_INNER_SETTLEMENT_RULE
+			23 -> FConstants.MODEL_OUTER_SETTLEMENT_RULE
+			24 -> FConstants.MODEL_ETC1
+			25 -> FConstants.MODEL_ETC2
 			else -> ""
 		}
 	}
@@ -204,8 +219,39 @@ data class PharmaModel(
 		val mobilePhone = FExtensions.escapeString(mobilePhone)
 		val openDateString: String = openDate?.let { "'${FExtensions.parseDateTimeString(it, "yyyy-MM-dd")}'" } ?: "null"
 		val closeDateString: String = closeDate?.let { "'${FExtensions.parseDateTimeString(it, "yyyy-MM-dd")}'" } ?: "null"
+		val retroactiveRule = FExtensions.escapeString(retroactiveRule)
+		val innerSettlementRule = FExtensions.escapeString(innerSettlementRule)
+		val outerSettlementRule = FExtensions.escapeString(outerSettlementRule)
 		val etc1 = FExtensions.escapeString(etc1)
 		val etc2 = FExtensions.escapeString(etc2)
-		return "('$thisPK', '$code', '$orgName', '$innerName', '$ownerName', '$taxpayerNumber', '$phoneNumber', '$faxNumber', '$zipCode', '$address', '$addressDetail', '$businessType', '$businessItem', '${billType.index}', '${pharmaType.index}', '${pharmaGroup.index}', '${contractType.index}', '${deliveryDiv.index}', '$mail', '$mobilePhone', $openDateString, $closeDateString, '$etc1', '$etc2', '$imageUrl', ${if (inVisible) 1 else 0})"
+		return "('$thisPK', '$code', '$orgName', '$innerName', '$ownerName', '$taxpayerNumber', '$phoneNumber', '$faxNumber', '$zipCode', '$address', '$addressDetail', '$businessType', '$businessItem', '${billType.index}', '${pharmaType.index}', '${pharmaGroup.index}', '${contractType.index}', '${deliveryDiv.index}', '$mail', '$mobilePhone', $openDateString, $closeDateString, '$retroactiveRule', '$innerSettlementRule', '$outerSettlementRule', '$etc1', '$etc2', '$imageUrl', ${if (inVisible) 1 else 0})"
+	}
+	fun safeCopy(rhs: PharmaModel): PharmaModel {
+		this.orgName = rhs.orgName
+		this.innerName = rhs.innerName
+		this.ownerName = rhs.ownerName
+		this.taxpayerNumber = rhs.taxpayerNumber
+		this.phoneNumber = rhs.phoneNumber
+		this.faxNumber = rhs.faxNumber
+		this.zipCode = rhs.zipCode
+		this.address = rhs.address
+		this.addressDetail = rhs.addressDetail
+		this.businessType = rhs.businessType
+		this.businessItem = rhs.businessItem
+		this.billType = rhs.billType
+		this.pharmaType = rhs.pharmaType
+		this.pharmaGroup = rhs.pharmaGroup
+		this.contractType = rhs.contractType
+		this.deliveryDiv = rhs.deliveryDiv
+		this.mail = rhs.mail
+		this.mobilePhone = rhs.mobilePhone
+		this.openDate = rhs.openDate
+		this.closeDate = rhs.closeDate
+		this.retroactiveRule = rhs.retroactiveRule
+		this.innerSettlementRule = rhs.innerSettlementRule
+		this.outerSettlementRule = rhs.outerSettlementRule
+		this.etc1 = rhs.etc1
+		this.etc2 = rhs.etc2
+		return this
 	}
 }
