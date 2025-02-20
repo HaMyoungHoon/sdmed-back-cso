@@ -20,7 +20,7 @@ interface IMedicineRepository: JpaRepository<MedicineModel, String> {
 
 	@Query("SELECT a FROM MedicineModel a " +
 			"LEFT JOIN PharmaModel b on a.makerCode = b.code " +
-			"WHERE a.inVisible = :inVisible AND (a.innerName LIKE %:name% OR b.innerName LIKE %:name%) " +
+			"WHERE a.inVisible = :inVisible AND (a.innerName LIKE %:name% OR b.innerName LIKE %:pharma%) " +
 			"ORDER BY a.code ASC")
 	fun selectAllByNameContainingOrPharmaContaining(name: String, pharma: String, inVisible: Boolean = false): List<MedicineModel>
 
@@ -33,7 +33,7 @@ interface IMedicineRepository: JpaRepository<MedicineModel, String> {
 	@Query("SELECT new sdmed.back.model.sqlCSO.medicine.MedicineModel(a, b.orgName) " +
 			"FROM MedicineModel a " +
 			"LEFT JOIN PharmaModel b ON a.makerCode = b.code " +
-			"WHERE a.inVisible = :inVIsible " +
+			"WHERE a.inVisible = :inVisible " +
 			"ORDER BY a.code ASC")
 	fun selectAllByInvisibleAndMakerNameOrderByCode(inVisible: Boolean = false): List<MedicineModel>
 }

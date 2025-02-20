@@ -55,20 +55,29 @@ open class MedicineService: FServiceBase() {
 		}
 	}
 	protected fun insertMedicineAll(data: List<MedicineModel>, withSub: Boolean = true): Int {
+		if (data.isEmpty()) {
+			return 0
+		}
 		val values = data.stream().map{it.insertString()}.collect(joining(","))
 		val sqlString = "${FConstants.MODEL_MEDICINE_INSERT_INTO}$values"
 		val ret = entityManager.createNativeQuery(sqlString).executeUpdate()
 		entityManager.flush()
 		entityManager.clear()
 		if (withSub) {
-			insertMedicineSubAll(data.map { it.medicineSubModel })
+			insertMedicineSubAll(data.map { it.medicineSubModel }.filter { it.code.isNotBlank() })
 		}
 		return ret
 	}
 	protected fun insertMedicineSubAll(data: List<MedicineSubModel>): Int {
-		val already = medicineSubRepository.findALlByCodeInOrderByCode(data.map { it.code })
+		if (data.isEmpty()) {
+			return 0
+		}
+		val already = medicineSubRepository.findALlByCodeInOrderByCode(data.map { it.code }).distinctBy { it.thisPK }.filter { it.code.isNotBlank() }
 		val saveList = data.filterNot { x -> x.code in already.map { y -> y.code } }
-		var ret = medicineSubRepository.saveAll(saveList).size
+		var ret = 0
+		if (saveList.isNotEmpty()) {
+			ret = medicineSubRepository.saveAll(saveList).size
+		}
 		if (already.isNotEmpty()) {
 			val buffMap = data.associateBy { it.code }
 			if (already.isNotEmpty()) {
@@ -79,7 +88,10 @@ open class MedicineService: FServiceBase() {
 					}
 				}
 			}
-			ret += entityManager.merge(already).size
+			ret += already.size
+			already.forEach { x ->
+				entityManager.merge(x)
+			}
 			entityManager.flush()
 			entityManager.clear()
 		}
@@ -92,13 +104,19 @@ open class MedicineService: FServiceBase() {
 //		return ret
 	}
 	protected fun updateMedicineAll(data: List<MedicineModel>, withSub: Boolean = true): Int {
-		val ret = entityManager.merge(data)
+		if (data.isEmpty()) {
+			return 0
+		}
+		val ret = data.size
+		data.forEach { x ->
+			entityManager.merge(x)
+		}
 		entityManager.flush()
 		entityManager.clear()
 		if (withSub) {
-			insertMedicineSubAll(data.map { it.medicineSubModel })
+			insertMedicineSubAll(data.map { it.medicineSubModel }.filter { it.code.isNotBlank() })
 		}
-		return ret.size
+		return ret
 	}
 	protected fun insertMedicineIngredientAll(data: List<MedicineIngredientModel>): Int {
 		val values = data.stream().map{it.insertString()}.collect(joining(","))
