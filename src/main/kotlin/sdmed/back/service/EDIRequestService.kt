@@ -119,6 +119,7 @@ class EDIRequestService: EDIService() {
 		ediUploadModel.day = serverTimeDay
 		ediUploadModel.regDate = serverTime
 		ediUploadModel.userPK = tokenUser.thisPK
+		ediUploadModel.id = tokenUser.id
 		ediUploadModel.name = tokenUser.name
 		val hospital = hospitalRepository.findByThisPK(ediUploadModel.hospitalPK) ?: throw HospitalNotFoundException()
 		if (hospital.inVisible) {
@@ -212,6 +213,7 @@ class EDIRequestService: EDIService() {
 		ediUploadModel.day = serverTimeDay
 		ediUploadModel.regDate = serverTime
 		ediUploadModel.userPK = tokenUser.thisPK
+		ediUploadModel.id = tokenUser.id
 		ediUploadModel.name = tokenUser.name
 		var hospital = hospitalRepository.selectByNewHospital()
 		if (hospital == null) {

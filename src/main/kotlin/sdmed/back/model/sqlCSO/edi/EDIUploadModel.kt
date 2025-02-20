@@ -32,6 +32,8 @@ data class EDIUploadModel(
 	@Column(columnDefinition = "nvarchar(36)", updatable = false, nullable = false)
 	var userPK: String = "",
 	@Column(columnDefinition = "nvarchar(255)", nullable = false)
+	var id: String = "",
+	@Column(columnDefinition = "nvarchar(255)", nullable = false)
 	var name: String = "",
 	@Column(columnDefinition = "nvarchar(4)", nullable = false)
 	var year: String = "",
