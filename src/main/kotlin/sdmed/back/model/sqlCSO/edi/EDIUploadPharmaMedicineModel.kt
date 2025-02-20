@@ -37,6 +37,8 @@ data class EDIUploadPharmaMedicineModel(
 	var makerCode: String = "",
 	@Column(columnDefinition = "nvarchar(36)", updatable = false, nullable = false)
 	var medicinePK: String = "",
+	@Column(columnDefinition = "nvarchar(20)", updatable = false, nullable = false)
+	var kdCode: String = "",
 	@Column(columnDefinition = "nvarchar(255)", updatable = false, nullable = false)
 	var name: String = "",
 	@Column
