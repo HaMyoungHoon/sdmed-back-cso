@@ -152,7 +152,7 @@ data class UserDataModel(
 	override fun errorCondition(): Boolean {
 		if (indexGet(0).length < 3) {
 			return true
-		} else if (indexGet(1).length < 8) {
+		} else if (indexGet(1).length < 7) {
 			return true
 		} else if (indexGet(2).isEmpty()) {
 			return true
