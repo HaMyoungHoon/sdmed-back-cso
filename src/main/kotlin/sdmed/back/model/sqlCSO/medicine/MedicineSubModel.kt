@@ -58,4 +58,21 @@ data class MedicineSubModel(
 		return "('$thisPK', '$code', '$standard', '$accountUnit', '${medicineType.index}', '${medicineMethod.index}', '${medicineCategory.index}', '${medicineGroup.index}', " +
 				"'${medicineDiv.index}', '${medicineRank.index}', '${medicineStorageTemp.index}', '${medicineStorageBox.index}', '$packageUnit', '$unit', '$etc1', '$etc2')"
 	}
+	fun safeCopy(rhs: MedicineSubModel): MedicineSubModel {
+		this.standard = rhs.standard
+		this.accountUnit = rhs.accountUnit
+		this.medicineType = rhs.medicineType
+		this.medicineMethod = rhs.medicineMethod
+		this.medicineCategory = rhs.medicineCategory
+		this.medicineGroup = rhs.medicineGroup
+		this.medicineDiv = rhs.medicineDiv
+		this.medicineRank = rhs.medicineRank
+		this.medicineStorageTemp = rhs.medicineStorageTemp
+		this.medicineStorageBox = rhs.medicineStorageBox
+		this.packageUnit = rhs.packageUnit
+		this.unit = rhs.unit
+		this.etc1 = rhs.etc1
+		this.etc2 = rhs.etc2
+		return this
+	}
 }

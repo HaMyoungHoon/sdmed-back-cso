@@ -21,7 +21,7 @@ open class MedicineService: FServiceBase() {
 
 	protected fun getAllMedicine(token: String, withAllPrice: Boolean = false): List<MedicineModel> {
 		isValid(token)
-		val ret = medicineRepository.selectAllByInVisibleOrderByCode()
+		val ret = medicineRepository.selectAllByInvisibleAndMakerNameOrderByCode()
 		val sub = medicineSubRepository.findAllByOrderByCode()
 		val ingredient = medicineIngredientRepository.findAllByOrderByMainIngredientCode()
 		medicineMerge(ret, sub, ingredient)
@@ -67,14 +67,38 @@ open class MedicineService: FServiceBase() {
 	}
 	protected fun insertMedicineSubAll(data: List<MedicineSubModel>): Int {
 		val already = medicineSubRepository.findALlByCodeInOrderByCode(data.map { it.code })
-		val buff = data.filterNot { it.code in already.map { it.code } }
-		return medicineSubRepository.saveAll(buff).size
+		val saveList = data.filterNot { x -> x.code in already.map { y -> y.code } }
+		var ret = medicineSubRepository.saveAll(saveList).size
+		if (already.isNotEmpty()) {
+			val buffMap = data.associateBy { it.code }
+			if (already.isNotEmpty()) {
+				already.forEach { x ->
+					val buff = buffMap[x.code]
+					if (buff != null) {
+						x.safeCopy(buff)
+					}
+				}
+			}
+			ret += entityManager.merge(already).size
+			entityManager.flush()
+			entityManager.clear()
+		}
+		return ret
 //		val values = data.stream().map{it.insertString()}.collect(joining(","))
 //		val sqlString = "${FConstants.MODEL_MEDICINE_SUB_INSERT_INTO}$values"
 //		val ret = entityManager.createNativeQuery(sqlString).executeUpdate()
 //		entityManager.flush()
 //		entityManager.clear()
 //		return ret
+	}
+	protected fun updateMedicineAll(data: List<MedicineModel>, withSub: Boolean = true): Int {
+		val ret = entityManager.merge(data)
+		entityManager.flush()
+		entityManager.clear()
+		if (withSub) {
+			insertMedicineSubAll(data.map { it.medicineSubModel })
+		}
+		return ret.size
 	}
 	protected fun insertMedicineIngredientAll(data: List<MedicineIngredientModel>): Int {
 		val values = data.stream().map{it.insertString()}.collect(joining(","))

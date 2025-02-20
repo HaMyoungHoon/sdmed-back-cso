@@ -94,7 +94,7 @@ class EDIService: FServiceBase() {
 						this.price = if (existMedicine.customPrice != 0) existMedicine.customPrice else existMedicine.maxPrice
 					}
 					this.charge = existMedicine.charge
-					this.name = existMedicine.name
+					this.name = existMedicine.orgName
 					this.makerCode = existMedicine.makerCode
 				})
 			}

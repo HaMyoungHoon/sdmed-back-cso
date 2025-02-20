@@ -53,15 +53,21 @@ class MedicineListService: MedicineService() {
 		val excelModel = excelFileParser.medicineUploadExcelParse(tokenUser.id, file)
 		val already: MutableList<MedicineModel> = mutableListOf()
 		excelModel.chunked(500).forEach { x-> already.addAll(medicineRepository.findAllByCodeIn(x.map { y -> y.code })) }
-		excelModel.removeIf { x -> x.code in already.map { y -> y.code } }
-		if (excelModel.isEmpty()) {
-			return "count : 0"
-		}
-
+		val insertData = excelModel.toMutableList()
+		insertData.removeIf { x -> x.code in already.map { y -> y.code } }
 		var retCount = 0
-		excelModel.chunked(500).forEach { retCount += insertMedicineAll(it) }
-		if (retCount == 0) {
-			return "count : $retCount"
+		if (insertData.isNotEmpty()) {
+			insertData.chunked(500).forEach { retCount += insertMedicineAll(it) }
+		}
+		val excelMap = excelModel.associateBy { it.code }
+		if (already.isNotEmpty()) {
+			already.forEach { x ->
+				val buff = excelMap[x.code]
+				if (buff != null) {
+					x.safeCopy(buff)
+				}
+			}
+			already.chunked(500).forEach { retCount += updateMedicineAll(it) }
 		}
 
 		val stackTrace = Thread.currentThread().stackTrace
@@ -102,7 +108,7 @@ class MedicineListService: MedicineService() {
 		val ret = medicineRepository.save(data)
 		medicineSubRepository.save(data.medicineSubModel)
 		val stackTrace = Thread.currentThread().stackTrace
-		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "${data.name} modify")
+		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "${data.orgName} modify")
 		logRepository.save(logModel)
 		return ret
 	}

@@ -96,6 +96,7 @@ object FConstants {
 	const val MODEL_MEDICINE_MAKER_NAME = "제조사"
 	const val MODEL_MEDICINE_MAKER_CODE = "제조사코드"
 	const val MODEL_MEDICINE_NAME = "제품명"
+	const val MODEL_MEDICINE_INNER_NAME = "내부명"
 	const val MODEL_MEDICINE_STANDARD = "규격"
 	const val MODEL_MEDICINE_ACCOUNT_UNIT = "계산단위"
 	const val MODEL_MEDICINE_CHARGE = "수수료율"
@@ -112,8 +113,8 @@ object FConstants {
 	const val MODEL_MEDICINE_UNIT = "단위"
 	const val MODEL_MEDICINE_ETC1 = "비고1"
 	const val MODEL_MEDICINE_ETC2 = "비고2"
-	const val MODEL_MEDICINE_COUNT = 23
-	const val MODEL_MEDICINE_INSERT_INTO = "INSERT INTO MedicineModel (thisPK, code, mainIngredientCode, kdCode, standardCode, makerCode, name, customPrice, charge, inVisible) VALUES "
+	const val MODEL_MEDICINE_COUNT = 24
+	const val MODEL_MEDICINE_INSERT_INTO = "INSERT INTO MedicineModel (thisPK, code, mainIngredientCode, kdCode, standardCode, makerCode, name, innerName, customPrice, charge, inVisible) VALUES "
 	const val MODEL_MEDICINE_SUB_INSERT_INTO = "INSERT INTO MedicineSubModel (thisPK, code, standard, accountUnit, " +
 			"medicineType, medicineMethod, medicineCategory, medicineGroup, medicineDiv, medicineRank, medicineStorageTemp, medicineStorageBox, " +
 			"packageUnit, unit, etc1, etc2) VALUES "
