@@ -99,6 +99,7 @@ class QnAListService: QnAService() {
 
 		val header = QnAHeaderModel().apply {
 			this.userPK = tokenUser.thisPK
+			this.id = tokenUser.id
 			this.name = tokenUser.name
 			this.title = title
 		}

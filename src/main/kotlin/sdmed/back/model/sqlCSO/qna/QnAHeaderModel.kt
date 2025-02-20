@@ -13,6 +13,8 @@ data class QnAHeaderModel(
 	@Column(columnDefinition = "nvarchar(36)", updatable = false, nullable = false)
 	var userPK: String = "",
 	@Column(columnDefinition = "nvarchar(255)", updatable = false, nullable = false)
+	var id: String = "",
+	@Column(columnDefinition = "nvarchar(255)", updatable = false, nullable = false)
 	var name: String = "",
 	@Column(columnDefinition = "nvarchar(100)", updatable = false, nullable = false)
 	var title: String = "",
