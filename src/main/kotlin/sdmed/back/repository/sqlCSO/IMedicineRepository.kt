@@ -3,6 +3,7 @@ package sdmed.back.repository.sqlCSO
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.stereotype.Repository
+import sdmed.back.model.common.medicine.MedicineDiv
 import sdmed.back.model.sqlCSO.medicine.MedicineModel
 
 @Repository
@@ -30,10 +31,22 @@ interface IMedicineRepository: JpaRepository<MedicineModel, String> {
 	fun selectAllByInVisibleOrderByCode(inVisible: Boolean = false): List<MedicineModel>
 
 
-	@Query("SELECT new sdmed.back.model.sqlCSO.medicine.MedicineModel(a, b.orgName) " +
+	@Query("SELECT new sdmed.back.model.sqlCSO.medicine.MedicineModel(a, b.orgName, d.orgName) " +
 			"FROM MedicineModel a " +
 			"LEFT JOIN PharmaModel b ON a.makerCode = b.code " +
+			"LEFT JOIN PharmaMedicineRelationModel c ON a.thisPK = c.medicinePK " +
+			"LEFT JOIN PharmaModel d ON c.pharmaPK = d.thisPK " +
 			"WHERE a.inVisible = :inVisible " +
 			"ORDER BY a.code ASC")
-	fun selectAllByInvisibleAndMakerNameOrderByCode(inVisible: Boolean = false): List<MedicineModel>
+	fun selectAllByInvisibleOrderByCode(inVisible: Boolean = false): List<MedicineModel>
+
+	@Query("SELECT new sdmed.back.model.sqlCSO.medicine.MedicineModel(a, b.orgName, d.orgName) " +
+			"FROM MedicineModel a " +
+			"LEFT JOIN PharmaModel b ON a.makerCode = b.code " +
+			"LEFT JOIN PharmaMedicineRelationModel c ON a.thisPK = c.medicinePK " +
+			"LEFT JOIN PharmaModel d ON c.pharmaPK = d.thisPK " +
+			"LEFT JOIN MedicineSubModel e ON a.code = e.code " +
+			"WHERE a.inVisible = :inVisible AND e.medicineDiv = :medicineDiv " +
+			"ORDER BY a.code ASC")
+	fun selectAllByInvisibleOpenOrderByCode(inVisible: Boolean = false, medicineDiv: MedicineDiv = MedicineDiv.Open): List<MedicineModel>
 }

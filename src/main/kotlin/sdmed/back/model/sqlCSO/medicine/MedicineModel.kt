@@ -22,6 +22,8 @@ data class MedicineModel(
 	@Column
 	var standardCode: Long = 0L,
 	@Transient
+	var clientName: String? = null,
+	@Transient
 	var makerName: String? = null,
 	@Column(columnDefinition = "nvarchar(50)", nullable = false)
 	var makerCode: String = "",
@@ -47,12 +49,13 @@ data class MedicineModel(
 	@Transient
 	var medicinePriceModel: MutableList<MedicinePriceModel> = mutableListOf(),
 ): FExcelParseModel() {
-	constructor(buff: MedicineModel, makerName: String?) : this() {
+	constructor(buff: MedicineModel, makerName: String?, clientName: String?) : this() {
 		this.thisPK = buff.thisPK
 		this.code = buff.code
 		this.mainIngredientCode = buff.mainIngredientCode
 		this.kdCode = buff.kdCode
 		this.standardCode = buff.standardCode
+		this.clientName = clientName
 		this.makerName = makerName
 		this.makerCode = buff.makerCode
 		this.orgName = buff.orgName
@@ -146,9 +149,9 @@ data class MedicineModel(
 	override fun errorString() = "${FConstants.MODEL_MEDICINE_CODE} : ${code}\n${FConstants.MODEL_MEDICINE_NAME} : ${orgName}"
 	fun insertString(): String {
 		val mainIngredientCode = FExtensions.escapeString(mainIngredientCode)
-		val name = FExtensions.escapeString(orgName)
 		val innerName = FExtensions.escapeString(innerName)
-		return "('$thisPK', '$code', '$mainIngredientCode', '$kdCode', '$standardCode', '$makerCode', '$name', '$innerName', '$customPrice', '$charge', ${if (inVisible) 1 else 0})"
+		val orgName = FExtensions.escapeString(orgName)
+		return "('$thisPK', '$code', '$mainIngredientCode', '$kdCode', '$standardCode', '$makerCode', '$innerName', '$orgName', '$customPrice', '$charge', ${if (inVisible) 1 else 0})"
 	}
 	fun insertSubString() = medicineSubModel.insertString()
 

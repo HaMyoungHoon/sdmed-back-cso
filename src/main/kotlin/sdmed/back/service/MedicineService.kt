@@ -3,6 +3,8 @@ package sdmed.back.service
 import org.springframework.beans.factory.annotation.Autowired
 import sdmed.back.config.FConstants
 import sdmed.back.config.FServiceBase
+import sdmed.back.model.common.user.UserRole
+import sdmed.back.model.common.user.UserRoles
 import sdmed.back.model.sqlCSO.medicine.MedicineIngredientModel
 import sdmed.back.model.sqlCSO.medicine.MedicineModel
 import sdmed.back.model.sqlCSO.medicine.MedicinePriceModel
@@ -21,7 +23,12 @@ open class MedicineService: FServiceBase() {
 
 	protected fun getAllMedicine(token: String, withAllPrice: Boolean = false): List<MedicineModel> {
 		isValid(token)
-		val ret = medicineRepository.selectAllByInvisibleAndMakerNameOrderByCode()
+		val tokenUser = getUserDataByToken(token)
+		val ret = if (haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee))) {
+			medicineRepository.selectAllByInvisibleOrderByCode()
+		} else {
+			medicineRepository.selectAllByInvisibleOpenOrderByCode()
+		}
 		val sub = medicineSubRepository.findAllByOrderByCode()
 		val ingredient = medicineIngredientRepository.findAllByOrderByMainIngredientCode()
 		medicineMerge(ret, sub, ingredient)
