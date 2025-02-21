@@ -210,4 +210,31 @@ data class HospitalModel(
 		val etc2 = FExtensions.escapeString(etc2)
 		return "('$thisPK', '$code', '$orgName', '$innerName', '$ownerName', '$taxpayerNumber', '$phoneNumber', '$faxNumber', '$zipCode', '$address', '$addressDetail', '$businessType', '$businessItem', '${billType.index}', '$licenseNumber', '$nursingHomeNumber', '${contractType.index}', '${deliveryDiv.index}', '$mail', '$mobilePhone', $openDateString, $closeDateString, '$etc1', '$etc2', '$imageUrl', ${if (inVisible) 1 else 0})"
 	}
+	fun safeCopy(rhs: HospitalModel): HospitalModel {
+		this.orgName = rhs.orgName
+		this.innerName = rhs.innerName
+		this.ownerName = rhs.ownerName
+		this.taxpayerNumber = rhs.taxpayerNumber
+		this.phoneNumber = rhs.phoneNumber
+		this.faxNumber = rhs.faxNumber
+		this.zipCode = rhs.zipCode
+		this.address = rhs.address
+		this.addressDetail = rhs.addressDetail
+		this.businessType = rhs.businessType
+		this.businessItem = rhs.businessItem
+		this.billType = rhs.billType
+		this.contractType = rhs.contractType
+		this.deliveryDiv = rhs.deliveryDiv
+		this.licenseNumber = rhs.licenseNumber
+		this.nursingHomeNumber = rhs.nursingHomeNumber
+		this.mail = rhs.mail
+		this.mobilePhone = rhs.mobilePhone
+		this.openDate = rhs.openDate
+		this.closeDate = rhs.closeDate
+		this.etc1 = rhs.etc1
+		this.etc2 = rhs.etc2
+		this.imageUrl = rhs.imageUrl
+		this.inVisible = rhs.inVisible
+		return this
+	}
 }

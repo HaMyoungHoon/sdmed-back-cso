@@ -62,34 +62,25 @@ class HospitalListService: HospitalService() {
 			throw AuthenticationEntryPointException()
 		}
 
-		val hospitalDataModel = excelFileParser.hospitalUploadExcelParse(tokenUser.id, file)
-		var index = 0
+		val excelModel = excelFileParser.hospitalUploadExcelParse(tokenUser.id, file)
 		val already: MutableList<HospitalModel> = mutableListOf()
-		while (true) {
-			if (hospitalDataModel.count() > index + 500) {
-				already.addAll(hospitalRepository.findAllByCodeIn(hospitalDataModel.subList(index, index + 500).map { it.code }))
-			} else {
-				already.addAll(hospitalRepository.findAllByCodeIn(hospitalDataModel.subList(index, hospitalDataModel.count()).map { it.code }))
-				break
-			}
-			index += 500
-		}
-		hospitalDataModel.removeIf { x -> x.code in already.map { y -> y.code } }
-		if (hospitalDataModel.isEmpty()) {
-			return "count : 0"
-		}
-		hospitalDataModel.removeIf { x -> x.code == FConstants.NEW_HOSPITAL_CODE }
-		index = 0
+		excelModel.chunked(500).forEach { x -> already.addAll(hospitalRepository.findAllByCodeIn(x.map { y -> y.code })) }
 		var retCount = 0
-		while (true) {
-			if (hospitalDataModel.count() > index + 500) {
-				retCount += insertAll(hospitalDataModel.subList(index, index + 500))
-			} else {
-				retCount += insertAll(hospitalDataModel.subList(index, hospitalDataModel.count()))
-				break
+		val saveList = excelModel.toMutableList()
+		saveList.removeIf { x -> x.code in already.map { y -> y.code } }
+		saveList.chunked(500).forEach { x -> retCount += insertAll(x) }
+		if (already.isNotEmpty()) {
+			val buffMap = excelModel.associateBy { it.code }
+			if (already.isNotEmpty()) {
+				already.forEach { x ->
+					val buff = buffMap[x.code]
+					if (buff != null) {
+						x.safeCopy(buff)
+					}
+				}
 			}
-			index += 500
 		}
+		already.chunked(500).forEach { x -> retCount += updateAll(x) }
 		val stackTrace = Thread.currentThread().stackTrace
 		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "add hospital count : $retCount")
 		logRepository.save(logModel)
@@ -109,7 +100,6 @@ class HospitalListService: HospitalService() {
 
 		hospitalRepository.findByThisPK(data.thisPK) ?: throw HospitalNotFoundException()
 		val ret = hospitalRepository.save(data)
-
 		val stackTrace = Thread.currentThread().stackTrace
 		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "hospital modify")
 		logRepository.save(logModel)
@@ -117,11 +107,26 @@ class HospitalListService: HospitalService() {
 	}
 
 	private fun insertAll(data: List<HospitalModel>): Int {
+		if (data.isEmpty()) {
+			return 0
+		}
+
 		val values: String = data.stream().map{it.insertString()}.collect(Collectors.joining(","))
 		val sqlString = "${FConstants.MODEL_HOS_INSERT_INTO}$values"
 		val ret = entityManager.createNativeQuery(sqlString).executeUpdate()
 		entityManager.flush()
 		entityManager.clear()
 		return ret
+	}
+	private fun updateAll(data: List<HospitalModel>): Int {
+		if (data.isEmpty()) {
+			return 0
+		}
+		data.forEach { x ->
+			entityManager.merge(x)
+		}
+		entityManager.flush()
+		entityManager.clear()
+		return data.size
 	}
 }
