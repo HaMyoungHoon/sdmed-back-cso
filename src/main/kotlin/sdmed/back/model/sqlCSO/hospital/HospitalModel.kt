@@ -69,6 +69,10 @@ data class HospitalModel(
 	@Column(columnDefinition = "text", nullable = false)
 //	@Column(columnDefinition = "nvarchar(max)", nullable = false)
 	var etc2: String = "",
+	@Column(columnDefinition = "nvarchar(255)")
+	var manager1: String = "",
+	@Column(columnDefinition = "nvarchar(255)")
+	var manager2: String = "",
 	// mysql
 	@Column(columnDefinition = "text", nullable = false)
 //	@Column(columnDefinition = "nvarchar(max)", nullable = false)
@@ -103,8 +107,10 @@ data class HospitalModel(
 			18 -> mobilePhone
 			19 -> FExtensions.parseDateTimeString(openDate, "yyyy-MM-dd")
 			20 -> FExtensions.parseDateTimeString(closeDate, "yyyy-MM-dd")
-			21 -> etc1
-			22 -> etc2
+			21 -> manager1
+			22 -> manager2
+			23 -> etc1
+			24 -> etc2
 			else -> ""
 		}
 	}
@@ -131,8 +137,10 @@ data class HospitalModel(
 			18 -> mobilePhone = data ?: ""
 			19 -> openDate = if (data.isNullOrEmpty()) null else FExtensions.parseStringToSqlDate(data, "yyyy-MM-dd")
 			20 -> closeDate = if (data.isNullOrEmpty()) null else FExtensions.parseStringToSqlDate(data, "yyyy-MM-dd")
-			21 -> etc1 = data ?: ""
-			22 -> etc2 = data ?: ""
+			21 -> manager1 = data ?: ""
+			22 -> manager2 = data ?: ""
+			23 -> etc1 = data ?: ""
+			24 -> etc2 = data ?: ""
 		}
 	}
 	override fun titleGet(index: Int): String {
@@ -158,8 +166,10 @@ data class HospitalModel(
 			18 -> FConstants.MODEL_MOBILE_PHONE
 			19 -> FConstants.MODEL_OPEN_DATE
 			20 -> FConstants.MODEL_CLOSE_DATE
-			21 -> FConstants.MODEL_ETC1
-			22 -> FConstants.MODEL_ETC2
+			20 -> FConstants.MODEL_MANAGER1
+			21 -> FConstants.MODEL_MANAGER2
+			22 -> FConstants.MODEL_ETC1
+			23 -> FConstants.MODEL_ETC2
 			else -> ""
 		}
 	}
@@ -206,9 +216,11 @@ data class HospitalModel(
 		val mobilePhone = FExtensions.escapeString(mobilePhone)
 		val openDateString: String = openDate?.let { "'${FExtensions.parseDateTimeString(it, "yyyy-MM-dd")}'" } ?: "null"
 		val closeDateString: String = closeDate?.let { "'${FExtensions.parseDateTimeString(it, "yyyy-MM-dd")}'" } ?: "null"
+		val manager1 = FExtensions.escapeString(manager1)
+		val manager2 = FExtensions.escapeString(manager2)
 		val etc1 = FExtensions.escapeString(etc1)
 		val etc2 = FExtensions.escapeString(etc2)
-		return "('$thisPK', '$code', '$orgName', '$innerName', '$ownerName', '$taxpayerNumber', '$phoneNumber', '$faxNumber', '$zipCode', '$address', '$addressDetail', '$businessType', '$businessItem', '${billType.index}', '$licenseNumber', '$nursingHomeNumber', '${contractType.index}', '${deliveryDiv.index}', '$mail', '$mobilePhone', $openDateString, $closeDateString, '$etc1', '$etc2', '$imageUrl', ${if (inVisible) 1 else 0})"
+		return "('$thisPK', '$code', '$orgName', '$innerName', '$ownerName', '$taxpayerNumber', '$phoneNumber', '$faxNumber', '$zipCode', '$address', '$addressDetail', '$businessType', '$businessItem', '${billType.index}', '$licenseNumber', '$nursingHomeNumber', '${contractType.index}', '${deliveryDiv.index}', '$mail', '$mobilePhone', $openDateString, $closeDateString, '$manager1', '$manager2', '$etc1', '$etc2', '$imageUrl', ${if (inVisible) 1 else 0})"
 	}
 	fun safeCopy(rhs: HospitalModel): HospitalModel {
 		this.orgName = rhs.orgName
@@ -231,6 +243,8 @@ data class HospitalModel(
 		this.mobilePhone = rhs.mobilePhone
 		this.openDate = rhs.openDate
 		this.closeDate = rhs.closeDate
+		this.manager1 = rhs.manager1
+		this.manager2 = rhs.manager2
 		this.etc1 = rhs.etc1
 		this.etc2 = rhs.etc2
 		this.imageUrl = rhs.imageUrl

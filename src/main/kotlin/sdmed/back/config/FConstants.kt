@@ -11,15 +11,15 @@ object FConstants {
 
 	const val ASYNC_TASK_EXECUTOR = "asyncTaskExecutor"
 
-	const val HTTP_MHHA = "http://*.mhha.kr"
-	const val HTTPS_MHHA = "https://*.mhha.kr"
+	const val HTTP_SD_MED = "http://*.sdmed.co.kr"
+	const val HTTPS_SD_MED = "https://*.sdmed.co.kr"
 
-	const val HTTP_FRONT_1 = "http://angular.mhha.kr"
-	const val HTTPS_FRONT_1 = "https://angular.mhha.kr"
-	const val HTTP_FRONT_2 = "http://www.mhha.kr"
-	const val HTTPS_FRONT_2 = "https://www.mhha.kr"
-	const val HTTP_FRONT_3 = "http://mhha.kr"
-	const val HTTPS_FRONT_3 = "https://mhha.kr"
+	const val HTTP_FRONT_1 = "http://intra-cso.sdmed.co.kr"
+	const val HTTPS_FRONT_1 = "https://intra-cso.sdmed.co.kr"
+	const val HTTP_FRONT_2 = "http://extra-cso.sdmed.co.kr"
+	const val HTTPS_FRONT_2 = "https://extra-cso.sdmed.co.kr"
+	const val HTTP_BACK_1 = "http://back-cso.sdmed.co.kr/"
+	const val HTTPS_BACK_1 = "https://back-cso.sdmed.co.kr/"
 
 	const val CONTENT_TYPE = "Content-Type"
 	const val CONTENT_LENGTH = "Content-Length"
@@ -79,6 +79,8 @@ object FConstants {
 	const val MODEL_RETROACTIVE_RULE = "소급기준"
 	const val MODEL_INNER_SETTLEMENT_RULE = "내부정산기준"
 	const val MODEL_OUTER_SETTLEMENT_RULE = "외부정산기준"
+	const val MODEL_MANAGER1 = "영업담당"
+	const val MODEL_MANAGER2 = "부서장"
 	const val MODEL_ETC1 = "비고1"
 	const val MODEL_ETC2 = "비고2"
 	const val MODEL_PHARMA_COUNT = 26
@@ -90,7 +92,7 @@ object FConstants {
 	const val MODEL_LICENSE_NUMBER = "면허번호"
 	const val MODEL_NURSING_HOME_NUMBER = "요양기관번호"
 	const val MODEL_HOS_COUNT = 23
-	const val MODEL_HOS_INSERT_INTO = "INSERT INTO HospitalModel (thisPK, code, orgName, innerName, ownerName, taxpayerNumber, phoneNumber, faxNumber, zipCode, address, addressDetail, businessType, businessItem, billType, licenseNumber, nursingHomeNumber, contractType, deliveryDiv, mail, mobilePhone, openDate, closeDate, etc1, etc2, imageUrl, inVisible) VALUES "
+	const val MODEL_HOS_INSERT_INTO = "INSERT INTO HospitalModel (thisPK, code, orgName, innerName, ownerName, taxpayerNumber, phoneNumber, faxNumber, zipCode, address, addressDetail, businessType, businessItem, billType, licenseNumber, nursingHomeNumber, contractType, deliveryDiv, mail, mobilePhone, openDate, closeDate, 'manager1', 'manager2', etc1, etc2, imageUrl, inVisible) VALUES "
 
 	const val MODEL_MEDICINE_CODE = "코드"
 	const val MODEL_MEDICINE_MAIN_INGREDIENT_CODE = "주성분코드"
