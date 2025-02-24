@@ -87,8 +87,7 @@ object FConstants {
 	const val MODEL_RETROACTIVE_RULE = "소급기준"
 	const val MODEL_INNER_SETTLEMENT_RULE = "내부정산기준"
 	const val MODEL_OUTER_SETTLEMENT_RULE = "외부정산기준"
-	const val MODEL_MANAGER1 = "영업담당"
-	const val MODEL_MANAGER2 = "부서장"
+	const val MODEL_MANAGER = "영업담당"
 	const val MODEL_ETC1 = "비고1"
 	const val MODEL_ETC2 = "비고2"
 	const val MODEL_PHARMA_COUNT = 26
@@ -99,8 +98,8 @@ object FConstants {
 
 	const val MODEL_LICENSE_NUMBER = "면허번호"
 	const val MODEL_NURSING_HOME_NUMBER = "요양기관번호"
-	const val MODEL_HOS_COUNT = 23
-	const val MODEL_HOS_INSERT_INTO = "INSERT INTO HospitalModel (thisPK, code, orgName, innerName, ownerName, taxpayerNumber, phoneNumber, faxNumber, zipCode, address, addressDetail, businessType, businessItem, billType, licenseNumber, nursingHomeNumber, contractType, deliveryDiv, mail, mobilePhone, openDate, closeDate, 'manager1', 'manager2', etc1, etc2, imageUrl, inVisible) VALUES "
+	const val MODEL_HOS_COUNT = 24
+	const val MODEL_HOS_INSERT_INTO = "INSERT INTO HospitalModel (thisPK, code, orgName, innerName, ownerName, taxpayerNumber, phoneNumber, faxNumber, zipCode, address, addressDetail, businessType, businessItem, billType, licenseNumber, nursingHomeNumber, contractType, deliveryDiv, mail, mobilePhone, openDate, closeDate, manager, etc1, etc2, imageUrl, inVisible) VALUES "
 
 	const val MODEL_MEDICINE_CODE = "코드"
 	const val MODEL_MEDICINE_MAIN_INGREDIENT_CODE = "주성분코드"
