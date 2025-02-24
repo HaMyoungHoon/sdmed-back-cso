@@ -18,9 +18,15 @@ class LogController: FControllerBase() {
 	@Autowired lateinit var commonService: CommonService
 
 	@Operation(summary = "get log view model")
-	@GetMapping(value = ["/list"])
-	fun getList(@RequestHeader token: String,
-							@RequestParam(required = false) page: Int = 0,
-							@RequestParam(required = false) size: Int = 1000) =
+	@GetMapping(value = ["/list/log"])
+	fun getLogList(@RequestHeader token: String,
+	               @RequestParam(required = false) page: Int = 0,
+	               @RequestParam(required = false) size: Int = 1000) =
 		responseService.getResult(commonService.getLogViewModel(token, page, size))
+	@Operation(summary = "get ip log model")
+	@GetMapping(value = ["/list/ipLog"])
+	fun getIPLogList(@RequestHeader token: String,
+	                 @RequestParam(required = false) page: Int = 0,
+	                 @RequestParam(required = false) size: Int = 1000) =
+		responseService.getResult(commonService.getIPLogModel(token, page, size))
 }

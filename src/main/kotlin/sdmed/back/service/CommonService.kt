@@ -5,21 +5,26 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import sdmed.back.advice.exception.*
+import sdmed.back.config.FConstants
 import sdmed.back.config.FExtensions
 import sdmed.back.config.FServiceBase
 import sdmed.back.model.common.user.UserRole
 import sdmed.back.model.common.user.UserRoles
+import sdmed.back.model.sqlCSO.IPLogModel
 import sdmed.back.model.sqlCSO.LogViewModel
 import sdmed.back.model.sqlCSO.common.CheckAuthNumberModel
 import sdmed.back.model.sqlCSO.common.QuarantineAuthNumberModel
 import sdmed.back.model.sqlCSO.common.VersionCheckModel
 import sdmed.back.model.sqlCSO.common.VersionCheckType
 import sdmed.back.repository.sqlCSO.ICheckAuthNumberRepository
+import sdmed.back.repository.sqlCSO.IIPLogRepository
 import sdmed.back.repository.sqlCSO.IQuarantineAuthNumberRepository
 import sdmed.back.repository.sqlCSO.IVersionCheckRepository
+import java.sql.Timestamp
 import java.util.Date
 
 class CommonService: FServiceBase() {
+	@Autowired lateinit var ipLogRepository: IIPLogRepository
 	@Autowired lateinit var versionCheckRepository: IVersionCheckRepository
 	@Autowired lateinit var checkAuthNumberRepository: ICheckAuthNumberRepository
 	@Autowired lateinit var quarantineAuthNumberRepository: IQuarantineAuthNumberRepository
@@ -119,5 +124,30 @@ class CommonService: FServiceBase() {
 		}
 		val pageable = PageRequest.of(page, size)
 		return logRepository.selectLogViewModel(pageable)
+	}
+	fun getIPLogModel(token: String, page: Int = 0, size: Int = 1000): Page<IPLogModel> {
+		isValid(token)
+		val tokenUser = getUserDataByToken(token)
+		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee))) {
+			throw AuthenticationEntryPointException()
+		}
+		val pageable = PageRequest.of(page, size)
+		return ipLogRepository.selectIPLogModel(pageable)
+	}
+	fun addIPLog(ipLogModel: IPLogModel): IPLogModel {
+		if (ipLogModel.ipContains(FConstants.IP_OFFICE_1) || ipLogModel.ipContains(FConstants.IP_OFFICE_2)) {
+			return ipLogModel
+		}
+		if (ipLogModel.requestUri.startsWith(FConstants.REQUEST_MQTT) || ipLogModel.requestUri.startsWith(FConstants.REQUEST_COMMON) ||
+			ipLogModel.requestUri.startsWith(FConstants.REQUEST_INTRA) || ipLogModel.requestUri.startsWith(FConstants.REQUEST_EXTRA)) {
+			return ipLogModel
+		}
+
+		val minusTime = 1 * 30 * 1000
+		val model = ipLogRepository.findByLocalAddrAndRequestUriAndDateTimeGreaterThan(ipLogModel.localAddr, ipLogModel.requestUri, Timestamp(ipLogModel.dateTime.time - minusTime))
+		if (model != null) {
+			return model
+		}
+		return ipLogRepository.save(ipLogModel)
 	}
 }

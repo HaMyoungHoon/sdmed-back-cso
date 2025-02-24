@@ -12,7 +12,7 @@ import sdmed.back.model.common.IRestResult
 @Tag(name = "ExceptionController")
 @RestController
 @RequestMapping(value = ["/v1/exception"])
-@CrossOrigin(origins = [FConstants.HTTP_MHHA, FConstants.HTTPS_MHHA], allowedHeaders = ["*"])
+@CrossOrigin(origins = [FConstants.HTTP_SD_MED, FConstants.HTTPS_SD_MED], allowedHeaders = ["*"])
 class ExceptionController {
 	@GetMapping(value = ["/entryPoint"])
 	fun entrypointException(): IRestResult {

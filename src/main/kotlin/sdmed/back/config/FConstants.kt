@@ -14,12 +14,20 @@ object FConstants {
 	const val HTTP_SD_MED = "http://*.sdmed.co.kr"
 	const val HTTPS_SD_MED = "https://*.sdmed.co.kr"
 
+	const val IP_OFFICE_1 = "112.161.25.114"
+	const val IP_OFFICE_2 = "112.161.25.115"
+
 	const val HTTP_FRONT_1 = "http://intra-cso.sdmed.co.kr"
 	const val HTTPS_FRONT_1 = "https://intra-cso.sdmed.co.kr"
 	const val HTTP_FRONT_2 = "http://extra-cso.sdmed.co.kr"
 	const val HTTPS_FRONT_2 = "https://extra-cso.sdmed.co.kr"
 	const val HTTP_BACK_1 = "http://back-cso.sdmed.co.kr/"
 	const val HTTPS_BACK_1 = "https://back-cso.sdmed.co.kr/"
+
+	const val REQUEST_MQTT = "/mqtt"
+	const val REQUEST_COMMON = "/common"
+	const val REQUEST_INTRA = "/intra"
+	const val REQUEST_EXTRA = "/extra"
 
 	const val CONTENT_TYPE = "Content-Type"
 	const val CONTENT_LENGTH = "Content-Length"

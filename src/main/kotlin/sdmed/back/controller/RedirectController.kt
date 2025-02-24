@@ -13,7 +13,7 @@ import java.net.URI
 @Tag(name = "RedirectController")
 @RestController
 @RequestMapping(value = ["/"])
-@CrossOrigin(origins = [FConstants.HTTP_MHHA, FConstants.HTTPS_MHHA], allowedHeaders = ["*"])
+@CrossOrigin(origins = [FConstants.HTTP_SD_MED, FConstants.HTTPS_SD_MED], allowedHeaders = ["*"])
 class RedirectController {
 	@Hidden
 	@GetMapping
