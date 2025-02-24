@@ -84,10 +84,10 @@ class EDIService: FServiceBase() {
 	}
 	protected fun realMedicineCheck(ediPK: String, medicineList: List<EDIUploadPharmaMedicineModel>, existMedicineList: List<MedicineModel>): MutableList<EDIUploadPharmaMedicineModel> {
 		val ret: MutableList<EDIUploadPharmaMedicineModel> = mutableListOf()
-		val medicineMap = medicineList.associateBy { it.medicinePK }
-		for (existMedicine in existMedicineList) {
-			val medicine = medicineMap[existMedicine.thisPK]
-			if (medicine != null) {
+		val existMedicineMap = existMedicineList.associateBy { it.thisPK }
+		for (medicine in medicineList) {
+			val existMedicine = existMedicineMap[medicine.medicinePK]
+			if (existMedicine != null) {
 				ret.add(medicine.apply {
 					this.ediPK = ediPK
 					if (this.price == 0) {
