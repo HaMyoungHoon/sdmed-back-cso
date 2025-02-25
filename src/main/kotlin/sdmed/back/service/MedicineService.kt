@@ -59,8 +59,7 @@ open class MedicineService: FServiceBase() {
 			val allPrice = medicinePriceRepository.findAllByKdCodeIn(ret.map { it.kdCode })
 			medicinePriceMerge(ret, allPrice)
 		} else {
-			val kdCodeString = ret.joinToString(",") { "'${it.kdCode}'" }
-			val recentPrice = medicinePriceRepository.selectAllByRecentData(kdCodeString)
+			val recentPrice = medicinePriceRepository.selectAllByRecentData(ret.map { it.kdCode })
 			medicinePriceMerge(ret, recentPrice)
 		}
 		ret.onEach { it.init() }
@@ -82,8 +81,7 @@ open class MedicineService: FServiceBase() {
 			val allPrice = medicinePriceRepository.findAllByKdCodeIn(ret.content.map { it.kdCode })
 			medicinePriceMerge(ret.content, allPrice)
 		} else {
-			val kdCodeString = ret.content.joinToString(",") { "'${it.kdCode}'" }
-			val recentPrice = medicinePriceRepository.selectAllByRecentData(kdCodeString)
+			val recentPrice = medicinePriceRepository.selectAllByRecentData(ret.content.map { it.kdCode })
 			medicinePriceMerge(ret.content, recentPrice)
 		}
 		ret.onEach { it.init() }
@@ -108,8 +106,7 @@ open class MedicineService: FServiceBase() {
 			val allPrice = medicinePriceRepository.findAllByKdCodeIn(ret.content.map { it.kdCode })
 			medicinePriceMerge(ret.content, allPrice)
 		} else {
-			val kdCodeString = ret.content.joinToString(",") { "'${it.kdCode}'" }
-			val recentPrice = medicinePriceRepository.selectAllByRecentData(kdCodeString)
+			val recentPrice = medicinePriceRepository.selectAllByRecentData(ret.content.map { it.kdCode })
 			medicinePriceMerge(ret.content, recentPrice)
 		}
 		ret.onEach { it.init() }
