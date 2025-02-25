@@ -19,6 +19,24 @@ class ExtraQnAListController: FControllerBase() {
 	@GetMapping(value = ["/list"])
 	fun getList(@RequestHeader token: String) =
 		responseService.getResult(qnaListService.getMyList(token))
+	@Operation(summary = "타이틀 검색")
+	@GetMapping(value = ["/like"])
+	fun getLike(@RequestHeader token: String,
+	            @RequestParam searchString: String) =
+		responseService.getResult(qnaListService.getMyLike(token, searchString))
+	@Operation(summary = "페이지 켜면 처음 보이는 거")
+	@GetMapping(value = ["/list/paging"])
+	fun getPagingList(@RequestHeader token: String,
+	                  @RequestParam(required = false) page: Int = 0,
+	                  @RequestParam(required = false) size: Int = 100) =
+		responseService.getResult(qnaListService.getMyPagingList(token, page, size))
+	@Operation(summary = "페이지 켜면 처음 보이는 거")
+	@GetMapping(value = ["/like/paging"])
+	fun getPagingLike(@RequestHeader token: String,
+	                  @RequestParam searchString: String,
+	                  @RequestParam(required = false) page: Int = 0,
+	                  @RequestParam(required = false) size: Int = 100) =
+		responseService.getResult(qnaListService.getMyPagingLike(token, searchString, page, size))
 
 	@Operation(summary = "qna 헤더")
 	@GetMapping(value = ["/data/header/{thisPK}"])

@@ -1,6 +1,7 @@
 package sdmed.back.service
 
-import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageRequest
 import org.springframework.transaction.annotation.Transactional
 import sdmed.back.advice.exception.AuthenticationEntryPointException
 import sdmed.back.advice.exception.NotValidOperationException
@@ -18,7 +19,6 @@ import sdmed.back.model.sqlCSO.qna.QnAHeaderModel
 import sdmed.back.model.sqlCSO.qna.QnAReplyModel
 import sdmed.back.model.sqlCSO.qna.QnAState
 import sdmed.back.model.sqlCSO.request.RequestModel
-import sdmed.back.repository.sqlCSO.IRequestRepository
 import java.util.*
 
 class QnAListService: QnAService() {
@@ -30,6 +30,35 @@ class QnAListService: QnAService() {
 		}
 
 		return qnaHeaderRepository.findAllByUserPKOrderByRegDateDesc(tokenUser.thisPK)
+	}
+	fun getMyLike(token: String, searchString: String): List<QnAHeaderModel> {
+		isValid(token)
+		val tokenUser = getUserDataByToken(token)
+		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee, UserRole.BusinessMan))) {
+			throw AuthenticationEntryPointException()
+		}
+
+		return qnaHeaderRepository.selectAllLIKEUserPkOrderByRegDateDesc(searchString, tokenUser.thisPK)
+	}
+	fun getMyPagingList(token: String, page: Int = 0, size: Int = 100): Page<QnAHeaderModel> {
+		isValid(token)
+		val tokenUser = getUserDataByToken(token)
+		val pageable = PageRequest.of(page, size)
+		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee, UserRole.BusinessMan))) {
+			throw AuthenticationEntryPointException()
+		}
+
+		return qnaHeaderRepository.findAllByUserPKOrderByRegDateDesc(tokenUser.thisPK, pageable)
+	}
+	fun getMyPagingLike(token: String, searchString: String, page: Int = 0, size: Int = 100): Page<QnAHeaderModel> {
+		isValid(token)
+		val tokenUser = getUserDataByToken(token)
+		val pageable = PageRequest.of(page, size)
+		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee, UserRole.BusinessMan))) {
+			throw AuthenticationEntryPointException()
+		}
+
+		return qnaHeaderRepository.selectAllLIKEUserPkOrderByRegDateDesc(searchString, tokenUser.thisPK, pageable)
 	}
 	fun getHaveToReplyList(token: String): List<QnAHeaderModel> {
 		isValid(token)
