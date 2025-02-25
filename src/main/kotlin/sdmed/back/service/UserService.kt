@@ -39,7 +39,7 @@ class UserService: FServiceBase() {
 		}
 		return getUserDataByPK(userPK, childView, relationView, pharmaOwnMedicineView)
 	}
-	fun getUserDataByID(id: String, childView: Boolean = false, relationView: Boolean = false, pharmaOwnMedicineView: Boolean = false): UserDataModel {
+	fun getUserDataByID(id: String, childView: Boolean = false, relationView: Boolean = false, pharmaOwnMedicineView: Boolean = false, relationMedicineView: Boolean = true): UserDataModel {
 		val ret = userDataRepository.selectById(id) ?: throw UserNotFoundException()
 		if (childView) {
 			userChildPKRepository.selectAllByMotherPK(ret.thisPK).let {
@@ -49,12 +49,12 @@ class UserService: FServiceBase() {
 			}
 		}
 		if (relationView) {
-			ret.hosList = mergeRel(ret.thisPK, pharmaOwnMedicineView)
+			ret.hosList = mergeRel(ret.thisPK, pharmaOwnMedicineView, relationMedicineView)
 		}
 
 		return ret
 	}
-	fun getUserDataByPK(thisPK: String, childView: Boolean = false, relationView: Boolean = false, pharmaOwnMedicineView: Boolean = false): UserDataModel {
+	fun getUserDataByPK(thisPK: String, childView: Boolean = false, relationView: Boolean = false, pharmaOwnMedicineView: Boolean = false, relationMedicineView: Boolean = true): UserDataModel {
 		val ret = userDataRepository.findByThisPK(thisPK) ?: throw UserNotFoundException()
 		ret.fileList = userFileRepository.findAllByUserPK(ret.thisPK).toMutableList()
 		if (childView) {
@@ -65,7 +65,7 @@ class UserService: FServiceBase() {
 			}
 		}
 		if (relationView) {
-			ret.hosList = mergeRel(ret.thisPK, pharmaOwnMedicineView)
+			ret.hosList = mergeRel(ret.thisPK, pharmaOwnMedicineView, relationMedicineView)
 		}
 
 		return ret
@@ -275,7 +275,7 @@ class UserService: FServiceBase() {
 		return password
 	}
 
-	fun mergeRel(userPK: String, pharmaOwnMedicineView: Boolean = false): MutableList<HospitalModel> {
+	fun mergeRel(userPK: String, pharmaOwnMedicineView: Boolean = false, relationMedicineView: Boolean = true): MutableList<HospitalModel> {
 		var ret: MutableList<HospitalModel> = mutableListOf()
 		val userRelationModel = userRelationRepository.findAllByUserPK(userPK)
 		val hosMap = hospitalRepository.findAllByThisPKIn(userRelationModel.map { it.hosPK }).associateBy { it.thisPK }
@@ -285,7 +285,11 @@ class UserService: FServiceBase() {
 				it.medicineList = medicineRepository.findAllByThisPKIn(relation.map { x -> x.medicinePK }).toMutableList()
 			}
 		}.associateBy { it.thisPK }
-		val medicineBuff = medicineRepository.findAllByThisPKIn(userRelationModel.map { it.medicinePK })
+		val medicineBuff = if (relationMedicineView) {
+			medicineRepository.findAllByThisPKIn(userRelationModel.map { it.medicinePK })
+		} else {
+			mutableListOf()
+		}
 		val sub = medicineSubRepository.findALlByCodeInOrderByCode(medicineBuff.map { it.code })
 		val ingredient = medicineIngredientRepository.findAllByMainIngredientCodeIn(medicineBuff.map { it.mainIngredientCode })
 		medicineMerge(medicineBuff, sub, ingredient)

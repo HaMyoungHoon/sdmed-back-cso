@@ -30,14 +30,14 @@ class UserInfoService: UserService() {
 			filter { it.thisPK != tokenUser.thisPK }
 		}
 	}
-	fun getData(token: String, userPK: String, childView: Boolean = false, relationView: Boolean = false, pharmaOwnMedicineView: Boolean = false): UserDataModel {
+	fun getData(token: String, userPK: String, childView: Boolean = false, relationView: Boolean = false, pharmaOwnMedicineView: Boolean = false, relationMedicineView: Boolean = true): UserDataModel {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.UserChanger))) {
 			throw AuthenticationEntryPointException()
 		}
 
-		return getUserDataByPK(userPK, childView, relationView, pharmaOwnMedicineView)
+		return getUserDataByPK(userPK, childView, relationView, pharmaOwnMedicineView, relationMedicineView)
 	}
 	fun getListChildAble(token: String, thisPK: String): List<UserDataModel> {
 		isValid(token)

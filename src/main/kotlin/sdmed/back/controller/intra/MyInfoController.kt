@@ -18,8 +18,9 @@ class MyInfoController: FControllerBase() {
 	fun getData(@RequestHeader token: String,
 							@RequestParam(required = false) childView: Boolean = false,
 							@RequestParam(required = false) relationView: Boolean = false,
-							@RequestParam(required = false) pharmaOwnMedicineView: Boolean = false) =
-		responseService.getResult(myInfoService.getMyData(token, childView, relationView, pharmaOwnMedicineView))
+							@RequestParam(required = false) pharmaOwnMedicineView: Boolean = false,
+							@RequestParam(required = false) relationMedicineView: Boolean = false) =
+		responseService.getResult(myInfoService.getMyData(token, childView, relationView, pharmaOwnMedicineView, relationMedicineView))
 
 	@Operation(summary = "패스워드 변경")
 	@PutMapping(value = ["/passwordChange"])

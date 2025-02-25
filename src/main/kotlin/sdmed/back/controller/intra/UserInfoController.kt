@@ -32,8 +32,9 @@ class UserInfoController: FControllerBase() {
 							@PathVariable thisPK: String,
 							@RequestParam(required = false) childView: Boolean = false,
 							@RequestParam(required = false) relationView: Boolean = false,
-							@RequestParam(required = false) pharmaOwnMedicineView: Boolean = false) =
-		responseService.getResult(userInfoService.getData(token, thisPK, childView, relationView, pharmaOwnMedicineView))
+							@RequestParam(required = false) pharmaOwnMedicineView: Boolean = false,
+							@RequestParam(required = false) relationMedicineView: Boolean = false) =
+		responseService.getResult(userInfoService.getData(token, thisPK, childView, relationView, pharmaOwnMedicineView, relationMedicineView))
 	@Operation(summary = "자식으로 넣을 수 있는 유저 리스트")
 	@GetMapping(value = ["/list/childAble/{thisPK}"])
 	fun getListChildAble(@RequestHeader token: String,
