@@ -38,7 +38,7 @@ class QnAListService: QnAService() {
 			throw AuthenticationEntryPointException()
 		}
 
-		return qnaHeaderRepository.selectAllLIKEUserPkOrderByRegDateDesc(searchString, tokenUser.thisPK)
+		return qnaHeaderRepository.selectAllLIKEUserPkOrderByRegDateDesc(tokenUser.thisPK, searchString)
 	}
 	fun getMyPagingList(token: String, page: Int = 0, size: Int = 100): Page<QnAHeaderModel> {
 		isValid(token)
@@ -58,7 +58,7 @@ class QnAListService: QnAService() {
 			throw AuthenticationEntryPointException()
 		}
 
-		return qnaHeaderRepository.selectAllLIKEUserPkOrderByRegDateDesc(searchString, tokenUser.thisPK, pageable)
+		return qnaHeaderRepository.selectAllLIKEUserPkOrderByRegDateDesc(tokenUser.thisPK, searchString, pageable)
 	}
 	fun getHaveToReplyList(token: String): List<QnAHeaderModel> {
 		isValid(token)
