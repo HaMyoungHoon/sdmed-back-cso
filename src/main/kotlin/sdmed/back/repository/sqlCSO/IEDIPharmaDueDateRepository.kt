@@ -13,15 +13,15 @@ interface IEDIPharmaDueDateRepository: JpaRepository<EDIPharmaDueDateModel, Stri
 
 	@Query("SELECT a FROM EDIPharmaDueDateModel a " +
 			"WHERE a.year = :year " +
-			"ORDER BY a.year, a.month DESC")
+			"ORDER BY a.year, a.month, a.day, a.orgName DESC")
 	fun selectAllByThisYearDueDate(year: String): List<EDIPharmaDueDateModel>
 	@Query("SELECT a FROM EDIPharmaDueDateModel a " +
 			"WHERE a.year = :year AND a.month = :month " +
-			"ORDER BY a.year, a.month DESC")
+			"ORDER BY a.year, a.month, a.day, a.orgName DESC")
 	fun selectAllByThisYearMonthDueDate(year: String, month: String): List<EDIPharmaDueDateModel>
 	@Query("SELECT a.* FROM EDIPharmaDueDateModel a " +
 			"WHERE STR_TO_DATE(CONCAT(a.year, '-', a.month, '-', a.day), '%Y-%m-%d') BETWEEN :startDate AND :endDate " +
-			"ORDER BY a.year, a.month DESC", nativeQuery = true)
+			"ORDER BY a.year, a.month, a.day, a.orgName DESC", nativeQuery = true)
 	fun selectAllByThisYearMonthRangeDueDate(startDate: Date, endDate: Date): List<EDIPharmaDueDateModel>
 	@Query("SELECT a FROM PharmaModel a " +
 			"WHERE a.inVisible = :inVisible AND a.thisPK NOT IN (" +
@@ -31,7 +31,7 @@ interface IEDIPharmaDueDateRepository: JpaRepository<EDIPharmaDueDateModel, Stri
 	fun selectPharmaListByThisYearMonthDueDate(year: String, month: String, inVisible: Boolean = false): List<PharmaModel>
 	@Query("SELECT a FROM EDIPharmaDueDateModel a " +
 			"WHERE a.pharmaPK = :pharmaPK AND a.year = :year " +
-			"ORDER BY a.year, a.month DESC")
+			"ORDER BY a.year, a.month, a.day, a.orgName DESC")
 	fun selectAllByPharmaThisYearDueDate(pharmaPK: String, year: String): List<EDIPharmaDueDateModel>
 	@Query("SELECT a FROM EDIPharmaDueDateModel a " +
 			"WHERE a.year = :year AND a.month = :month " +
