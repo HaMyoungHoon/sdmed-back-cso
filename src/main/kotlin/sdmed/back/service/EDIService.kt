@@ -134,7 +134,7 @@ class EDIService: FServiceBase() {
 			}
 		}
 	}
-	protected fun mergeEDIPharmaMedicine(pharmaList: List<EDIUploadPharmaModel>, medicineList: List<EDIUploadPharmaMedicineModel>, newData: MutableList<EDIUploadPharmaModel>) {
+	protected fun mergeEDIPharmaMedicine_old(pharmaList: List<EDIUploadPharmaModel>, medicineList: List<EDIUploadPharmaMedicineModel>, newData: MutableList<EDIUploadPharmaModel>) {
 		val pharmaMap = pharmaList.associateBy { it.pharmaPK }
 		for (medicine in medicineList) {
 			val pharma = pharmaMap[medicine.pharmaPK]
@@ -149,6 +149,14 @@ class EDIService: FServiceBase() {
 				}
 			}
 		}
+	}
+	protected fun mergeEDIPharmaMedicine(pharmaList: List<EDIUploadPharmaModel>, medicineList: List<EDIUploadPharmaMedicineModel>, newData: MutableList<EDIUploadPharmaModel>) {
+		val pharmaMap = pharmaList.associateBy { it.pharmaPK }
+		for (medicine in medicineList) {
+			val pharma = pharmaMap[medicine.pharmaPK]
+			pharma?.medicineList?.add(medicine)
+		}
+		newData.addAll(pharmaList)
 	}
 	protected fun canIUseApplyDate(token: String, applyDate: Date): Boolean {
 		val year = FExtensions.parseDateTimeString(applyDate, "yyyy") ?: throw NotValidOperationException()

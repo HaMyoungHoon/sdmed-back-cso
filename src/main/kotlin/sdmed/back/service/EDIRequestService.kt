@@ -49,6 +49,22 @@ class EDIRequestService: EDIService() {
 
 		return ret
 	}
+	fun getPharmaList(token: String, applyDate: Date, withMedicine: Boolean = false): List<EDIPharmaBuffModel> {
+		isValid(token)
+		val tokenUser = getUserDataByToken(token)
+		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.BusinessMan))) {
+			throw AuthenticationEntryPointException()
+		}
+
+		val ret = userRelationRepository.selectAllByInvisible().distinctBy { it.thisPK }
+		if (withMedicine) {
+			val pharmaPK = ret.map { it.thisPK }
+//			val medicine = userRelationRepository.selectAllMyMedicine(tokenUser.thisPK, hosPK).distinctBy { it.thisPK }.filter { it.pharmaPK in pharmaPK }
+//			mergePharmaMedicine(ret, medicine)
+		}
+
+		return ret
+	}
 	fun getPharmaList(token: String, hosPK: String, applyDate: Date, withMedicine: Boolean = true): List<EDIPharmaBuffModel> {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
@@ -208,6 +224,8 @@ class EDIRequestService: EDIService() {
 		}
 
 		val serverTime = Date()
+		val serverTimeYear = FExtensions.parseDateTimeString(serverTime, "yyyy") ?: throw NotValidOperationException()
+		val serverTimeMonth = FExtensions.parseDateTimeString(serverTime, "MM") ?: throw NotValidOperationException()
 		val serverTimeDay = FExtensions.parseDateTimeString(serverTime, "dd") ?: throw NotValidOperationException()
 		ediUploadModel.thisPK = UUID.randomUUID().toString()
 		ediUploadModel.day = serverTimeDay
@@ -223,10 +241,21 @@ class EDIRequestService: EDIService() {
 				innerName = FConstants.NEW_HOSPITAL_NAME
 			})
 		}
+		val existPharmaList = pharmaRepository.findAllByThisPKIn(ediUploadModel.pharmaList.map { it.pharmaPK }).filter { !it.inVisible }
+		val realPharma = realPharmaCheck(ediUploadModel.thisPK, ediUploadModel.pharmaList, existPharmaList)
+		realPharma.onEach {
+			it.thisPK = UUID.randomUUID().toString()
+			it.ediPK = ediUploadModel.thisPK
+			it.year = serverTimeYear
+			it.month = serverTimeMonth
+			it.day = ediUploadModel.day
+			it.medicineList.clear()
+		}
+		val dueDateList = ediPharmaDueDateRepository.selectAllByPharmaInThisYearMonthDueDate(serverTimeYear, serverTimeMonth).filter { x -> x.pharmaPK in realPharma.map { y -> y.pharmaPK } }
 
 		ediUploadModel.hospitalPK = hospital.thisPK
 		ediUploadModel.orgName = hospital.orgName
-		ediUploadModel.pharmaList = mutableListOf()
+		ediUploadModel.pharmaList = carriedOverPharma(realPharma, dueDateList).toMutableList()
 		ediUploadModel.ediState = EDIState.None
 		ediUploadModel.regDate = serverTime
 		ediUploadModel.fileList.onEach {
@@ -235,6 +264,7 @@ class EDIRequestService: EDIService() {
 		}
 
 		val ret = ediUploadRepository.save(ediUploadModel)
+		ediUploadPharmaRepository.saveAll(ediUploadModel.pharmaList)
 		ediUploadFileRepository.saveAll(ediUploadModel.fileList)
 		requestRepository.save(RequestModel().apply {
 			requestUserPK = tokenUser.thisPK

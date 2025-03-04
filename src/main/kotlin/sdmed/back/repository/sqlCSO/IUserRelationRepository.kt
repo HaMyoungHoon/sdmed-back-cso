@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository
 import sdmed.back.model.sqlCSO.edi.EDIHosBuffModel
 import sdmed.back.model.sqlCSO.edi.EDIMedicineBuffModel
 import sdmed.back.model.sqlCSO.edi.EDIPharmaBuffModel
+import sdmed.back.model.sqlCSO.pharma.PharmaModel
 import sdmed.back.model.sqlCSO.user.UserRelationModel
 
 @Repository
@@ -30,6 +31,11 @@ interface IUserRelationRepository: JpaRepository<UserRelationModel, String> {
 			"WHERE a.inVisible = false AND b.userPK = :userPK AND b.hosPK = :hosPK " +
 			"ORDER BY a.code ASC ")
 	fun selectAllMyPharma(userPK: String, hosPK: String): List<EDIPharmaBuffModel>
+	@Query("SELECT new sdmed.back.model.sqlCSO.edi.EDIPharmaBuffModel(a.thisPK, '', a.code, a.orgName, a.innerName) " +
+			"FROM PharmaModel a " +
+			"WHERE a.inVisible = :inVisible " +
+			"ORDER BY a.code ASC")
+	fun selectAllByInvisible(inVisible: Boolean = false): List<EDIPharmaBuffModel>
 	@Query("SELECT new sdmed.back.model.sqlCSO.edi.EDIPharmaBuffModel(a.thisPK, b.hosPK, a.code, a.orgName, a.innerName) " +
 			"FROM PharmaModel a " +
 			"LEFT JOIN UserRelationModel b ON a.thisPK = b.pharmaPK " +
