@@ -22,19 +22,19 @@ interface IUserRelationRepository: JpaRepository<UserRelationModel, String> {
 	@Query("SELECT new sdmed.back.model.sqlCSO.edi.EDIHosBuffModel(a.thisPK, a.orgName) FROM HospitalModel a " +
 			"LEFT JOIN UserRelationModel b ON a.thisPK = b.hosPK " +
 			"WHERE a.inVisible = false AND b.userPK = :userPK " +
-			"ORDER BY a.code ASC ")
+			"ORDER BY a.orgName ASC ")
 	fun selectAllMyHospital(userPK: String): List<EDIHosBuffModel>
 
 	@Query("SELECT new sdmed.back.model.sqlCSO.edi.EDIPharmaBuffModel(a.thisPK, b.hosPK, a.code, a.orgName, a.innerName) " +
 			"FROM PharmaModel a " +
 			"LEFT JOIN UserRelationModel b ON a.thisPK = b.pharmaPK " +
 			"WHERE a.inVisible = false AND b.userPK = :userPK AND b.hosPK = :hosPK " +
-			"ORDER BY a.code ASC ")
+			"ORDER BY a.orgName ASC ")
 	fun selectAllMyPharma(userPK: String, hosPK: String): List<EDIPharmaBuffModel>
 	@Query("SELECT new sdmed.back.model.sqlCSO.edi.EDIPharmaBuffModel(a.thisPK, '', a.code, a.orgName, a.innerName) " +
 			"FROM PharmaModel a " +
 			"WHERE a.inVisible = :inVisible " +
-			"ORDER BY a.code ASC")
+			"ORDER BY a.orgName ASC")
 	fun selectAllByInvisible(inVisible: Boolean = false): List<EDIPharmaBuffModel>
 	@Query("SELECT new sdmed.back.model.sqlCSO.edi.EDIPharmaBuffModel(a.thisPK, b.hosPK, a.code, a.orgName, a.innerName) " +
 			"FROM PharmaModel a " +
@@ -44,7 +44,7 @@ interface IUserRelationRepository: JpaRepository<UserRelationModel, String> {
 			"SELECT d.hospitalPK, c.pharmaPK FROM EDIUploadPharmaModel c " +
 			"LEFT JOIN EDIUploadModel d ON c.ediPK = d.thisPK " +
 			"WHERE d.userPK = :userPK AND d.year = :year AND d.month = :month AND c.ediState != 2) " +
-			"ORDER BY a.code ASC ")
+			"ORDER BY a.orgName ASC ")
 	fun selectAllMyPharmaAble(userPK: String, hosPK: String, year: String, month: String): List<EDIPharmaBuffModel>
 	@Query("SELECT new sdmed.back.model.sqlCSO.edi.EDIPharmaBuffModel(a.thisPK, b.hosPK, a.code, a.orgName, a.innerName) " +
 			"FROM PharmaModel a " +
@@ -54,7 +54,7 @@ interface IUserRelationRepository: JpaRepository<UserRelationModel, String> {
 			"SELECT 1 FROM EDIUploadPharmaModel c " +
 			"LEFT JOIN EDIUploadModel d ON c.ediPK = d.thisPK " +
 			"WHERE d.userPK = :userPK AND d.year = :year AND d.month = :month AND c.ediState != 2 AND d.hospitalPK = b.hosPK AND c.pharmaPK = a.thisPK) " +
-			"ORDER BY a.code ASC ")
+			"ORDER BY a.orgName ASC ")
 	fun selectAllMyPharmaAbleIn(userPK: String, hosPK: List<String>, year: String, month: String): List<EDIPharmaBuffModel>
 //	@Query("SELECT new sdmed.back.model.sqlCSO.edi.EDIPharmaBuffModel(a.thisPK, b.hosPK, a.code, a.orgName, a.innerName) " +
 //			"FROM PharmaModel a " +
@@ -64,7 +64,7 @@ interface IUserRelationRepository: JpaRepository<UserRelationModel, String> {
 //			"SELECT d.hospitalPK, c.pharmaPK FROM EDIUploadPharmaModel c " +
 //			"LEFT JOIN EDIUploadModel d ON c.ediPK = d.thisPK " +
 //			"WHERE d.userPK = :userPK AND d.year = :year AND d.month = :month AND c.ediState != 2) " +
-//			"ORDER BY a.code ASC ")
+//			"ORDER BY a.rgName ASC ")
 //	fun selectAllMyPharmaAbleIn(userPK: String, hosPK: List<String>, year: String, month: String): List<EDIPharmaBuffModel>
 
 	@Query(
@@ -72,7 +72,7 @@ interface IUserRelationRepository: JpaRepository<UserRelationModel, String> {
 			"LEFT JOIN UserRelationModel b ON a.thisPK = b.medicinePK " +
 			"LEFT JOIN PharmaModel c ON b.pharmaPK = c.thisPK " +
 			"WHERE a.inVisible = false AND b.userPK = :userPK AND b.hosPK = :hosPK " +
-			"ORDER BY a.code ASC ")
+			"ORDER BY a.orgName ASC ")
 	fun selectAllMyMedicine(userPK: String, hosPK: String): List<EDIMedicineBuffModel>
 
 	@Query(
@@ -80,6 +80,6 @@ interface IUserRelationRepository: JpaRepository<UserRelationModel, String> {
 			"LEFT JOIN UserRelationModel b ON a.thisPK = b.medicinePK " +
 			"LEFT JOIN PharmaModel c ON b.pharmaPK = c.thisPK " +
 			"WHERE a.inVisible = false AND b.userPK = :userPK AND b.hosPK IN (:hosPK) " +
-			"ORDER BY a.code ASC ")
+			"ORDER BY a.orgName ASC ")
 	fun selectAllMyMedicineIn(userPK: String, hosPK: List<String>): List<EDIMedicineBuffModel>
 }
