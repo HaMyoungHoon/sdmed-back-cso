@@ -40,6 +40,7 @@ class MqttService: FServiceBase() {
 	fun sendMessage(token: String, topic: String, payload: MqttContentModel) {
 		val tokenUser = getUserDataByToken(token)
 		payload.senderPK = tokenUser.thisPK
+		payload.senderID = tokenUser.id
 		payload.senderName = tokenUser.name
 		val msg = if (haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee))) {
 			MessageBuilder.withPayload(objectMapper.writeValueAsBytes(payload))
