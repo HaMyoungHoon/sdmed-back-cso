@@ -29,6 +29,8 @@ data class EDIUploadPharmaModel(
 	var ediState: EDIState = EDIState.None,
 	@Transient
 	var medicineList: MutableList<EDIUploadPharmaMedicineModel> = mutableListOf(),
+	@Transient
+	var fileList: MutableList<EDIUploadPharmaFileModel> = mutableListOf()
 ) {
 	fun copy(pharma: EDIUploadPharmaModel): EDIUploadPharmaModel {
 		this.thisPK = pharma.thisPK
@@ -41,6 +43,7 @@ data class EDIUploadPharmaModel(
 		this.isCarriedOver = pharma.isCarriedOver
 		this.ediState = pharma.ediState
 		this.medicineList = pharma.medicineList
+		this.fileList = pharma.fileList
 		return this
 	}
 	fun dateCopy(year: String, month: String, day: String): EDIUploadPharmaModel {

@@ -31,4 +31,7 @@ interface IHospitalRepository: JpaRepository<HospitalModel, String> {
 	@Query("SELECT a FROM HospitalModel a " +
 			"WHERE a.code = :code AND a.orgName = :orgName")
 	fun selectByNewHospital(code: String = FConstants.NEW_HOSPITAL_CODE, orgName: String = FConstants.NEW_HOSPITAL_NAME): HospitalModel?
+	@Query("SELECT a FROM HospitalModel a " +
+			"WHERE a.code = :code AND a.orgName = :orgName")
+	fun selectByTransferHospital(code: String = FConstants.TRANSFER_HOSPITAL_CODE, orgName: String = FConstants.TRANSFER_HOSPITAL_NAME): HospitalModel?
 }

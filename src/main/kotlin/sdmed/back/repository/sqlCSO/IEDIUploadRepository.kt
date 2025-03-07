@@ -27,6 +27,10 @@ interface IEDIUploadRepository: JpaRepository<EDIUploadModel, String> {
 			"ORDER BY a.regDate DESC")
 	fun selectAllByMe(userPK: String, startDate: Date, endDate: Date): List<EDIUploadModel>
 
+	@Query("SELECT a FROM EDIUploadModel a " +
+			"LEFT JOIN EDIUploadPharmaModel b on a.thisPK = b.ediPK " +
+			"WHERE b.thisPK = :pharmaPK")
+	fun selectByPharmaPK(pharmaPK: String): EDIUploadModel?
 
 	@Query("SELECT DISTinct new sdmed.back.model.sqlCSO.edi.EDIUploadCheckModel(c.name, c.thisPK, b.thisPK, b.orgName) " +
 			"FROM UserRelationModel a " +

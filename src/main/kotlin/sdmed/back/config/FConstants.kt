@@ -169,6 +169,8 @@ object FConstants {
 
 	const val NEW_HOSPITAL_CODE = "-99999"
 	const val NEW_HOSPITAL_NAME = "신규처"
+	const val TRANSFER_HOSPITAL_CODE = "-88888"
+	const val TRANSFER_HOSPITAL_NAME = "이관처"
 
 	const val REGEX_CHECK_ID = "^[A-Za-z0-9가-힣]{3,20}\$"
 	// 숫자, 문자(영대소한글)

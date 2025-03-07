@@ -103,7 +103,17 @@ class EDIRequestService: EDIService() {
 		}
 
 		val queryDate = FExtensions.getStartEndQueryDate(startDate, endDate)
-		return ediUploadRepository.selectAllByMe(tokenUser.thisPK, queryDate.first, queryDate.second)
+		val ret = ediUploadRepository.selectAllByMe(tokenUser.thisPK, queryDate.first, queryDate.second)
+		val pharma = ediUploadPharmaRepository.findAllByEdiPKIn(ret.map { it.thisPK })
+		val pharmaGroup = pharma.groupBy { it.ediPK }
+		for (edi in ret) {
+			val pharmaMap = pharmaGroup[edi.thisPK]
+			if (!pharmaMap.isNullOrEmpty()) {
+				edi.pharmaList.addAll(pharmaMap)
+			}
+		}
+
+		return ret
 	}
 	fun getEDIUploadMyData(token: String, thisPK: String): EDIUploadModel {
 		isValid(token)
@@ -179,6 +189,7 @@ class EDIRequestService: EDIService() {
 		val dueDateList = ediPharmaDueDateRepository.selectAllByPharmaInThisYearMonthDueDate(serverTimeYear, serverTimeMonth).filter { x -> x.pharmaPK in realPharmaNewData.map { y -> y.pharmaPK } }
 		ediUploadModel.orgName = hospital.orgName
 		ediUploadModel.pharmaList = carriedOverPharma(realPharmaNewData, dueDateList).toMutableList()
+		ediUploadModel.pharmaList.forEach { x -> x.fileList.forEach { y -> y.initThisPK(x.thisPK) } }
 		ediUploadModel.ediState = if (ediUploadModel.pharmaList.count { x -> x.ediState == EDIState.Pending } > 0) EDIState.Pending else EDIState.None
 		ediUploadModel.regDate = serverTime
 		ediUploadModel.fileList.onEach {
@@ -200,6 +211,7 @@ class EDIRequestService: EDIService() {
 		ediUploadPharmaRepository.saveAll(ediUploadModel.pharmaList)
 		ediUploadPharmaMedicineRepository.saveAll(ediUploadModel.pharmaList.flatMap { it.medicineList })
 		ediUploadFileRepository.saveAll(ediUploadModel.fileList)
+		ediUploadModel.pharmaList.forEach { x -> ediUploadPharmaFileRepository.saveAll(x.fileList) }
 		requestRepository.save(RequestModel().apply {
 			requestUserPK = tokenUser.thisPK
 			requestItemPK = ediUploadModel.thisPK
@@ -233,19 +245,27 @@ class EDIRequestService: EDIService() {
 		ediUploadModel.userPK = tokenUser.thisPK
 		ediUploadModel.id = tokenUser.id
 		ediUploadModel.name = tokenUser.name
-		var hospital = hospitalRepository.selectByNewHospital()
+		var hospital = if (ediUploadModel.ediType == EDIType.TRANSFER) {
+			hospitalRepository.selectByTransferHospital()
+		} else {
+			hospitalRepository.selectByNewHospital()
+		}
 		if (hospital == null) {
 			hospital = hospitalRepository.save(HospitalModel().apply {
-				code = FConstants.NEW_HOSPITAL_CODE
-				orgName = FConstants.NEW_HOSPITAL_NAME
-				innerName = FConstants.NEW_HOSPITAL_NAME
+				if(ediUploadModel.ediType == EDIType.TRANSFER) {
+					code = FConstants.TRANSFER_HOSPITAL_CODE
+					orgName = FConstants.TRANSFER_HOSPITAL_NAME
+					innerName = FConstants.TRANSFER_HOSPITAL_NAME
+				} else {
+					code = FConstants.NEW_HOSPITAL_CODE
+					orgName = FConstants.NEW_HOSPITAL_NAME
+					innerName = FConstants.NEW_HOSPITAL_NAME
+				}
 			})
 		}
 		val existPharmaList = pharmaRepository.findAllByThisPKIn(ediUploadModel.pharmaList.map { it.pharmaPK }).filter { !it.inVisible }
 		val realPharma = realPharmaCheck(ediUploadModel.thisPK, ediUploadModel.pharmaList, existPharmaList)
 		realPharma.onEach {
-			it.thisPK = UUID.randomUUID().toString()
-			it.ediPK = ediUploadModel.thisPK
 			it.year = serverTimeYear
 			it.month = serverTimeMonth
 			it.day = ediUploadModel.day
@@ -256,6 +276,7 @@ class EDIRequestService: EDIService() {
 		ediUploadModel.hospitalPK = hospital.thisPK
 		ediUploadModel.orgName = hospital.orgName
 		ediUploadModel.pharmaList = carriedOverPharma(realPharma, dueDateList).toMutableList()
+		ediUploadModel.pharmaList.forEach { x -> x.fileList.forEach { y -> y.initThisPK(x.thisPK) } }
 		ediUploadModel.ediState = EDIState.None
 		ediUploadModel.regDate = serverTime
 		ediUploadModel.fileList.onEach {
@@ -265,6 +286,7 @@ class EDIRequestService: EDIService() {
 
 		val ret = ediUploadRepository.save(ediUploadModel)
 		ediUploadPharmaRepository.saveAll(ediUploadModel.pharmaList)
+		ediUploadModel.pharmaList.forEach { x -> ediUploadPharmaFileRepository.saveAll(x.fileList) }
 		ediUploadFileRepository.saveAll(ediUploadModel.fileList)
 		requestRepository.save(RequestModel().apply {
 			requestUserPK = tokenUser.thisPK
@@ -287,6 +309,11 @@ class EDIRequestService: EDIService() {
 		}
 
 		val data = ediUploadRepository.findByThisPK(thisPK) ?: throw EDIUploadNotExistException()
+		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin))) {
+			if (data.userPK != tokenUser.thisPK ) {
+				throw AuthenticationEntryPointException()
+			}
+		}
 		if (data.ediState == EDIState.OK || data.ediState == EDIState.Reject) {
 			throw NotValidOperationException()
 		}
@@ -299,7 +326,46 @@ class EDIRequestService: EDIService() {
 		}})
 
 		val stackTrace = Thread.currentThread().stackTrace
-		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "add edi file : ${ediUploadFileModel.count()}")
+		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "add edi file : target = $thisPK ${ediUploadFileModel.count()}")
+		logRepository.save(logModel)
+		return ret
+	}
+	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
+	fun postEDIPharmaFileUpload(token: String, ediPK: String, ediPharmaPK: String, ediUploadPharmaFileModel: List<EDIUploadPharmaFileModel>): List<EDIUploadPharmaFileModel> {
+		isValid(token)
+		val tokenUser = getUserDataByToken(token)
+		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.BusinessMan))) {
+			throw AuthenticationEntryPointException()
+		}
+		if (ediUploadPharmaFileModel.isEmpty()) {
+			return emptyList()
+		}
+
+		val data = ediUploadRepository.findByThisPK(ediPK) ?: throw EDIUploadNotExistException()
+		if (data.ediState == EDIState.OK || data.ediState == EDIState.Reject) {
+			throw NotValidOperationException()
+		}
+		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin))) {
+			if (data.userPK != tokenUser.thisPK ) {
+				throw AuthenticationEntryPointException()
+			}
+		}
+
+		val targetEDIPharma = ediUploadPharmaRepository.findAllByEdiPKOrderByPharmaPK(ediPK).find { it.thisPK == ediPharmaPK } ?: return emptyList()
+		if (targetEDIPharma.ediState == EDIState.OK || targetEDIPharma.ediState == EDIState.Reject) {
+			throw NotValidOperationException()
+		}
+
+		val ret = ediUploadPharmaFileRepository.saveAll(ediUploadPharmaFileModel.map { x -> EDIUploadPharmaFileModel().apply {
+			this.ediPharmaPK = ediPharmaPK
+			this.pharmaPK = x.pharmaPK
+			this.blobUrl = x.blobUrl
+			this.originalFilename = x.originalFilename
+			this.mimeType = x.mimeType
+		}})
+
+		val stackTrace = Thread.currentThread().stackTrace
+		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "add edi pharma file : target = $ediPharmaPK ${ediUploadPharmaFileModel.count()}")
 		logRepository.save(logModel)
 		return ret
 	}
@@ -313,8 +379,10 @@ class EDIRequestService: EDIService() {
 
 		val data = ediUploadFileRepository.findByThisPK(thisPK) ?: throw EDIFileNotExistException()
 		val edi = ediUploadRepository.findByThisPK(data.ediPK) ?: throw EDIUploadNotExistException()
-		if (edi.userPK != tokenUser.thisPK) {
-			throw NotValidOperationException()
+		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin))) {
+			if (edi.userPK != tokenUser.thisPK) {
+				throw NotValidOperationException()
+			}
 		}
 		if (edi.ediState == EDIState.OK || edi.ediState == EDIState.Reject) {
 			throw NotValidOperationException()
@@ -324,7 +392,34 @@ class EDIRequestService: EDIService() {
 		ediUploadFileRepository.save(data)
 //		ediUploadFileRepository.delete(data)
 		val stackTrace = Thread.currentThread().stackTrace
-		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "del edi file : ${data.originalFilename}")
+		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "del edi file : target = $thisPK ${data.originalFilename}")
+		logRepository.save(logModel)
+		return data
+	}
+	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
+	fun deleteEDIPharmaFile(token: String, thisPK: String): EDIUploadPharmaFileModel {
+		isValid(token)
+		val tokenUser = getUserDataByToken(token)
+		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.EdiChanger, UserRole.BusinessMan))) {
+			throw AuthenticationEntryPointException()
+		}
+
+		val data = ediUploadPharmaFileRepository.findByThisPK(thisPK) ?: throw EDIFileNotExistException()
+		val edi = ediUploadRepository.selectByPharmaPK(data.pharmaPK) ?: throw EDIUploadNotExistException()
+		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin))) {
+			if (edi.userPK != tokenUser.thisPK) {
+				throw NotValidOperationException()
+			}
+		}
+		if (edi.ediState == EDIState.OK || edi.ediState == EDIState.Reject) {
+			throw NotValidOperationException()
+		}
+
+		data.inVisible = true
+		ediUploadPharmaFileRepository.save(data)
+//		ediUploadPharmaFileRepository.delete(data)
+		val stackTrace = Thread.currentThread().stackTrace
+		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "del edi pharma file : target = $thisPK ${data.originalFilename}")
 		logRepository.save(logModel)
 		return data
 	}

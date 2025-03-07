@@ -7,6 +7,7 @@ import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.web.bind.annotation.*
 import sdmed.back.config.FControllerBase
 import sdmed.back.model.sqlCSO.edi.EDIUploadFileModel
+import sdmed.back.model.sqlCSO.edi.EDIUploadPharmaFileModel
 import sdmed.back.service.EDIListService
 import sdmed.back.service.EDIRequestService
 import java.util.*
@@ -35,10 +36,22 @@ class ExtraEDIListController: FControllerBase() {
 										@PathVariable thisPK: String,
 										@RequestBody ediUploadFileModel: List<EDIUploadFileModel>) =
 		responseService.getResult(ediRequestService.postEDIFileUpload(token, thisPK, ediUploadFileModel))
+	@Operation(summary = "edi pharma file upload")
+	@PostMapping(value = ["/file/{ediPK}/pharma/{ediPharmaPK}"])
+	fun postEDIPharmaUpload(@RequestHeader token: String,
+													@PathVariable ediPK: String,
+													@PathVariable ediPharmaPK: String,
+													@RequestBody ediUploadPharmaFileModel: List<EDIUploadPharmaFileModel>) =
+		responseService.getResult(ediRequestService.postEDIPharmaFileUpload(token, ediPK, ediPharmaPK, ediUploadPharmaFileModel))
 
 	@Operation(summary = "edi file 삭제")
 	@DeleteMapping(value = ["/data/file/{thisPK}"])
 	fun deleteEDIFile(@RequestHeader token: String,
 	                  @PathVariable thisPK: String) =
 		responseService.getResult(ediRequestService.deleteEDIFile(token, thisPK))
+	@Operation(summary = "edi pharma file 삭제")
+	@DeleteMapping(value = ["/data/pharma/file/{thisPK}"])
+	fun deleteEDIPharmaFile(@RequestHeader token: String,
+	                        @PathVariable thisPK: String) =
+		responseService.getResult(ediRequestService.deleteEDIPharmaFile(token, thisPK))
 }

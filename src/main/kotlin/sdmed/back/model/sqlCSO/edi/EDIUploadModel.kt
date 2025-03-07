@@ -47,6 +47,8 @@ data class EDIUploadModel(
 	var orgName: String = "",
 	@Column
 	var ediState: EDIState = EDIState.None,
+	@Column
+	var ediType: EDIType = EDIType.DEFAULT,
 	@Column(updatable = false, nullable = false)
 	var regDate: Date = Date(),
 	@Column(columnDefinition = "nvarchar(255)")

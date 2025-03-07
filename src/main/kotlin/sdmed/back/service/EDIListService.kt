@@ -60,7 +60,7 @@ class EDIListService: EDIService() {
 		data.ediState = responseData.ediState
 		ediUploadPharmaRepository.save(data)
 		val mother = ediUploadRepository.findByThisPK(data.ediPK) ?: throw EDIUploadNotExistException()
-		mother.ediState = FExtensions.ediStateParse(ediUploadPharmaRepository.findALlByEdiPKOrderByPharmaPK(mother.thisPK).map { it.ediState })
+		mother.ediState = FExtensions.ediStateParse(ediUploadPharmaRepository.findAllByEdiPKOrderByPharmaPK(mother.thisPK).map { it.ediState })
 		val ret = ediUploadRepository.save(mother)
 		ediUploadResponseRepository.save(EDIUploadResponseModel().apply {
 			this.ediPK = mother.thisPK
@@ -164,7 +164,7 @@ class EDIListService: EDIService() {
 		data.ediState = pharma.ediState
 		val ret = ediUploadPharmaRepository.save(data)
 		val mother = ediUploadRepository.findByThisPK(data.ediPK) ?: throw EDIUploadNotExistException()
-		val allChildEdiState = ediUploadPharmaRepository.findALlByEdiPKOrderByPharmaPK(mother.thisPK).map { x -> x.ediState }
+		val allChildEdiState = ediUploadPharmaRepository.findAllByEdiPKOrderByPharmaPK(mother.thisPK).map { x -> x.ediState }
 		var responseType = ResponseType.None
 		if (allChildEdiState.count { x -> x == EDIState.None } == allChildEdiState.count()) {
 			mother.ediState = EDIState.None

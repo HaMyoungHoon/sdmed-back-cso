@@ -18,6 +18,7 @@ class EDIService: FServiceBase() {
 	@Autowired lateinit var ediUploadPharmaRepository: IEDIUploadPharmaRepository
 	@Autowired lateinit var ediUploadPharmaMedicineRepository: IEDIUploadPharmaMedicineRepository
 	@Autowired lateinit var ediUploadFileRepository: IEDIUploadFileRepository
+	@Autowired lateinit var ediUploadPharmaFileRepository: IEDIUploadPharmaFileRepository
 	@Autowired lateinit var ediUploadResponseRepository: IEDIUploadResponseRepository
 	@Autowired lateinit var ediApplyDateRepository: IEDIApplyDateRepository
 	@Autowired lateinit var ediPharmaDueDateRepository: IEDIPharmaDueDateRepository
@@ -30,10 +31,12 @@ class EDIService: FServiceBase() {
 	protected fun parseEDIUploadModel(data: EDIUploadModel, inVisible: Boolean = false) = data.apply {
 		this.responseList = ediUploadResponseRepository.findAllByEdiPKOrderByRegDate(thisPK).toMutableList()
 		this.fileList = ediUploadFileRepository.findAllByEdiPKAndInVisibleOrderByRegDateDesc(thisPK).toMutableList()
-		val pharmaList = ediUploadPharmaRepository.findALlByEdiPKOrderByPharmaPK(thisPK)
+		val pharmaList = ediUploadPharmaRepository.findAllByEdiPKOrderByPharmaPK(thisPK)
 		val medicineList = ediUploadPharmaMedicineRepository.findAllByEdiPKAndInVisibleAndPharmaPKInOrderByMedicinePK(thisPK, inVisible, pharmaList.map { it.pharmaPK })
 		val newData: MutableList<EDIUploadPharmaModel> = mutableListOf()
 		mergeEDIPharmaMedicine(pharmaList, medicineList, newData)
+		val pharmaFileList = ediUploadPharmaFileRepository.findAllByEdiPharmaPKIn(newData.map { it.thisPK })
+		mergeEDIPharmaFile(newData, pharmaFileList)
 		this.pharmaList = newData
 	}
 	protected fun carriedOverPharma(pharmaList: List<EDIUploadPharmaModel>, dueDateList: List<EDIPharmaDueDateModel>): List<EDIUploadPharmaModel> {
@@ -77,6 +80,7 @@ class EDIService: FServiceBase() {
 					this.ediPK = ediPK
 					thisPK = UUID.randomUUID().toString()
 					orgName = existPharma.orgName
+					this.fileList = pharma.fileList
 				})
 			}
 		}
@@ -157,6 +161,15 @@ class EDIService: FServiceBase() {
 			pharma?.medicineList?.add(medicine)
 		}
 		newData.addAll(pharmaList)
+	}
+	protected fun mergeEDIPharmaFile(pharmaList: List<EDIUploadPharmaModel>, fileList: List<EDIUploadPharmaFileModel>) {
+		val fileMap = fileList.groupBy { it.ediPharmaPK }
+		for (pharma in pharmaList) {
+			val file = fileMap[pharma.thisPK]
+			if (!file.isNullOrEmpty()) {
+				pharma.fileList.addAll(file)
+			}
+		}
 	}
 	protected fun canIUseApplyDate(token: String, applyDate: Date): Boolean {
 		val year = FExtensions.parseDateTimeString(applyDate, "yyyy") ?: throw NotValidOperationException()
