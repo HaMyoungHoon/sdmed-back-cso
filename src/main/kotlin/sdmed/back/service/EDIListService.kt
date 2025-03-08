@@ -16,26 +16,47 @@ class EDIListService: EDIService() {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
 		val queryDate = FExtensions.getStartEndQueryDate(startDate, endDate)
-		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee))) {
-			return ediUploadRepository.selectAllByMe(tokenUser.thisPK, queryDate.first, queryDate.second)
+		val ret = if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee))) {
+			ediUploadRepository.selectAllByMe(tokenUser.thisPK, queryDate.first, queryDate.second)
+		} else {
+			ediUploadRepository.selectAllByDate(queryDate.first, queryDate.second)
 		}
 
-		return ediUploadRepository.selectAllByDate(queryDate.first, queryDate.second)
+		val pharma = ediUploadPharmaRepository.findAllByEdiPKIn(ret.map { it.thisPK })
+		val pharmaGroup = pharma.groupBy { it.ediPK }
+		for (edi in ret) {
+			val pharmaMap = pharmaGroup[edi.thisPK]
+			if (!pharmaMap.isNullOrEmpty()) {
+				edi.pharmaList.addAll(pharmaMap)
+			}
+		}
+
+		return ret
 	}
 	fun getEDIUploadListMyChild(token: String, startDate: Date, endDate: Date): List<EDIUploadModel> {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
 		val queryDate = FExtensions.getStartEndQueryDate(startDate, endDate)
-		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee))) {
-			return ediUploadRepository.selectAllByMe(tokenUser.thisPK, queryDate.first, queryDate.second)
+		val ret = if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee))) {
+			ediUploadRepository.selectAllByMe(tokenUser.thisPK, queryDate.first, queryDate.second)
+		} else {
+			val myChildPK = userChildPKRepository.selectAllByMotherPK(tokenUser.thisPK)
+			if (myChildPK.isEmpty()) {
+				arrayListOf()
+			} else {
+				ediUploadRepository.selectAllByMyChildAndDate(queryDate.first, queryDate.second).filter { it.userPK in myChildPK }
+			}
 		}
 
-		val myChildPK = userChildPKRepository.selectAllByMotherPK(tokenUser.thisPK)
-		if (myChildPK.isEmpty()) {
-			return arrayListOf()
+		val pharma = ediUploadPharmaRepository.findAllByEdiPKIn(ret.map { it.thisPK })
+		val pharmaGroup = pharma.groupBy { it.ediPK }
+		for (edi in ret) {
+			val pharmaMap = pharmaGroup[edi.thisPK]
+			if (!pharmaMap.isNullOrEmpty()) {
+				edi.pharmaList.addAll(pharmaMap)
+			}
 		}
-
-		return ediUploadRepository.selectAllByMyChildAndDate(queryDate.first, queryDate.second).filter { it.userPK in myChildPK }
+		return ret
 	}
 	fun getEDIUploadData(token: String, thisPK: String): EDIUploadModel {
 		isValid(token)

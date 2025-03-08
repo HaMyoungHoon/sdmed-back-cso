@@ -17,8 +17,12 @@ import java.util.*
  * @property day 해당 업로드 서버 날짜  (서버는 2024-12-12 인데, 데이터가 2024-10월 분 일 수도 있음)
  * @property hospitalPK
  * @property orgName
+ * @property tempHospitalPK 신규처 검색해서 넣을 거
+ * @property tempOrgName 신규처 검색해서 넣을 거
  * @property ediState
+ * @property ediType
  * @property regDate
+ * @property etc 신규처 임시
  * @property pharmaList
  * @property fileList
  * @property responseList
@@ -45,6 +49,10 @@ data class EDIUploadModel(
 	var hospitalPK: String = "",
 	@Column(columnDefinition = "nvarchar(255)", updatable = false, nullable = false)
 	var orgName: String = "",
+	@Column(columnDefinition = "nvarchar(36)", updatable = false, nullable = false)
+	var tempHospitalPK: String = "",
+	@Column(columnDefinition = "nvarchar(255)", updatable = false, nullable = false)
+	var tempOrgName: String = "",
 	@Column
 	var ediState: EDIState = EDIState.None,
 	@Column
