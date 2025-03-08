@@ -3,19 +3,21 @@ package sdmed.back.service
 import org.springframework.beans.factory.annotation.Autowired
 import sdmed.back.advice.exception.AuthenticationEntryPointException
 import sdmed.back.advice.exception.NotValidOperationException
+import sdmed.back.config.FConstants
 import sdmed.back.config.FExtensions
 import sdmed.back.model.common.user.UserRole
 import sdmed.back.model.common.user.UserRoles
 import sdmed.back.model.sqlCSO.edi.EDIUploadCheckModel
 import sdmed.back.model.sqlCSO.edi.EDIUploadCheckSubModel
 import sdmed.back.model.sqlCSO.user.UserDataModel
+import sdmed.back.repository.sqlCSO.IHospitalRepository
 import sdmed.back.repository.sqlCSO.IUserRelationRepository
 import java.util.*
 
 
 class EDIUploadCheckService: EDIService() {
-	@Autowired
-	lateinit var userRelationRepository: IUserRelationRepository
+	@Autowired lateinit var userRelationRepository: IUserRelationRepository
+
 	fun getList(token: String, date: Date, isEDIDate: Boolean = true, isMyChild: Boolean = true): List<EDIUploadCheckModel> {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
@@ -27,7 +29,11 @@ class EDIUploadCheckService: EDIService() {
 		val userList = getUserList(token, isMyChild).map { it.thisPK }
 		val ret = ediUploadRepository.selectCheckModelNullIn(userList)
 		val subNullList = ediUploadRepository.selectCheckSubModelNullIn(userList)
-		val subUploadList = if (isEDIDate) ediUploadRepository.selectCheckSubModelEDIDateIn(userList, year, month) else ediUploadRepository.selectCheckSubModelApplyDateIn(userList, year, month)
+		val subUploadList = if (isEDIDate) {
+			ediUploadRepository.selectCheckSubModelEDIDateIn2(userList, year, month, ret.map { it.hospitalPK })
+		} else {
+			ediUploadRepository.selectCheckSubModelApplyDateIn2(userList, year, month, ret.map { it.hospitalPK })
+		}.filter { x -> !x.isNullValue() }
 		val retSub = mutableListOf<EDIUploadCheckSubModel>()
 		retSub.addAll(subUploadList)
 		retSub.addAll(subNullList.filterNot { x ->
@@ -53,9 +59,20 @@ class EDIUploadCheckService: EDIService() {
 		val targetUser = getUserDataPK(userPK)
 		val year = FExtensions.parseDateTimeString(date, "yyyy") ?: throw NotValidOperationException()
 		val month = FExtensions.parseDateTimeString(date, "MM") ?: throw NotValidOperationException()
-		val ret = ediUploadRepository.selectCheckModelNull(targetUser.thisPK)
+		val ret = ediUploadRepository.selectCheckModelNull(targetUser.thisPK).toMutableList()
+		hospitalRepository.findByCode(FConstants.NEW_HOSPITAL_CODE)?.let {
+			ret.add(EDIUploadCheckModel(targetUser.id, targetUser.name, targetUser.thisPK, it.thisPK, it.orgName, it.innerName))
+		}
+		hospitalRepository.findByCode(FConstants.TRANSFER_HOSPITAL_CODE)?.let {
+			ret.add(EDIUploadCheckModel(targetUser.id, targetUser.name, targetUser.thisPK, it.thisPK, it.orgName, it.innerName))
+		}
+
 		val subNullList = ediUploadRepository.selectCheckSubModelNull(targetUser.thisPK)
-		val subUploadList = if (isEDIDate) ediUploadRepository.selectCheckSubModelEDIDate(targetUser.thisPK, year, month) else ediUploadRepository.selectCheckSubModelApplyDate(targetUser.thisPK, year, month)
+		val subUploadList = if (isEDIDate) {
+			ediUploadRepository.selectCheckSubModelEDIDate2(targetUser.thisPK, year, month, ret.map { it.hospitalPK })
+		} else {
+			ediUploadRepository.selectCheckSubModelApplyDate2(targetUser.thisPK, year, month, ret.map { it.hospitalPK })
+		}.filter { x -> !x.isNullValue() }
 		val retSub = mutableListOf<EDIUploadCheckSubModel>()
 		retSub.addAll(subUploadList)
 		retSub.addAll(subNullList.filterNot { x ->

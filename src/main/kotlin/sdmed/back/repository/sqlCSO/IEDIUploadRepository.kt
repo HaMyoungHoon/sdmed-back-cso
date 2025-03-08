@@ -32,13 +32,13 @@ interface IEDIUploadRepository: JpaRepository<EDIUploadModel, String> {
 			"WHERE b.thisPK = :pharmaPK")
 	fun selectByPharmaPK(pharmaPK: String): EDIUploadModel?
 
-	@Query("SELECT DISTinct new sdmed.back.model.sqlCSO.edi.EDIUploadCheckModel(c.name, c.thisPK, b.thisPK, b.orgName) " +
+	@Query("SELECT DISTINCT new sdmed.back.model.sqlCSO.edi.EDIUploadCheckModel(c.id, c.name, c.thisPK, b.thisPK, b.orgName, b.innerName) " +
 			"FROM UserRelationModel a " +
 			"LEFT JOIN HospitalModel b ON a.hosPK = b.thisPK " +
 			"LEFT JOIN UserDataModel c ON a.userPK = c.thisPK " +
 			"WHERE a.userPK = :userPK AND b.inVisible = false")
 	fun selectCheckModelNull(userPK: String): List<EDIUploadCheckModel>
-	@Query("SELECT DISTinct new sdmed.back.model.sqlCSO.edi.EDIUploadCheckModel(c.name, c.thisPK, b.thisPK, b.orgName) " +
+	@Query("SELECT DISTINCT new sdmed.back.model.sqlCSO.edi.EDIUploadCheckModel(c.id, c.name, c.thisPK, b.thisPK, b.orgName, b.innerName) " +
 			"FROM UserRelationModel a " +
 			"LEFT JOIN HospitalModel b ON a.hosPK = b.thisPK " +
 			"LEFT JOIN UserDataModel c ON a.userPK = c.thisPK " +
@@ -60,49 +60,37 @@ interface IEDIUploadRepository: JpaRepository<EDIUploadModel, String> {
 			"WHERE a.userPK IN (:userPK) AND b.inVisible = false AND c.inVisible = false")
 	fun selectCheckSubModelNullIn(userPK: List<String>): List<EDIUploadCheckSubModel>
 
-	@Query("SELECT DISTINCT new sdmed.back.model.sqlCSO.edi.EDIUploadCheckSubModel(f.thisPK, d.thisPK, e.thisPK, e.orgName, b.ediState, c.regDate, c.thisPK, c.year, c.month, c.day, b.year, b.month, b.day, b.isCarriedOver)" +
-			"FROM UserRelationModel a " +
-			"LEFT JOIN EDIUploadPharmaModel b ON a.pharmaPK = b.pharmaPK " +
-			"LEFT JOIN EDIUploadModel c ON b.ediPK = c.thisPK " +
-			"LEFT JOIN HospitalModel d ON c.hospitalPK = d.thisPK " +
-			"LEFT JOIN PharmaModel e ON b.pharmaPK = e.thisPK " +
-			"LEFT JOIN UserDataModel f ON a.userPK = f.thisPK " +
-			"WHERE a.userPK = :userPK AND d.inVisible = false AND e.inVisible = false " +
-			"AND b.ediState != 2 AND c.year = :year AND c.month = :month " +
-			"ORDER BY c.regDate DESC")
-	fun selectCheckSubModelEDIDate(userPK: String, year: String, month: String): List<EDIUploadCheckSubModel>
-	@Query("SELECT DISTINCT new sdmed.back.model.sqlCSO.edi.EDIUploadCheckSubModel(f.thisPK, d.thisPK, e.thisPK, e.orgName, b.ediState, c.regDate, c.thisPK, c.year, c.month, c.day, b.year, b.month, b.day, b.isCarriedOver)" +
-			"FROM UserRelationModel a " +
-			"LEFT JOIN EDIUploadPharmaModel b ON b.pharmaPK = a.pharmaPK " +
-			"LEFT JOIN EDIUploadModel c ON c.thisPK = b.ediPK " +
-			"LEFT JOIN HospitalModel d ON d.thisPK = c.hospitalPK " +
-			"LEFT JOIN PharmaModel e ON e.thisPK = b.pharmaPK " +
-			"LEFT JOIN UserDataModel f ON a.userPK = f.thisPK " +
-			"WHERE a.userPK = :userPK AND d.inVisible = false AND e.inVisible = false " +
-			"AND b.ediState != 2 AND b.year = :year AND b.month = :month " +
-			"ORDER BY c.regDate DESC")
-	fun selectCheckSubModelApplyDate(userPK: String, year: String, month: String): List<EDIUploadCheckSubModel>
+	@Query("SELECT DISTINCT new sdmed.back.model.sqlCSO.edi.EDIUploadCheckSubModel(e.thisPK, c.thisPK, d.thisPK, d.orgName, b.ediState, a.regDate, a.thisPK, a.year, a.month, a.day, b.year, b.month, b.day, b.isCarriedOver) " +
+			"FROM EDIUploadModel a " +
+			"LEFT JOIN EDIUploadPharmaModel b ON a.thisPK = b.ediPK " +
+			"LEFT JOIN HospitalModel c ON a.hospitalPK = c.thisPK " +
+			"LEFT JOIN PharmaModel d ON b.pharmaPK = d.thisPK " +
+			"LEFT JOIN UserDataModel e ON a.userPK = e.thisPK " +
+			"WHERE a.userPK = :userPK AND a.ediState != 2 AND a.year = :year AND a.month = :month AND a.hospitalPK IN (:hospitalPKs)")
+	fun selectCheckSubModelEDIDate2(userPK: String, year: String, month: String, hospitalPKs: List<String>): List<EDIUploadCheckSubModel>
+	@Query("SELECT DISTINCT new sdmed.back.model.sqlCSO.edi.EDIUploadCheckSubModel(e.thisPK, c.thisPK, d.thisPK, d.orgName, b.ediState, a.regDate, a.thisPK, a.year, a.month, a.day, b.year, b.month, b.day, b.isCarriedOver) " +
+			"FROM EDIUploadModel a " +
+			"LEFT JOIN EDIUploadPharmaModel b ON a.thisPK = b.ediPK " +
+			"LEFT JOIN HospitalModel c ON a.hospitalPK = c.thisPK " +
+			"LEFT JOIN PharmaModel d ON b.pharmaPK = d.thisPK " +
+			"LEFT JOIN UserDataModel e ON a.userPK = e.thisPK " +
+			"WHERE a.userPK = :userPK AND a.ediState != 2 AND b.year = :year AND b.month = :month AND a.hospitalPK IN (:hospitalPKs)")
+	fun selectCheckSubModelApplyDate2(userPK: String, year: String, month: String, hospitalPKs: List<String>): List<EDIUploadCheckSubModel>
 
-	@Query("SELECT DISTINCT new sdmed.back.model.sqlCSO.edi.EDIUploadCheckSubModel(f.thisPK, d.thisPK, e.thisPK, e.orgName, b.ediState, c.regDate, c.thisPK, c.year, c.month, c.day, b.year, b.month, b.day, b.isCarriedOver)" +
-			"FROM UserRelationModel a " +
-			"LEFT JOIN EDIUploadPharmaModel b ON a.pharmaPK = b.pharmaPK " +
-			"LEFT JOIN EDIUploadModel c ON b.ediPK = c.thisPK " +
-			"LEFT JOIN HospitalModel d ON c.hospitalPK = d.thisPK " +
-			"LEFT JOIN PharmaModel e ON b.pharmaPK = e.thisPK " +
-			"LEFT JOIN UserDataModel f ON a.userPK = f.thisPK " +
-			"WHERE a.userPK IN (:userPK) AND d.inVisible = false AND e.inVisible = false " +
-			"AND b.ediState != 2 AND c.year = :year AND c.month = :month " +
-			"ORDER BY c.regDate DESC")
-	fun selectCheckSubModelEDIDateIn(userPK: List<String>, year: String, month: String): List<EDIUploadCheckSubModel>
-	@Query("SELECT DISTINCT new sdmed.back.model.sqlCSO.edi.EDIUploadCheckSubModel(f.thisPK, d.thisPK, e.thisPK, e.orgName, b.ediState, c.regDate, c.thisPK, c.year, c.month, c.day, b.year, b.month, b.day, b.isCarriedOver)" +
-			"FROM UserRelationModel a " +
-			"LEFT JOIN EDIUploadPharmaModel b ON b.pharmaPK = a.pharmaPK " +
-			"LEFT JOIN EDIUploadModel c ON c.thisPK = b.ediPK " +
-			"LEFT JOIN HospitalModel d ON d.thisPK = c.hospitalPK " +
-			"LEFT JOIN PharmaModel e ON e.thisPK = b.pharmaPK " +
-			"LEFT JOIN UserDataModel f ON a.userPK = f.thisPK " +
-			"WHERE a.userPK IN (:userPK) AND d.inVisible = false AND e.inVisible = false " +
-			"AND b.ediState != 2 AND b.year = :year AND b.month = :month " +
-			"ORDER BY c.regDate DESC")
-	fun selectCheckSubModelApplyDateIn(userPK: List<String>, year: String, month: String): List<EDIUploadCheckSubModel>
+	@Query("SELECT DISTINCT new sdmed.back.model.sqlCSO.edi.EDIUploadCheckSubModel(e.thisPK, c.thisPK, d.thisPK, d.orgName, b.ediState, a.regDate, a.thisPK, a.year, a.month, a.day, b.year, b.month, b.day, b.isCarriedOver) " +
+			"FROM EDIUploadModel a " +
+			"LEFT JOIN EDIUploadPharmaModel b ON a.thisPK = b.ediPK " +
+			"LEFT JOIN HospitalModel c ON a.hospitalPK = c.thisPK " +
+			"LEFT JOIN PharmaModel d ON b.pharmaPK = d.thisPK " +
+			"LEFT JOIN UserDataModel e ON a.userPK = e.thisPK " +
+			"WHERE a.userPK IN (:userPK) AND a.ediState != 2 AND a.year = :year AND a.month = :month AND a.hospitalPK IN (:hospitalPKs)")
+	fun selectCheckSubModelEDIDateIn2(userPK: List<String>, year: String, month: String, hospitalPKs: List<String>): List<EDIUploadCheckSubModel>
+	@Query("SELECT DISTINCT new sdmed.back.model.sqlCSO.edi.EDIUploadCheckSubModel(e.thisPK, c.thisPK, d.thisPK, d.orgName, b.ediState, a.regDate, a.thisPK, a.year, a.month, a.day, b.year, b.month, b.day, b.isCarriedOver) " +
+			"FROM EDIUploadModel a " +
+			"LEFT JOIN EDIUploadPharmaModel b ON a.thisPK = b.ediPK " +
+			"LEFT JOIN HospitalModel c ON a.hospitalPK = c.thisPK " +
+			"LEFT JOIN PharmaModel d ON b.pharmaPK = d.thisPK " +
+			"LEFT JOIN UserDataModel e ON a.userPK = e.thisPK " +
+			"WHERE a.userPK = (:userPK) AND a.ediState != 2 AND b.year = :year AND b.month = :month AND a.hospitalPK IN (:hospitalPKs)")
+	fun selectCheckSubModelApplyDateIn2(userPK: List<String>, year: String, month: String, hospitalPKs: List<String>): List<EDIUploadCheckSubModel>
 }
