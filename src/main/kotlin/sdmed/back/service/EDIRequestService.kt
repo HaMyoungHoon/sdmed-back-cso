@@ -49,7 +49,7 @@ class EDIRequestService: EDIService() {
 
 		return ret
 	}
-	fun getPharmaList(token: String, applyDate: Date, withMedicine: Boolean = false): List<EDIPharmaBuffModel> {
+	fun getPharmaList(token: String, withMedicine: Boolean = false): List<EDIPharmaBuffModel> {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.BusinessMan))) {

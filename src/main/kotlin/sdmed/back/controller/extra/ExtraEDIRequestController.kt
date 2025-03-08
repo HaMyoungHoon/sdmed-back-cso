@@ -30,9 +30,8 @@ class ExtraEDIRequestController: FControllerBase() {
 	@Operation(summary = "내가 가능한 제약사 목록")
 	@GetMapping(value = ["/list/pharma"])
 	fun getPharmaList(@RequestHeader token: String,
-	                  @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) applyDate: Date,
 	                  @RequestParam(required = false) withMedicine: Boolean = false) =
-		responseService.getResult(ediRequestService.getPharmaList(token, applyDate, withMedicine))
+		responseService.getResult(ediRequestService.getPharmaList(token, withMedicine))
 	@Operation(summary = "내가 가진 병원의 제약사 목록")
 	@GetMapping(value = ["/list/pharma/{hosPK}"])
 	fun getPharmaList(@RequestHeader token: String,
