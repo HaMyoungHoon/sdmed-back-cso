@@ -4,18 +4,13 @@ spring:
 
   datasource:
     sql-cso:
-#      driver-class-name: com.mysql.jdbc.Driver
-#      jdbc-url: jdbc:mysql://db-cso.sdmed.co.kr:33066/cso
-#      username: cso
-#      password: Tldptmdh1234
       driver-class-name: com.mysql.jdbc.Driver
-      jdbc-url: jdbc:mysql://db-cso.sdmed.co.kr:33066/cso
+      jdbc-url: jdbc:mysql://10.0.0.102:33066/cso
       username: cso
       password: Tldptmdh1234
 
     hikari:
       max-lifetime: 3500000
-
 
   messages:
     basename: i18n/exception
@@ -75,7 +70,7 @@ file:
 
 str:
   version: 1.0.0
-  profile: dev
+  profile: test
   blob:
     blobUrl: https://devsdmed1.blob.core.windows.net
     containerName: devsdmed1
