@@ -5,7 +5,7 @@ spring:
   datasource:
     sql-cso:
       driver-class-name: com.mysql.jdbc.Driver
-      jdbc-url: jdbc:mysql://10.0.0.102:33066/cso
+      jdbc-url: jdbc:mysql://10.0.0.103:33066/cso
       username: cso
       password: Tldptmdh1234
 
