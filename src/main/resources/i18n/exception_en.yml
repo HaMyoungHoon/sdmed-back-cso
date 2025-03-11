@@ -201,3 +201,7 @@ ediDueDateFileUploadException:
 userMappingFileUploadException:
   code: "-10048"
   msg: "user mapping upload failed."
+
+hospitalTempFileUploadException:
+  code: "-10049"
+  msg: "hospital temp upload failed."

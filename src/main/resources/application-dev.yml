@@ -8,14 +8,21 @@ spring:
 #      jdbc-url: jdbc:mysql://db-cso.sdmed.co.kr:33066/cso
 #      username: cso
 #      password: Tldptmdh1234
-      driver-class-name: com.mysql.jdbc.Driver
-      jdbc-url: jdbc:mysql://db-cso.sdmed.co.kr:33066/cso
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      jdbc-url: jdbc:mysql://dev-db-cso.sdmed.co.kr:33066/cso
       username: cso
       password: Tldptmdh1234
 
     hikari:
-      max-lifetime: 3500000
-
+      maximum-pool-size: 10
+      connection-timeout: 5000
+      validation-timeout: 2000
+      minimum-idle: 10
+      idle-timeout: 600000
+      max-lifetime: 1800000
+      keepalive-time: 60000
+      leak-detection-threshold: 20000
+      connection-test-query: "SELECT 1"
 
   messages:
     basename: i18n/exception
@@ -72,6 +79,7 @@ file:
   medicinePriceExcelDir: C:/FTP/STORAGE/EXCEL/MEDICINE_PRICE
   ediDueDateExcelDir: C:/FTP/STORAGE/EXCEL/EDI_DUE_DATE
   userMappingExcelDir: C:/FTP/STORAGE/EXCEL/USER_MAPPING
+  hospitalTempExcelDir: C:/FTP/STORAGE/EXCEL/HOSPITAL_TEMP
 
 str:
   version: 1.0.0

@@ -5,6 +5,7 @@ import org.springframework.web.multipart.MultipartFile
 import sdmed.back.advice.exception.*
 import sdmed.back.model.sqlCSO.edi.EDIPharmaDueDateModel
 import sdmed.back.model.sqlCSO.hospital.HospitalModel
+import sdmed.back.model.sqlCSO.hospital.HospitalTempModel
 import sdmed.back.model.sqlCSO.medicine.MedicineIngredientModel
 import sdmed.back.model.sqlCSO.medicine.MedicineModel
 import sdmed.back.model.sqlCSO.medicine.MedicinePriceModel
@@ -248,6 +249,32 @@ class FExcelFileParser {
 			if (setRowRet == null) {
 				FExtensions.fileDelete(copiedLocation)
 				throw UserMappingFileUploadException(model.errorString())
+			}
+			if (setRowRet == false) {
+				return@forEach
+			}
+			ret.add(model)
+		}
+
+		return ret
+	}
+	fun hospitalTempUploadExcelParse(uploaderID: String, file: MultipartFile): MutableList<HospitalTempModel> {
+		FExtensions.folderExist(FExcelParserType.HOSPITAL_TEMP)
+		val copiedLocation = FExtensions.fileCopy(file, FExcelParserType.HOSPITAL_TEMP, uploaderID)
+		val excelSheetHandler = ExcelSheetHandler.readExcel(copiedLocation.toFile())
+
+		if (!HospitalTempModel().findHeader(excelSheetHandler.header)) {
+			FExtensions.fileDelete(copiedLocation)
+			throw HospitalTempFileUploadException()
+		}
+
+		val ret: MutableList<HospitalTempModel> = mutableListOf()
+		excelSheetHandler.rows.forEach { x ->
+			val model = HospitalTempModel()
+			val setRowRet = model.rowSet(x)
+			if (setRowRet == null) {
+				FExtensions.fileDelete(copiedLocation)
+				throw HospitalTempFileUploadException(model.errorString())
 			}
 			if (setRowRet == false) {
 				return@forEach

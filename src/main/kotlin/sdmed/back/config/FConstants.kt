@@ -167,6 +167,22 @@ object FConstants {
 	const val MODEL_USER_RELATIONS_DELETE_WHERE_USER_PK_IN = "DELETE FROM UserRelationModel WHERE userPK IN "
 	const val MODEL_USER_RELATIONS_INSERT_INTO = "INSERT INTO UserRelationModel (thisPK, userPK, hosPK, pharmaPK, medicinePK) VALUES "
 
+	const val MODEL_HOSPITAL_TEMP_CODE = "암호화요양기호"
+	const val MODEL_HOSPITAL_TEMP_ORG_NAME = "요양기관명"
+	const val MODEL_HOSPITAL_TEMP_TYPE_CODE = "종별코드"
+	const val MODEL_HOSPITAL_TEMP_METRO_CODE = "시도코드"
+	const val MODEL_HOSPITAL_TEMP_CITY_CODE = "시군구코드"
+	const val MODEL_HOSPITAL_TEMP_LOCAL_NAME = "읍면동"
+	const val MODEL_HOSPITAL_TEMP_ZIP_CODE = "우편번호"
+	const val MODEL_HOSPITAL_TEMP_ADDRESS = "주소"
+	const val MODEL_HOSPITAL_TEMP_PHONE_NUMBER = "전화번호"
+	const val MODEL_HOSPITAL_TEMP_WEBSITE = "병원홈페이지"
+	const val MODEL_HOSPITAL_TEMP_OPEN_DATE = "개설일자"
+	const val MODEL_HOSPITAL_TEMP_LONGITUDE = "좌표(X)"
+	const val MODEL_HOSPITAL_TEMP_LATITUDE = "좌표(Y)"
+	const val MODEL_HOSPITAL_TEMP_COUNT = 16
+	const val MODEL_HOSPITAL_TEMP_INSERT_INTO = "INSERT INTO HospitalTempModel (thisPK, code, orgName, hospitalTempTypeCode, hospitalTempMetroCode, hospitalTempCityCode, hospitalTempLocalName, zipCode, address, phoneNumber, websiteUrl, openDate, longitude, latitude) VALUES "
+
 	const val NEW_HOSPITAL_CODE = "-99999"
 	const val NEW_HOSPITAL_NAME = "신규처"
 	const val TRANSFER_HOSPITAL_CODE = "-88888"

@@ -31,6 +31,7 @@ object FExtensions {
 	var medicinePriceExcelDir: String = ""
 	var ediDueDateExcelDir: String = ""
 	var userMappingExcelDir: String = ""
+	var hospitalTempExcelDir: String = ""
 
 	fun folderExist(excelType: FExcelParserType) {
 		Optional.ofNullable(Files.createDirectories(fileLocation(excelType))).orElseThrow { FileUploadException() }
@@ -46,6 +47,7 @@ object FExtensions {
 			FExcelParserType.MEDICINE_PRICE -> medicinePriceExcelDir
 			FExcelParserType.EDI_DUE_DATE -> ediDueDateExcelDir
 			FExcelParserType.USER_MAPPING -> userMappingExcelDir
+			FExcelParserType.HOSPITAL_TEMP -> hospitalTempExcelDir
 		}
 		return if (withTime) {
 			Paths.get("${ret}/${getDateTimeString("yyyy-MM-dd")}").toAbsolutePath().normalize()
@@ -134,6 +136,7 @@ object FExtensions {
 			FExcelParserType.MEDICINE_PRICE -> Paths.get("${medicinePriceExcelDir}/excel_upload_sample.xlsx").toAbsolutePath().normalize()
 			FExcelParserType.EDI_DUE_DATE -> Paths.get("${ediDueDateExcelDir}/excel_upload_sample.xlsx").toAbsolutePath().normalize()
 			FExcelParserType.USER_MAPPING -> Paths.get("${userMappingExcelDir}/excel_upload_sample.xlsx").toAbsolutePath().normalize()
+			FExcelParserType.HOSPITAL_TEMP -> Paths.get("${hospitalTempExcelDir}/excel_upload_sample.xlsx").toAbsolutePath().normalize()
 		}
 		return UrlResource(filePath.toUri())
 	}

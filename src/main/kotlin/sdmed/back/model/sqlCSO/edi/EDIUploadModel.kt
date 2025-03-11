@@ -49,9 +49,9 @@ data class EDIUploadModel(
 	var hospitalPK: String = "",
 	@Column(columnDefinition = "nvarchar(255)", updatable = false, nullable = false)
 	var orgName: String = "",
-	@Column(columnDefinition = "nvarchar(36)", updatable = false, nullable = false)
+	@Column(columnDefinition = "nvarchar(36)", nullable = false)
 	var tempHospitalPK: String = "",
-	@Column(columnDefinition = "nvarchar(255)", updatable = false, nullable = false)
+	@Column(columnDefinition = "nvarchar(255)", nullable = false)
 	var tempOrgName: String = "",
 	@Column
 	var ediState: EDIState = EDIState.None,

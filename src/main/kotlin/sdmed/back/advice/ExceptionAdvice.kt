@@ -273,6 +273,11 @@ class ExceptionAdvice {
 	protected fun userMappingFileUploadException(request: HttpServletRequest, exception: UserMappingFileUploadException) =
 		responseService.getFailResult(getMessage("userMappingFileUploadException.code").toInt(), getMessageMerge("userMappingFileUploadException.msg", exception.message))
 
+	@ExceptionHandler(HospitalTempFileUploadException::class)
+	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+	protected fun hospitalTempFileUploadException(request: HttpServletRequest, exception: HospitalTempFileUploadException) =
+		responseService.getFailResult(getMessage("hospitalTempFileUploadException.code").toInt(), getMessageMerge("hospitalTempFileUploadException.msg", exception.message))
+
 	@ExceptionHandler(AsyncRequestTimeoutException::class)
 	@ResponseStatus(HttpStatus.OK)
 	protected fun asyncRequestTimeoutException(request: HttpServletRequest, exception: AsyncRequestTimeoutException): AsyncContext =

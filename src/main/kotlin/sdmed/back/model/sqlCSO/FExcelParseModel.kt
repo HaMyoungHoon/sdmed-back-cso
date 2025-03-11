@@ -7,6 +7,9 @@ abstract class FExcelParseModel {
 			return false
 		}
 		for (index in 0 until dataCount) {
+			if (titleGet(index).isBlank()) {
+				return true
+			}
 			if (data[index] != titleGet(index)) {
 				return false
 			}

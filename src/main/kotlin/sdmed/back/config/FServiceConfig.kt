@@ -23,6 +23,7 @@ class FServiceConfig {
 
 	@Bean fun hospitalService() = HospitalService()
 	@Bean fun hospitalListService() = HospitalListService()
+	@Bean fun hospitalTempService() = HospitalTempService()
 
 	@Bean fun pharmaService() = PharmaService()
 	@Bean fun pharmaListService() = PharmaListService()

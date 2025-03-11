@@ -7,6 +7,7 @@ import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.web.bind.annotation.*
 import sdmed.back.config.FControllerBase
 import sdmed.back.model.sqlCSO.edi.*
+import sdmed.back.model.sqlCSO.hospital.HospitalTempModel
 import sdmed.back.service.EDIListService
 import java.util.Date
 
@@ -51,6 +52,12 @@ class EDIListController: FControllerBase() {
 							@PathVariable thisPK: String,
 							@RequestBody ediUploadModel: EDIUploadModel) =
 		responseService.getResult(ediListService.putEDIUpload(token, thisPK, ediUploadModel))
+	@Operation(summary = "edi 신규처 데이터 수정")
+	@PutMapping(value = ["/data/hospitalTemp/{thisPK}"])
+	fun putData(@RequestHeader token: String,
+	            @PathVariable thisPK: String,
+	            @RequestBody hospitalTempModel: HospitalTempModel) =
+		responseService.getResult(ediListService.putEDIUpload(token, thisPK, hospitalTempModel))
 
 	@Operation(summary = "edi 데이터-제약사 수정")
 	@PutMapping(value = ["/data/pharma/{thisPK}"])

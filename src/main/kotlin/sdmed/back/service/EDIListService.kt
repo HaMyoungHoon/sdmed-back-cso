@@ -9,6 +9,7 @@ import sdmed.back.model.common.user.UserRole
 import sdmed.back.model.common.user.UserRoles
 import sdmed.back.model.sqlCSO.LogModel
 import sdmed.back.model.sqlCSO.edi.*
+import sdmed.back.model.sqlCSO.hospital.HospitalTempModel
 import java.util.*
 
 class EDIListService: EDIService() {
@@ -152,6 +153,23 @@ class EDIListService: EDIService() {
 		val ret = ediUploadRepository.save(data)
 		val stackTrace = Thread.currentThread().stackTrace
 		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "modify edi : ${data.thisPK}")
+		logRepository.save(logModel)
+		return ret
+	}
+	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
+	fun putEDIUpload(token: String, thisPK: String, hospitalTempModel: HospitalTempModel): EDIUploadModel {
+		isValid(token)
+		val tokenUser = getUserDataByToken(token)
+		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee))) {
+			throw AuthenticationEntryPointException()
+		}
+		val data = ediUploadRepository.findByThisPK(thisPK) ?: throw EDIUploadNotExistException()
+		data.tempHospitalPK = hospitalTempModel.thisPK
+		data.tempOrgName = hospitalTempModel.orgName
+
+		val ret = ediUploadRepository.save(data)
+		val stackTrace = Thread.currentThread().stackTrace
+		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "modify edi place : ${data.thisPK} ${hospitalTempModel.thisPK} ${hospitalTempModel.orgName}")
 		logRepository.save(logModel)
 		return ret
 	}

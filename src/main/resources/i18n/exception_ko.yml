@@ -201,3 +201,7 @@ ediDueDateFileUploadException:
 userMappingFileUploadException:
   code: "-10048"
   msg: "유저 맵핑 업로드에 실패했습니다."
+
+hospitalTempFileUploadException:
+  code: "-10049"
+  msg: "임시 병원 정보 업로드에 실패했습니다."
