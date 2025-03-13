@@ -5,22 +5,22 @@ import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.stereotype.Repository
-import sdmed.back.model.sqlCSO.hospital.HospitalTempModel
+import sdmed.back.model.sqlCSO.hospital.PharmacyTempModel
 
 @Repository
-interface IHospitalTempRepository: JpaRepository<HospitalTempModel, String> {
-	fun findByThisPK(thisPK: String): HospitalTempModel?
-	fun findAllByCodeInOrderByOrgNameAsc(code: List<String>): List<HospitalTempModel>
-	fun findAllByOrderByOrgNameAsc(pageable: Pageable): Page<HospitalTempModel>
+interface IPharmacyTempRepository: JpaRepository<PharmacyTempModel, String> {
+	fun findByThisPK(thisPK: String): PharmacyTempModel?
+	fun findAllByCodeInOrderByOrgNameAsc(code: List<String>): List<PharmacyTempModel>
+	fun findAllByOrderByOrgNameAsc(pageable: Pageable): Page<PharmacyTempModel>
 
 	@Query("SELECT a FROM HospitalTempModel a " +
 			"WHERE a.orgName LIKE %:name% OR a.address LIKE %:address% " +
 			"ORDER BY a.orgName ASC ")
-	fun selectAllContains(name: String, address: String): List<HospitalTempModel>
-	@Query("SELECT a.* FROM HospitalTempModel a " +
+	fun selectAllContains(name: String, address: String): List<PharmacyTempModel>
+	@Query("SELECT a.* FROM PharmacyTempModel a " +
 			"WHERE (6371 * acos(cos(radians(:latitude)) * cos(radians(a.latitude)) " +
 			"* cos(radians(a.longitude) - radians(:longitude)) " +
 			"+ sin(radians(:latitude)) * sin(radians(a.latitude)))) <= (:distance / 1000) " +
 			"ORDER BY a.orgName ASC ", nativeQuery = true)
-	fun selectAllNearby(latitude: Double, longitude: Double, distance: Int): List<HospitalTempModel>
+	fun selectAllNearby(latitude: Double, longitude: Double, distance: Int): List<PharmacyTempModel>
 }

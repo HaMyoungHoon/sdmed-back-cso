@@ -11,4 +11,5 @@ enum class FExcelParserType {
 	EDI_DUE_DATE,
 	USER_MAPPING,
 	HOSPITAL_TEMP,
+	PHARMACY_TEMP,
 }

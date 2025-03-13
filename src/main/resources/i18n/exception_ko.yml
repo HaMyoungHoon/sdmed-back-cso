@@ -205,3 +205,7 @@ userMappingFileUploadException:
 hospitalTempFileUploadException:
   code: "-10049"
   msg: "임시 병원 정보 업로드에 실패했습니다."
+
+pharmacyTempFileUploadException:
+  code: "-10050"
+  msg: "임시 약국 정보 업로드에 실패했습니다."

@@ -6,6 +6,7 @@ import sdmed.back.advice.exception.*
 import sdmed.back.model.sqlCSO.edi.EDIPharmaDueDateModel
 import sdmed.back.model.sqlCSO.hospital.HospitalModel
 import sdmed.back.model.sqlCSO.hospital.HospitalTempModel
+import sdmed.back.model.sqlCSO.hospital.PharmacyTempModel
 import sdmed.back.model.sqlCSO.medicine.MedicineIngredientModel
 import sdmed.back.model.sqlCSO.medicine.MedicineModel
 import sdmed.back.model.sqlCSO.medicine.MedicinePriceModel
@@ -271,6 +272,32 @@ class FExcelFileParser {
 		val ret: MutableList<HospitalTempModel> = mutableListOf()
 		excelSheetHandler.rows.forEach { x ->
 			val model = HospitalTempModel()
+			val setRowRet = model.rowSet(x)
+			if (setRowRet == null) {
+				FExtensions.fileDelete(copiedLocation)
+				throw HospitalTempFileUploadException(model.errorString())
+			}
+			if (setRowRet == false) {
+				return@forEach
+			}
+			ret.add(model)
+		}
+
+		return ret
+	}
+	fun pharmacyTempUploadExcelParse(uploaderID: String, file: MultipartFile): MutableList<PharmacyTempModel> {
+		FExtensions.folderExist(FExcelParserType.PHARMACY_TEMP)
+		val copiedLocation = FExtensions.fileCopy(file, FExcelParserType.PHARMACY_TEMP, uploaderID)
+		val excelSheetHandler = ExcelSheetHandler.readExcel(copiedLocation.toFile())
+
+		if (!PharmacyTempModel().findHeader(excelSheetHandler.header)) {
+			FExtensions.fileDelete(copiedLocation)
+			throw HospitalTempFileUploadException()
+		}
+
+		val ret: MutableList<PharmacyTempModel> = mutableListOf()
+		excelSheetHandler.rows.forEach { x ->
+			val model = PharmacyTempModel()
 			val setRowRet = model.rowSet(x)
 			if (setRowRet == null) {
 				FExtensions.fileDelete(copiedLocation)

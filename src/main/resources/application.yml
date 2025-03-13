@@ -68,6 +68,7 @@ file:
   ediDueDateExcelDir: C:/FTP/STORAGE/EXCEL/EDI_DUE_DATE
   userMappingExcelDir: C:/FTP/STORAGE/EXCEL/USER_MAPPING
   hospitalTempExcelDir: C:/FTP/STORAGE/EXCEL/HOSPITAL_TEMP
+  pharmacyTempExcelDir: C:/FTP/STORAGE/EXCEL/PHARMACY_TEMP
 
 str:
   version: 1.0.0
