@@ -13,7 +13,7 @@ import sdmed.back.model.sqlCSO.hospital.HospitalTempModel
 import java.util.*
 
 class EDIListService: EDIService() {
-	fun getEDIUploadList(token: String, startDate: Date, endDate: Date): List<EDIUploadModel> {
+	fun getEDIUploadList(token: String, withFile: Boolean, startDate: Date, endDate: Date): List<EDIUploadModel> {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
 		val queryDate = FExtensions.getStartEndQueryDate(startDate, endDate)
@@ -24,6 +24,10 @@ class EDIListService: EDIService() {
 		}
 
 		val pharma = ediUploadPharmaRepository.findAllByEdiPKIn(ret.map { it.thisPK })
+		if (withFile) {
+			val pharmaFile = ediUploadPharmaFileRepository.findAllByEdiPharmaPKIn(pharma.map { it.thisPK })
+			mergeEDIPharmaFile(pharma, pharmaFile)
+		}
 		val pharmaGroup = pharma.groupBy { it.ediPK }
 		for (edi in ret) {
 			val pharmaMap = pharmaGroup[edi.thisPK]
@@ -34,7 +38,7 @@ class EDIListService: EDIService() {
 
 		return ret
 	}
-	fun getEDIUploadListMyChild(token: String, startDate: Date, endDate: Date): List<EDIUploadModel> {
+	fun getEDIUploadListMyChild(token: String, withFile: Boolean, startDate: Date, endDate: Date): List<EDIUploadModel> {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
 		val queryDate = FExtensions.getStartEndQueryDate(startDate, endDate)
@@ -50,6 +54,10 @@ class EDIListService: EDIService() {
 		}
 
 		val pharma = ediUploadPharmaRepository.findAllByEdiPKIn(ret.map { it.thisPK })
+		if (withFile) {
+			val pharmaFile = ediUploadPharmaFileRepository.findAllByEdiPharmaPKIn(pharma.map { it.thisPK })
+			mergeEDIPharmaFile(pharma, pharmaFile)
+		}
 		val pharmaGroup = pharma.groupBy { it.ediPK }
 		for (edi in ret) {
 			val pharmaMap = pharmaGroup[edi.thisPK]

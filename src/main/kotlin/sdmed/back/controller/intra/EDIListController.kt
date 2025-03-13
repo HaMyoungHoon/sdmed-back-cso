@@ -21,11 +21,12 @@ class EDIListController: FControllerBase() {
 	@GetMapping(value = ["/list"])
 	fun getList(@RequestHeader token: String,
 							@RequestParam(required = false) myChild: Boolean = true,
+	            @RequestParam(required = false) withFile: Boolean = false,
 							@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) startDate: Date,
 							@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) endDate: Date) = if (myChild) {
-								responseService.getResult(ediListService.getEDIUploadListMyChild(token, startDate, endDate))
+								responseService.getResult(ediListService.getEDIUploadListMyChild(token, withFile, startDate, endDate))
 							} else {
-								responseService.getResult(ediListService.getEDIUploadList(token, startDate, endDate))
+								responseService.getResult(ediListService.getEDIUploadList(token, withFile, startDate, endDate))
 							}
 	@Operation(summary = "edi 업로드 데이터")
 	@GetMapping(value = ["/data/{thisPK}"])
