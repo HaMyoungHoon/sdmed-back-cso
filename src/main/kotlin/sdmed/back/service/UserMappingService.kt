@@ -15,7 +15,7 @@ import sdmed.back.model.sqlCSO.user.UserDataModel
 import sdmed.back.model.sqlCSO.user.UserHosPharmaMedicinePairModel
 import java.util.stream.Collectors
 
-class UserMappingService: UserService() {
+open class UserMappingService: UserService() {
 	@Autowired lateinit var hospitalService: HospitalService
 	@Autowired lateinit var pharmaService: PharmaService
 
@@ -37,7 +37,7 @@ class UserMappingService: UserService() {
 		pharmaService.getPharmaData(token, pharmaPK, pharmaOwnMedicineView)
 
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
-	fun userRelationModify(token: String, userPK: String, hosPharmaMedicinePairModel: List<HosPharmaMedicinePairModel>): UserDataModel {
+	open fun userRelationModify(token: String, userPK: String, hosPharmaMedicinePairModel: List<HosPharmaMedicinePairModel>): UserDataModel {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee))) {
@@ -91,7 +91,7 @@ class UserMappingService: UserService() {
 		return getUserDataWithRelationByPK(userPK)
 	}
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
-	fun userRelationUpload(token: String, file: MultipartFile): Int {
+	open fun userRelationUpload(token: String, file: MultipartFile): Int {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.EdiChanger))) {

@@ -12,11 +12,11 @@ import org.springframework.context.annotation.Configuration
 
 @OpenAPIDefinition(servers = [io.swagger.v3.oas.annotations.servers.Server(url = "/", description = "defaultPath")])
 @Configuration
-class SwaggerConfiguration {
+open class SwaggerConfiguration {
 	@Value(value = "\${str.version}") lateinit var strVersion: String
 	@Value(value = "\${str.profile}") lateinit var strprofile: String
 	@Bean
-	fun openApi(): OpenAPI = OpenAPI()
+	open fun openApi(): OpenAPI = OpenAPI()
 		.info(v1Info())
 		.servers(mutableListOf<Server?>().apply {
 			add(testHttpsServer())

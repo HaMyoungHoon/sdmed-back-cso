@@ -19,7 +19,7 @@ import sdmed.back.repository.sqlCSO.*
 import java.sql.Timestamp
 import java.util.*
 
-class UserService: FServiceBase() {
+open class UserService: FServiceBase() {
 	@Autowired lateinit var hospitalRepository: IHospitalRepository
 	@Autowired lateinit var pharmaRepository: IPharmaRepository
 	@Autowired lateinit var medicineRepository: IMedicineRepository
@@ -73,7 +73,7 @@ class UserService: FServiceBase() {
 	fun getUserDataWithRelationByPK(thisPK: String) = getUserDataByPK(thisPK).apply { hosList = mergeRel(thisPK) }
 
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
-	fun signIn(id: String, pw: String): String {
+	open fun signIn(id: String, pw: String): String {
 		val user = getUserDataByID(id)
 		val encryptPW = fAmhohwa.encrypt(pw)
 		if (user.pw != encryptPW) {
@@ -89,7 +89,7 @@ class UserService: FServiceBase() {
 		return jwtTokenProvider.createToken(user)
 	}
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
-	fun newUser(confirmPW: String, data: UserDataModel): UserDataModel {
+	open fun newUser(confirmPW: String, data: UserDataModel): UserDataModel {
 		data.id = data.id.trim()
 		data.pw = data.pw.trim()
 		if (FExtensions.regexIdCheck(data.id) != true) {
@@ -128,7 +128,7 @@ class UserService: FServiceBase() {
 		return ret
 	}
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
-	fun newUser(token: String, confirmPW: String, data: UserDataModel): UserDataModel {
+	open fun newUser(token: String, confirmPW: String, data: UserDataModel): UserDataModel {
 		data.id = data.id.trim()
 		data.pw = data.pw.trim()
 		isValid(token)
@@ -170,7 +170,7 @@ class UserService: FServiceBase() {
 	}
 
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
-	fun passwordChangeByID(token: String, id: String, changePW: String): UserDataModel {
+	open fun passwordChangeByID(token: String, id: String, changePW: String): UserDataModel {
 		if (FExtensions.regexPasswordCheck(changePW) != true) {
 			throw AuthenticationEntryPointException()
 		}
@@ -191,7 +191,7 @@ class UserService: FServiceBase() {
 		return ret
 	}
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
-	fun passwordChangeByPK(token: String, userPK: String, changePW: String): UserDataModel {
+	open fun passwordChangeByPK(token: String, userPK: String, changePW: String): UserDataModel {
 		if (FExtensions.regexPasswordCheck(changePW) != true) {
 			throw AuthenticationEntryPointException()
 		}
@@ -213,7 +213,7 @@ class UserService: FServiceBase() {
 	}
 
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
-	fun tokenRefresh(token: String): String {
+	open fun tokenRefresh(token: String): String {
 		isValid(token)
 		val user = getUserDataByToken(token)
 		if (!isLive(user, false)) {
@@ -229,7 +229,7 @@ class UserService: FServiceBase() {
 	}
 
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
-	fun userFileUrlModify(token: String, userPK: String, blobModel: BlobUploadModel, userFileType: UserFileType): UserFileModel {
+	open fun userFileUrlModify(token: String, userPK: String, blobModel: BlobUploadModel, userFileType: UserFileType): UserFileModel {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.UserChanger))) {
@@ -258,7 +258,7 @@ class UserService: FServiceBase() {
 		return ret
 	}
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
-	fun passwordInit(token: String, userPK: String): String {
+	open fun passwordInit(token: String, userPK: String): String {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.UserChanger))) {

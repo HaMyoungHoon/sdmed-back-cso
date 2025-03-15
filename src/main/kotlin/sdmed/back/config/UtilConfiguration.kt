@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Configuration
 
 @Configuration
-class UtilConfiguration {
+open class UtilConfiguration {
 	@Value(value = "\${file.defDir}") var defDir: String = ""
 	@Value(value = "\${file.imageDir}") var imageDir: String = ""
 	@Value(value = "\${file.documentDir}") var documentDir: String = ""

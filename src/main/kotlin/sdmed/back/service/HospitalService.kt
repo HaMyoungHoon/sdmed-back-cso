@@ -5,7 +5,7 @@ import sdmed.back.config.FServiceBase
 import sdmed.back.model.sqlCSO.hospital.HospitalModel
 import sdmed.back.repository.sqlCSO.IHospitalRepository
 
-class HospitalService: FServiceBase() {
+open class HospitalService: FServiceBase() {
 	@Autowired lateinit var hospitalRepository: IHospitalRepository
 
 	fun getHospitalAllSearch(token: String, searchString: String, isSearchTypeCode: Boolean = true): List<HospitalModel> {

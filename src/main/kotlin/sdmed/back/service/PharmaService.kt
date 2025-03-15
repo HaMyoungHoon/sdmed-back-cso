@@ -6,7 +6,7 @@ import sdmed.back.config.FServiceBase
 import sdmed.back.model.sqlCSO.pharma.PharmaModel
 import sdmed.back.repository.sqlCSO.*
 
-class PharmaService: FServiceBase() {
+open class PharmaService: FServiceBase() {
 	@Autowired lateinit var pharmaRepository: IPharmaRepository
 	@Autowired lateinit var medicineRepository: IMedicineRepository
 	@Autowired lateinit var pharmaMedicineRelationRepository: IPharmaMedicineRelationRepository

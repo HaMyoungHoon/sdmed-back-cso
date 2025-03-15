@@ -9,7 +9,7 @@ import sdmed.back.model.common.user.UserRole
 import sdmed.back.model.sqlCSO.IPBlockModel
 import sdmed.back.repository.sqlCSO.IIPBlockRepository
 
-class IPControlService: FServiceBase() {
+open class IPControlService: FServiceBase() {
 	@Autowired lateinit var ipBlockRepository: IIPBlockRepository
 
 
@@ -17,7 +17,7 @@ class IPControlService: FServiceBase() {
 	fun getIPBlockModel(ipAddr: String) = ipBlockRepository.findByIpAddr(ipAddr)
 	fun getIPBlockModelList(ipAddr: String) = ipBlockRepository.selectLikeIpAddr(ipAddr)
 	@Transactional(CSOJPAConfig.TRANSACTION_MANAGER)
-	fun addIPBlockModelForController(token: String, ipBlockModel: IPBlockModel): IPBlockModel {
+	open fun addIPBlockModelForController(token: String, ipBlockModel: IPBlockModel): IPBlockModel {
 		isAdmin(token)
 		if (getIPBlockModel(ipBlockModel.ipAddr) != null) {
 			return ipBlockModel
@@ -26,7 +26,7 @@ class IPControlService: FServiceBase() {
 		return ipBlockRepository.save(ipBlockModel)
 	}
 	@Transactional(CSOJPAConfig.TRANSACTION_MANAGER)
-	fun addIPBlockModel(ipBlockModel: IPBlockModel): IPBlockModel {
+	open fun addIPBlockModel(ipBlockModel: IPBlockModel): IPBlockModel {
 		if (getIPBlockModel(ipBlockModel.ipAddr) != null) {
 			return ipBlockModel
 		}
@@ -34,13 +34,13 @@ class IPControlService: FServiceBase() {
 		return ipBlockRepository.save(ipBlockModel)
 	}
 	@Transactional(CSOJPAConfig.TRANSACTION_MANAGER)
-	fun setIPBlockModel(ipAddr: String, block: Boolean): IPBlockModel {
+	open fun setIPBlockModel(ipAddr: String, block: Boolean): IPBlockModel {
 		val model = getIPBlockModel(ipAddr) ?: return IPBlockModel()
 		model.isBlock = block
 		return ipBlockRepository.save(model)
 	}
 	@Transactional(CSOJPAConfig.TRANSACTION_MANAGER)
-	fun setIPBlockModelForController(token: String, ipAddr: String, block: Boolean): IPBlockModel {
+	open fun setIPBlockModelForController(token: String, ipAddr: String, block: Boolean): IPBlockModel {
 		isAdmin(token)
 		val model = getIPBlockModel(ipAddr) ?: return IPBlockModel()
 		model.isBlock = block

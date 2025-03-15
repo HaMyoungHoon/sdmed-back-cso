@@ -13,7 +13,7 @@ import sdmed.back.model.sqlCSO.pharma.PharmaModel
 import sdmed.back.repository.sqlCSO.*
 import java.util.*
 
-class EDIService: FServiceBase() {
+open class EDIService: FServiceBase() {
 	@Autowired lateinit var ediUploadRepository: IEDIUploadRepository
 	@Autowired lateinit var ediUploadPharmaRepository: IEDIUploadPharmaRepository
 	@Autowired lateinit var ediUploadPharmaMedicineRepository: IEDIUploadPharmaMedicineRepository

@@ -16,7 +16,7 @@ import sdmed.back.model.sqlCSO.request.ResponseCountModel
 import sdmed.back.model.sqlCSO.user.UserDataModel
 import java.util.*
 
-class DashboardService: FServiceBase() {
+open class DashboardService: FServiceBase() {
 
 	fun getListByMyChildNoResponse(token: String): List<RequestModel> {
 		isValid(token)
@@ -90,7 +90,7 @@ class DashboardService: FServiceBase() {
 	}
 
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
-	fun putRequestRecep(token: String, thisPK: String): RequestModel {
+	open fun putRequestRecep(token: String, thisPK: String): RequestModel {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee))) {
@@ -114,7 +114,7 @@ class DashboardService: FServiceBase() {
 	}
 
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
-	fun putRequestModelResponseData(token: String, thisPK: String, responseType: ResponseType): RequestModel {
+	open fun putRequestModelResponseData(token: String, thisPK: String, responseType: ResponseType): RequestModel {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee))) {

@@ -16,7 +16,7 @@ import sdmed.back.model.sqlCSO.pharma.PharmaModel
 import sdmed.back.repository.sqlCSO.IPharmaRepository
 import java.util.*
 
-class MedicineListService: MedicineService() {
+open class MedicineListService: MedicineService() {
 	@Autowired lateinit var pharmaRepository: IPharmaRepository
 
 	fun getList(token: String, withAllPrice: Boolean = false) = getAllMedicine(token, withAllPrice)
@@ -43,7 +43,7 @@ class MedicineListService: MedicineService() {
 		return pharmaRepository.selectAllByInvisibleOrderByCode()
 	}
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
-	fun medicineUpload(token: String, file: MultipartFile): String {
+	open fun medicineUpload(token: String, file: MultipartFile): String {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.MedicineChanger))) {
@@ -76,7 +76,7 @@ class MedicineListService: MedicineService() {
 		return "count : $retCount"
 	}
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
-	fun addMedicineData(token: String, data: MedicineModel): MedicineModel {
+	open fun addMedicineData(token: String, data: MedicineModel): MedicineModel {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.MedicineChanger))) {
@@ -98,7 +98,7 @@ class MedicineListService: MedicineService() {
 		return ret
 	}
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
-	fun medicineDataModify(token: String, data: MedicineModel): MedicineModel {
+	open fun medicineDataModify(token: String, data: MedicineModel): MedicineModel {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.MedicineChanger))) {

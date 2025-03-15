@@ -14,7 +14,7 @@ import sdmed.back.model.sqlCSO.edi.EDIApplyDateModel
 import sdmed.back.model.sqlCSO.edi.EDIApplyDateState
 import java.util.*
 
-class EDIApplyDateService: EDIService() {
+open class EDIApplyDateService: EDIService() {
 	fun getAllApplyDate(token: String): List<EDIApplyDateModel> {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
@@ -29,7 +29,7 @@ class EDIApplyDateService: EDIService() {
 	}
 
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
-	fun postApplyDate(token: String, applyDate: Date): EDIApplyDateModel {
+	open fun postApplyDate(token: String, applyDate: Date): EDIApplyDateModel {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.EdiChanger))) {
@@ -55,7 +55,7 @@ class EDIApplyDateService: EDIService() {
 	}
 
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
-	fun putApplyDateModify(token: String, thisPK: String, state: EDIApplyDateState): EDIApplyDateModel {
+	open fun putApplyDateModify(token: String, thisPK: String, state: EDIApplyDateState): EDIApplyDateModel {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.EdiChanger))) {

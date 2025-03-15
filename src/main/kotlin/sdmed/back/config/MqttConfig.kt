@@ -11,23 +11,23 @@ import org.springframework.integration.mqtt.core.DefaultMqttPahoClientFactory
 import org.springframework.integration.mqtt.outbound.MqttPahoMessageHandler
 
 @Configuration
-class MqttConfig {
+open class MqttConfig {
 	@Value(value = "\${mqtt.brokerUrl1}") lateinit var brokerUrl1: String
 	@Value(value = "\${mqtt.brokerUrl2}") lateinit var brokerUrl2: String
 	@Value(value = "\${mqtt.clientId}") lateinit var clientId: String
 	@Value(value = "\${mqtt.username}") lateinit var userName: String
 	@Value(value = "\${mqtt.password}") lateinit var password: String
 
-	@Bean fun mqttInputChannel() = DirectChannel()
-	@Bean fun mqttOutputChannel() = DirectChannel()
+	@Bean open fun mqttInputChannel() = DirectChannel()
+	@Bean open fun mqttOutputChannel() = DirectChannel()
 
 	@Bean
-	fun mqttConnectOptions() = MqttConnectOptions().apply {
+	open fun mqttConnectOptions() = MqttConnectOptions().apply {
 		this.userName = this@MqttConfig.userName
 		this.password = this@MqttConfig.password.toCharArray()
 	}
 	@Bean
-	fun mqttClientFactory() = DefaultMqttPahoClientFactory().apply {
+	open fun mqttClientFactory() = DefaultMqttPahoClientFactory().apply {
 		connectionOptions = mqttConnectOptions()
 	}
 	//	@Bean
@@ -41,11 +41,11 @@ class MqttConfig {
 //	}
 	@Bean
 	@ServiceActivator(inputChannel = "mqttOutputChannel")
-	fun mqttOutbound() = MqttPahoMessageHandler(brokerUrl1, clientId, mqttClientFactory()).apply {
+	open fun mqttOutbound() = MqttPahoMessageHandler(brokerUrl1, clientId, mqttClientFactory()).apply {
 		setAsync(true)
 	}
 	@Bean
-	fun sendMessageFlow() = IntegrationFlow.from(mqttOutputChannel())
+	open fun sendMessageFlow() = IntegrationFlow.from(mqttOutputChannel())
 		.handle(mqttOutbound())
 		.get()
 }

@@ -14,7 +14,7 @@ import sdmed.back.model.sqlCSO.pharma.PharmaModel
 import sdmed.back.repository.sqlCSO.IUserRelationRepository
 import java.util.*
 
-class EDIDueDateService: EDIService() {
+open class EDIDueDateService: EDIService() {
 	@Autowired lateinit var userRelationModel: IUserRelationRepository
 	fun getEDIDueDateList(token: String, date: Date, isYear: Boolean = false): List<EDIPharmaDueDateModel> {
 		isValid(token)
@@ -97,14 +97,14 @@ class EDIDueDateService: EDIService() {
 	}
 
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
-	fun postEDIPharmaDueDate(token: String, pharmaPK: String, date: Date): EDIPharmaDueDateModel {
+	open fun postEDIPharmaDueDate(token: String, pharmaPK: String, date: Date): EDIPharmaDueDateModel {
 		val year = FExtensions.parseDateTimeString(date, "yyyy") ?: throw NotValidOperationException()
 		val month = FExtensions.parseDateTimeString(date, "MM") ?: throw NotValidOperationException()
 		val day = FExtensions.parseDateTimeString(date, "dd") ?: throw NotValidOperationException()
 		return postEDIPharmaDueDate(token, pharmaPK, year, month, day)
 	}
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
-	fun ediDueDateUpload(token: String, file: MultipartFile): List<EDIPharmaDueDateModel> {
+	open fun ediDueDateUpload(token: String, file: MultipartFile): List<EDIPharmaDueDateModel> {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.EdiChanger))) {
@@ -151,7 +151,7 @@ class EDIDueDateService: EDIService() {
 		return ret
 	}
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
-	fun postEDIPharmaDueDate(token: String, pharmaPK: String, year: String, month: String, day: String): EDIPharmaDueDateModel {
+	open fun postEDIPharmaDueDate(token: String, pharmaPK: String, year: String, month: String, day: String): EDIPharmaDueDateModel {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.EdiChanger))) {
@@ -176,7 +176,7 @@ class EDIDueDateService: EDIService() {
 		return ret
 	}
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
-	fun postEDIPharmaDueDate(token: String, pharmaPK: List<String>, date: Date): List<EDIPharmaDueDateModel> {
+	open fun postEDIPharmaDueDate(token: String, pharmaPK: List<String>, date: Date): List<EDIPharmaDueDateModel> {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.EdiChanger))) {
@@ -206,14 +206,14 @@ class EDIDueDateService: EDIService() {
 		return ret
 	}
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
-	fun putEDIPharmaDueDate(token: String, pharmaPK: String, date: Date): EDIPharmaDueDateModel {
+	open fun putEDIPharmaDueDate(token: String, pharmaPK: String, date: Date): EDIPharmaDueDateModel {
 		val year = FExtensions.parseDateTimeString(date, "yyyy") ?: throw NotValidOperationException()
 		val month = FExtensions.parseDateTimeString(date, "MM") ?: throw NotValidOperationException()
 		val day = FExtensions.parseDateTimeString(date, "dd") ?: throw NotValidOperationException()
 		return putEDIPharmaDueDate(token, pharmaPK, year, month, day)
 	}
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
-	fun putEDIPharmaDueDate(token: String, thisPK: String, year: String, month: String, day: String): EDIPharmaDueDateModel {
+	open fun putEDIPharmaDueDate(token: String, thisPK: String, year: String, month: String, day: String): EDIPharmaDueDateModel {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.EdiChanger))) {
@@ -238,13 +238,13 @@ class EDIDueDateService: EDIService() {
 		return ret
 	}
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
-	fun deleteEDIPharmaDueDate(token: String, pharmaPK: String, date: Date): Boolean {
+	open fun deleteEDIPharmaDueDate(token: String, pharmaPK: String, date: Date): Boolean {
 		val year = FExtensions.parseDateTimeString(date, "yyyy") ?: throw NotValidOperationException()
 		val month = FExtensions.parseDateTimeString(date, "MM") ?: throw NotValidOperationException()
 		return deleteEDIPharmaDueDate(token, pharmaPK, year, month)
 	}
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
-	fun deleteEDIPharmaDueDate(token: String, pharmaPK: String, year: String, month: String): Boolean {
+	open fun deleteEDIPharmaDueDate(token: String, pharmaPK: String, year: String, month: String): Boolean {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.EdiChanger))) {

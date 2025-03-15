@@ -21,7 +21,7 @@ import java.util.*
 	entityManagerFactoryRef = CSOJPAConfig.ENTITY_MANAGER,
 	transactionManagerRef = CSOJPAConfig.TRANSACTION_MANAGER,
 	enableDefaultTransactions = true)
-class CSOJPAConfig {
+open class CSOJPAConfig {
 	companion object {
 		const val DATA_SOURCE = "csoDataSource"
 		const val ENTITY_MANAGER = "csoEntityManager"
@@ -29,19 +29,19 @@ class CSOJPAConfig {
 	}
 
 	@Bean
-	fun exceptionTranslation() = PersistenceExceptionTranslationPostProcessor()
+	open fun exceptionTranslation() = PersistenceExceptionTranslationPostProcessor()
 	@Bean(name = [DATA_SOURCE])
 	@ConfigurationProperties(prefix = "spring.datasource.sql-cso")
-	fun dataSource(): HikariDataSource = DataSourceBuilder.create().type(HikariDataSource::class.java).build()
+	open fun dataSource(): HikariDataSource = DataSourceBuilder.create().type(HikariDataSource::class.java).build()
 	@Bean(name = [ENTITY_MANAGER])
-	fun csoEntityManagerFactory(): LocalContainerEntityManagerFactoryBean = LocalContainerEntityManagerFactoryBean().apply {
+	open fun csoEntityManagerFactory(): LocalContainerEntityManagerFactoryBean = LocalContainerEntityManagerFactoryBean().apply {
 		this.dataSource = dataSource()
 		this.setPackagesToScan("sdmed.back.model.sqlCSO")
 		this.jpaVendorAdapter = HibernateJpaVendorAdapter()
 		this.setJpaProperties(additionalProperties())
 	}
 	@Bean(name = [TRANSACTION_MANAGER])
-	fun csoTransactionManager(): PlatformTransactionManager = JpaTransactionManager().apply {
+	open fun csoTransactionManager(): PlatformTransactionManager = JpaTransactionManager().apply {
 		this.entityManagerFactory = csoEntityManagerFactory().`object`
 	}
 	fun additionalProperties(): Properties = Properties().apply {

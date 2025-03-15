@@ -12,7 +12,7 @@ import sdmed.back.model.common.user.UserRoles
 import sdmed.back.model.sqlCSO.LogModel
 import sdmed.back.model.sqlCSO.user.UserDataModel
 
-class MyInfoService: UserService() {
+open class MyInfoService: UserService() {
 	fun getMyData(token: String, childView: Boolean = false, relationView: Boolean = false, pharmaOwnMedicineView: Boolean = false, relationMedicineView: Boolean = true): UserDataModel {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
@@ -22,7 +22,7 @@ class MyInfoService: UserService() {
 		return getUserDataByPK(tokenUser.thisPK, childView, relationView, pharmaOwnMedicineView, relationMedicineView)
 	}
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
-	fun passwordChange(token: String, currentPW: String, afterPW: String, confirmPW: String): UserDataModel {
+	open fun passwordChange(token: String, currentPW: String, afterPW: String, confirmPW: String): UserDataModel {
 		val tokenUser = getUserDataByToken(token)
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee, UserRole.BusinessMan))) {
 			throw AuthenticationEntryPointException()

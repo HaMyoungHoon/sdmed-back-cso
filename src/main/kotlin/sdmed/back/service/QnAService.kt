@@ -6,7 +6,7 @@ import sdmed.back.model.sqlCSO.qna.QnAReplyFileModel
 import sdmed.back.model.sqlCSO.qna.QnAReplyModel
 import sdmed.back.repository.sqlCSO.*
 
-class QnAService: FServiceBase() {
+open class QnAService: FServiceBase() {
 	@Autowired lateinit var qnaHeaderRepository: IQnAHeaderRepository
 	@Autowired lateinit var qnaContentRepository: IQnAContentRepository
 	@Autowired lateinit var qnaFileRepository: IQnAFileRepository

@@ -14,13 +14,13 @@ import org.springframework.web.servlet.i18n.SessionLocaleResolver
 import java.util.*
 
 @Configuration
-class MessageConfiguration: WebMvcConfigurer {
+open class MessageConfiguration: WebMvcConfigurer {
 	@Bean
-	fun localeResolver() = SessionLocaleResolver().apply { this.setDefaultLocale(Locale.KOREAN) }
+	open fun localeResolver() = SessionLocaleResolver().apply { this.setDefaultLocale(Locale.KOREAN) }
 	@Bean
-	fun localeChangeInterceptor() = LocaleChangeInterceptor().apply { this.paramName = "lang" }
+	open fun localeChangeInterceptor() = LocaleChangeInterceptor().apply { this.paramName = "lang" }
 	@Bean
-	fun messageSource(@Value(value = "\${spring.messages.basename}") basename: String,
+	open fun messageSource(@Value(value = "\${spring.messages.basename}") basename: String,
 	                  @Value(value = "\${spring.messages.encoding}") encoding: String) =
 		YamlMessageSource().apply {
 			this.setBasename(basename)

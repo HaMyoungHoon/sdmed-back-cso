@@ -17,7 +17,7 @@ import sdmed.back.model.sqlCSO.request.RequestModel
 import sdmed.back.repository.sqlCSO.IUserRelationRepository
 import java.util.*
 
-class EDIRequestService: EDIService() {
+open class EDIRequestService: EDIService() {
 	@Autowired lateinit var userRelationRepository: IUserRelationRepository
 	fun getApplyDateList(token: String): List<EDIApplyDateModel> {
 		isValid(token)
@@ -126,7 +126,7 @@ class EDIRequestService: EDIService() {
 	}
 
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
-	fun postEDIData(token: String, ediUploadModel: EDIUploadModel): EDIUploadModel {
+	open fun postEDIData(token: String, ediUploadModel: EDIUploadModel): EDIUploadModel {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.BusinessMan))) {
@@ -224,7 +224,7 @@ class EDIRequestService: EDIService() {
 		return ret
 	}
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
-	fun postNewEDIData(token: String, ediUploadModel: EDIUploadModel): EDIUploadModel {
+	open fun postNewEDIData(token: String, ediUploadModel: EDIUploadModel): EDIUploadModel {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.BusinessMan))) {
@@ -301,7 +301,7 @@ class EDIRequestService: EDIService() {
 	}
 
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
-	fun postEDIFileUpload(token: String, thisPK: String, ediUploadFileModel: List<EDIUploadFileModel>): List<EDIUploadFileModel> {
+	open fun postEDIFileUpload(token: String, thisPK: String, ediUploadFileModel: List<EDIUploadFileModel>): List<EDIUploadFileModel> {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.BusinessMan))) {
@@ -331,7 +331,7 @@ class EDIRequestService: EDIService() {
 		return ret
 	}
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
-	fun postEDIPharmaFileUpload(token: String, ediPK: String, ediPharmaPK: String, ediUploadPharmaFileModel: List<EDIUploadPharmaFileModel>): List<EDIUploadPharmaFileModel> {
+	open fun postEDIPharmaFileUpload(token: String, ediPK: String, ediPharmaPK: String, ediUploadPharmaFileModel: List<EDIUploadPharmaFileModel>): List<EDIUploadPharmaFileModel> {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.BusinessMan))) {
@@ -370,7 +370,7 @@ class EDIRequestService: EDIService() {
 		return ret
 	}
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
-	fun deleteEDIFile(token: String, thisPK: String): EDIUploadFileModel {
+	open fun deleteEDIFile(token: String, thisPK: String): EDIUploadFileModel {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.EdiChanger, UserRole.BusinessMan))) {
@@ -397,7 +397,7 @@ class EDIRequestService: EDIService() {
 		return data
 	}
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
-	fun deleteEDIPharmaFile(token: String, thisPK: String): EDIUploadPharmaFileModel {
+	open fun deleteEDIPharmaFile(token: String, thisPK: String): EDIUploadPharmaFileModel {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.EdiChanger, UserRole.BusinessMan))) {

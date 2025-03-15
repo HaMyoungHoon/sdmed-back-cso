@@ -15,7 +15,7 @@ import sdmed.back.model.sqlCSO.hospital.HospitalModel
 import java.util.*
 import java.util.stream.Collectors
 
-class HospitalListService: HospitalService() {
+open class HospitalListService: HospitalService() {
 	fun getList(token: String): List<HospitalModel> {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
@@ -32,7 +32,7 @@ class HospitalListService: HospitalService() {
 	}
 
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
-	fun addHospitalData(token: String, data: HospitalModel): HospitalModel {
+	open fun addHospitalData(token: String, data: HospitalModel): HospitalModel {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.HospitalChanger))) {
@@ -55,7 +55,7 @@ class HospitalListService: HospitalService() {
 		return ret
 	}
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
-	fun hospitalUpload(token: String, file: MultipartFile): String {
+	open fun hospitalUpload(token: String, file: MultipartFile): String {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.HospitalChanger))) {
@@ -88,7 +88,7 @@ class HospitalListService: HospitalService() {
 	}
 
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
-	fun hospitalDataModify(token: String, data: HospitalModel): HospitalModel {
+	open fun hospitalDataModify(token: String, data: HospitalModel): HospitalModel {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.HospitalChanger))) {

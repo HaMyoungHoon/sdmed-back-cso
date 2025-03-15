@@ -15,7 +15,7 @@ import sdmed.back.model.sqlCSO.user.UserChildPKModel
 import sdmed.back.model.sqlCSO.user.UserDataModel
 import java.util.stream.Collectors
 
-class UserInfoService: UserService() {
+open class UserInfoService: UserService() {
 	fun getList(token: String): List<UserDataModel> {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
@@ -50,7 +50,7 @@ class UserInfoService: UserService() {
 	}
 
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
-	fun userDataModify(token: String, userData: UserDataModel): UserDataModel {
+	open fun userDataModify(token: String, userData: UserDataModel): UserDataModel {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.UserChanger))) {
@@ -76,7 +76,7 @@ class UserInfoService: UserService() {
 		return ret
 	}
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
-	fun userUpload(token: String, file: MultipartFile): String {
+	open fun userUpload(token: String, file: MultipartFile): String {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.UserChanger))) {
@@ -119,7 +119,7 @@ class UserInfoService: UserService() {
 		return "count : $retCount"
 	}
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
-	fun childModify(token: String, motherPK: String, childPK: List<String>): String {
+	open fun childModify(token: String, motherPK: String, childPK: List<String>): String {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.UserChanger))) {

@@ -21,7 +21,7 @@ import sdmed.back.repository.sqlCSO.IHospitalTempRepository
 import sdmed.back.repository.sqlCSO.IPharmacyTempRepository
 import java.util.stream.Collectors
 
-class HospitalTempService: FServiceBase() {
+open class HospitalTempService: FServiceBase() {
 	@Autowired lateinit var hospitalTempRepository: IHospitalTempRepository
 	@Autowired lateinit var hospitalTempFileRepository: IHospitalTempFileRepository
 	@Autowired lateinit var pharmacyTempRepository: IPharmacyTempRepository
@@ -63,7 +63,7 @@ class HospitalTempService: FServiceBase() {
 		return pharmacyTempRepository.selectAllNearby(latitude, longitude, distance)
 	}
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
-	fun hospitalTempUpload(token: String, file: MultipartFile, alreadyUpdate: Boolean = false): String {
+	open fun hospitalTempUpload(token: String, file: MultipartFile, alreadyUpdate: Boolean = false): String {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.HospitalChanger))) {
@@ -97,7 +97,7 @@ class HospitalTempService: FServiceBase() {
 		return "count : $retCount"
 	}
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
-	fun hospitalTempFileUpload(token: String, hospitalTempFileModel: HospitalTempFileModel): HospitalTempFileModel {
+	open fun hospitalTempFileUpload(token: String, hospitalTempFileModel: HospitalTempFileModel): HospitalTempFileModel {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.HospitalChanger))) {
@@ -112,7 +112,7 @@ class HospitalTempService: FServiceBase() {
 		return ret
 	}
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
-	fun hospitalTempFileUpload(token: String, thisPK: String, hospitalTempFileModel: List<HospitalTempFileModel>): List<HospitalTempFileModel> {
+	open fun hospitalTempFileUpload(token: String, thisPK: String, hospitalTempFileModel: List<HospitalTempFileModel>): List<HospitalTempFileModel> {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.HospitalChanger))) {
@@ -127,7 +127,7 @@ class HospitalTempService: FServiceBase() {
 		return ret
 	}
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
-	fun pharmacyTempUpload(token: String, file: MultipartFile, alreadyUpdate: Boolean = false): String {
+	open fun pharmacyTempUpload(token: String, file: MultipartFile, alreadyUpdate: Boolean = false): String {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.HospitalChanger))) {

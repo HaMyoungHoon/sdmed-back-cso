@@ -24,14 +24,14 @@ import sdmed.back.service.IPControlService
 @EnableWebSecurity
 @ConditionalOnDefaultWebSecurity
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
-class SecurityConfiguration {
+open class SecurityConfiguration {
 	@Value(value = "\${str.profile}") lateinit var strProfile: String
 	@Autowired lateinit var refererCheckFilter: RefererCheckFilter
 	@Autowired lateinit var ipControlService: IPControlService
 	@Autowired lateinit var commonService: CommonService
 	@Bean
 	@Throws(Exception::class)
-	fun filterChain(http: HttpSecurity): SecurityFilterChain = http
+	open fun filterChain(http: HttpSecurity): SecurityFilterChain = http
 		.csrf { it.disable() }
 		.sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
 		.exceptionHandling {
@@ -44,5 +44,5 @@ class SecurityConfiguration {
 		.build()
 
 	@Bean
-	fun passwordEncoder(): PasswordEncoder = PasswordEncoderFactories.createDelegatingPasswordEncoder()
+	open fun passwordEncoder(): PasswordEncoder = PasswordEncoderFactories.createDelegatingPasswordEncoder()
 }

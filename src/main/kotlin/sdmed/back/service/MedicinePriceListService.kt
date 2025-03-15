@@ -11,7 +11,7 @@ import sdmed.back.model.sqlCSO.medicine.MedicineIngredientModel
 import sdmed.back.model.sqlCSO.medicine.MedicinePriceModel
 import java.util.*
 
-class MedicinePriceListService: MedicineService() {
+open class MedicinePriceListService: MedicineService() {
 
 	fun getList(token: String, withAllPrice: Boolean = false) = getAllMedicine(token, withAllPrice)
 	fun getLike(token: String, searchString: String, withAllPrice: Boolean = false) = getLikeMedicine(token, searchString, withAllPrice)
@@ -26,7 +26,7 @@ class MedicinePriceListService: MedicineService() {
 		return medicinePriceRepository.selectLatestDate()
 	}
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
-	fun medicinePriceUpload(token: String, applyDate: Date, file: MultipartFile): String {
+	open fun medicinePriceUpload(token: String, applyDate: Date, file: MultipartFile): String {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.MedicineChanger))) {
@@ -53,7 +53,7 @@ class MedicinePriceListService: MedicineService() {
 		return "count : $retCount"
 	}
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
-	fun medicineIngredientUpload(token: String, file: MultipartFile): String {
+	open fun medicineIngredientUpload(token: String, file: MultipartFile): String {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.MedicineChanger))) {

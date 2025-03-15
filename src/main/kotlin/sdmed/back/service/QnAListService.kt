@@ -21,7 +21,7 @@ import sdmed.back.model.sqlCSO.qna.QnAState
 import sdmed.back.model.sqlCSO.request.RequestModel
 import java.util.*
 
-class QnAListService: QnAService() {
+open class QnAListService: QnAService() {
 	fun getMyList(token: String): List<QnAHeaderModel> {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
@@ -119,7 +119,7 @@ class QnAListService: QnAService() {
 	}
 
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
-	fun postQnA(token: String, title: String, qnaContentModel: QnAContentModel): QnAHeaderModel {
+	open fun postQnA(token: String, title: String, qnaContentModel: QnAContentModel): QnAHeaderModel {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.BusinessMan))) {
@@ -161,7 +161,7 @@ class QnAListService: QnAService() {
 		return header
 	}
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
-	fun postQnAReplyAnswer(token: String, thisPK: String, qnaReplyModel: QnAReplyModel): QnAReplyModel {
+	open fun postQnAReplyAnswer(token: String, thisPK: String, qnaReplyModel: QnAReplyModel): QnAReplyModel {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee))) {
@@ -204,7 +204,7 @@ class QnAListService: QnAService() {
 		return ret
 	}
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
-	fun postQnAReplyQuestion(token: String, thisPK: String, qnaReplyModel: QnAReplyModel): QnAReplyModel {
+	open fun postQnAReplyQuestion(token: String, thisPK: String, qnaReplyModel: QnAReplyModel): QnAReplyModel {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.BusinessMan))) {
@@ -257,7 +257,7 @@ class QnAListService: QnAService() {
 	}
 
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
-	fun putQnAComplete(token: String, thisPK: String): QnAHeaderModel {
+	open fun putQnAComplete(token: String, thisPK: String): QnAHeaderModel {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
 		val header = if (haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee))) {

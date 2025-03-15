@@ -5,36 +5,36 @@ import org.springframework.context.annotation.Configuration
 import sdmed.back.service.*
 
 @Configuration
-class FServiceConfig {
-	@Bean fun ipControlService() = IPControlService()
-	@Bean fun mqttService() = MqttService()
-	@Bean fun dashboardService() = DashboardService()
-	@Bean fun extraDashboardService() = ExtraDashboardService()
-	@Bean fun commonService() = CommonService()
+open class FServiceConfig {
+	@Bean open fun ipControlService() = IPControlService()
+	@Bean open fun mqttService() = MqttService()
+	@Bean open fun dashboardService() = DashboardService()
+	@Bean open fun extraDashboardService() = ExtraDashboardService()
+	@Bean open fun commonService() = CommonService()
 
-	@Bean fun userService() = UserService()
-	@Bean fun myInfoService() = MyInfoService()
-	@Bean fun userInfoService() = UserInfoService()
-	@Bean fun userMappingService() = UserMappingService()
+	@Bean open fun userService() = UserService()
+	@Bean open fun myInfoService() = MyInfoService()
+	@Bean open fun userInfoService() = UserInfoService()
+	@Bean open fun userMappingService() = UserMappingService()
 
-	@Bean fun medicineService() = MedicineService()
-	@Bean fun medicinePriceListService() = MedicinePriceListService()
-	@Bean fun medicineListService() = MedicineListService()
+	@Bean open fun medicineService() = MedicineService()
+	@Bean open fun medicinePriceListService() = MedicinePriceListService()
+	@Bean open fun medicineListService() = MedicineListService()
 
-	@Bean fun hospitalService() = HospitalService()
-	@Bean fun hospitalListService() = HospitalListService()
-	@Bean fun hospitalTempService() = HospitalTempService()
+	@Bean open fun hospitalService() = HospitalService()
+	@Bean open fun hospitalListService() = HospitalListService()
+	@Bean open fun hospitalTempService() = HospitalTempService()
 
-	@Bean fun pharmaService() = PharmaService()
-	@Bean fun pharmaListService() = PharmaListService()
+	@Bean open fun pharmaService() = PharmaService()
+	@Bean open fun pharmaListService() = PharmaListService()
 
-	@Bean fun ediService() = EDIService()
-	@Bean fun ediDueDateService() = EDIDueDateService()
-	@Bean fun ediApplyDateService() = EDIApplyDateService()
-	@Bean fun ediListService() = EDIListService()
-	@Bean fun ediRequestService() = EDIRequestService()
-	@Bean fun ediUploadCheckService() = EDIUploadCheckService()
+	@Bean open fun ediService() = EDIService()
+	@Bean open fun ediDueDateService() = EDIDueDateService()
+	@Bean open fun ediApplyDateService() = EDIApplyDateService()
+	@Bean open fun ediListService() = EDIListService()
+	@Bean open fun ediRequestService() = EDIRequestService()
+	@Bean open fun ediUploadCheckService() = EDIUploadCheckService()
 
-	@Bean fun qnaService() = QnAService()
-	@Bean fun qnaListService() = QnAListService()
+	@Bean open fun qnaService() = QnAService()
+	@Bean open fun qnaListService() = QnAListService()
 }
