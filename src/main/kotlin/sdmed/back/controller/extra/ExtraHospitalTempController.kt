@@ -30,4 +30,11 @@ class ExtraHospitalTempController: FControllerBase() {
 	                  @RequestParam longitude: Double,
 	                  @RequestParam(required = false) distance: Int = 1) =
 		responseService.getResult(hospitalTempService.getNearbyHospital(token, latitude, longitude, distance))
+	@Operation(summary = "가까운 약국 찾기")
+	@GetMapping(value = ["/list/nearby/pharmacy"])
+	fun getPharmacyListNearBy(@RequestHeader token: String,
+							  @RequestParam latitude: Double,
+							  @RequestParam longitude: Double,
+							  @RequestParam(required = false) distance: Int = 1000) =
+		responseService.getResult(hospitalTempService.getNearbyPharmacy(token, latitude, longitude, distance))
 }
