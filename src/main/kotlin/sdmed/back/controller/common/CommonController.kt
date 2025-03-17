@@ -34,6 +34,10 @@ class CommonController: FControllerBase() {
 	fun signIn(@RequestParam id: String,
 	           @RequestParam pw: String) =
 		responseService.getResult(userService.signIn(id, pw))
+	@Operation(summary = "로그인")
+	@GetMapping(value = ["/multiSign"])
+	fun signIn(@RequestParam token: String) =
+		responseService.getResult(userService.tokenRefresh(token))
 	@Operation(summary = "회원가입")
 	@PostMapping(value = ["/signUp"])
 	fun signUp(@RequestParam confirmPW: String,
