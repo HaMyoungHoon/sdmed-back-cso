@@ -81,6 +81,20 @@ file:
   userMappingExcelDir: C:/FTP/STORAGE/EXCEL/USER_MAPPING
   hospitalTempExcelDir: C:/FTP/STORAGE/EXCEL/HOSPITAL_TEMP
   pharmacyTempExcelDir: C:/FTP/STORAGE/EXCEL/PHARMACY_TEMP
+  #linux path
+#  defDir: /home/FTP/STORAGE
+#  imageDir: /home/FTP/STORAGE/IMAGE
+#  documentDir: /home/FTP/STORAGE/DOCUMENT
+#  userExcelDir: /home/FTP/STORAGE/EXCEL/USER
+#  pharmaExcelDir: /home/FTP/STORAGE/EXCEL/PHARMA
+#  hospitalExcelDir: /home/FTP/STORAGE/EXCEL/HOSPITAL
+#  medicineExcelDir: /home/FTP/STORAGE/EXCEL/MEDICINE
+#  medicineIngredientExcelDir: /home/FTP/STORAGE/EXCEL/MEDICINE_INGREDIENT
+#  medicinePriceExcelDir: /home/FTP/STORAGE/EXCEL/MEDICINE_PRICE
+#  ediDueDateExcelDir: /home/FTP/STORAGE/EXCEL/EDI_DUE_DATE
+#  userMappingExcelDir: /home/FTP/STORAGE/EXCEL/USER_MAPPING
+#  hospitalTempExcelDir: /home/FTP/STORAGE/EXCEL/HOSPITAL_TEMP
+#  pharmacyTempExcelDir: /home/FTP/STORAGE/EXCEL/PHARMACY_TEMP
 
 str:
   version: 1.0.0
