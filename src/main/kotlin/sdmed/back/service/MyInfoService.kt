@@ -17,13 +17,13 @@ import sdmed.back.model.sqlCSO.user.UserTrainingModel
 import java.util.Date
 
 open class MyInfoService: UserService() {
-	fun getMyData(token: String, childView: Boolean = false, relationView: Boolean = false, pharmaOwnMedicineView: Boolean = false, relationMedicineView: Boolean = true): UserDataModel {
+	fun getMyData(token: String, childView: Boolean = false, relationView: Boolean = false, pharmaOwnMedicineView: Boolean = false, relationMedicineView: Boolean = true, trainingModelView: Boolean = true): UserDataModel {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee, UserRole.BusinessMan))) {
 			throw AuthenticationEntryPointException()
 		}
-		return getUserDataByPK(tokenUser.thisPK, childView, relationView, pharmaOwnMedicineView, relationMedicineView)
+		return getUserDataByPK(tokenUser.thisPK, childView, relationView, pharmaOwnMedicineView, relationMedicineView, trainingModelView)
 	}
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
 	open fun addMyTrainingModel(token: String, userPK: String, trainingDate: Date, uploadModel: BlobUploadModel): UserTrainingModel {
