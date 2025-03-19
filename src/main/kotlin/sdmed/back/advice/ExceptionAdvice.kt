@@ -283,6 +283,11 @@ class ExceptionAdvice {
 	protected fun pharmacyTempFileUploadException(request: HttpServletRequest, exception: PharmacyTempFileUploadException) =
 		responseService.getFailResult(getMessage("pharmacyTempFileUploadException.code").toInt(), getMessageMerge("pharmacyTempFileUploadException.msg", exception.message))
 
+	@ExceptionHandler(UserTrainingFileUploadException::class)
+	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+	protected fun userTrainingFileUploadException(request: HttpServletRequest, exception: UserTrainingFileUploadException) =
+		responseService.getFailResult(getMessage("userTrainingFileUploadException.code").toInt(), getMessageMerge("userTrainingFileUploadException.msg", exception.message))
+
 	@ExceptionHandler(AsyncRequestTimeoutException::class)
 	@ResponseStatus(HttpStatus.OK)
 	protected fun asyncRequestTimeoutException(request: HttpServletRequest, exception: AsyncRequestTimeoutException): AsyncContext =

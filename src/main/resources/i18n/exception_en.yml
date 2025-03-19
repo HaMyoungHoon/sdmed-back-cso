@@ -209,3 +209,7 @@ hospitalTempFileUploadException:
 pharmacyTempFileUploadException:
   code: "-10050"
   msg: "pharmacy temp upload failed."
+
+userTrainingFileUploadException:
+  code: "-10051"
+  msg: "user training file upload failed."

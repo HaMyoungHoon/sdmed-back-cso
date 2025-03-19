@@ -209,3 +209,7 @@ hospitalTempFileUploadException:
 pharmacyTempFileUploadException:
   code: "-10050"
   msg: "임시 약국 정보 업로드에 실패했습니다."
+
+userTrainingFileUploadException:
+  code: "-10051"
+  msg: "유저 교육수료 파일 업로드에 실패했습니다."

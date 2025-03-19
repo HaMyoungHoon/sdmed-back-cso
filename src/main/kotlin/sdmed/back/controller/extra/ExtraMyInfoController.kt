@@ -3,12 +3,14 @@ package sdmed.back.controller.extra
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.web.bind.annotation.*
 import sdmed.back.config.FControllerBase
 import sdmed.back.model.common.IRestResult
 import sdmed.back.model.sqlCSO.BlobUploadModel
 import sdmed.back.model.sqlCSO.user.UserFileType
 import sdmed.back.service.MyInfoService
+import java.util.Date
 
 
 @Tag(name = "extra 내정보")
@@ -43,4 +45,11 @@ class ExtraMyInfoController: FControllerBase() {
 		responseService.getResult(myInfoService.userFileUrlModify(token, thisPK, blobModel, userFileType).apply {
 			azureBlobService.blobUploadSave(blobModel.newSave())
 		})
+	@Operation(summary = "유저 교육수료증 등록")
+	@PostMapping(value = ["/file/training/{thisPK}"])
+	fun postUserTrainingData(@RequestHeader token: String,
+							 @PathVariable thisPK: String,
+							 @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) trainingDate: Date,
+							 @RequestBody blobModel: BlobUploadModel) =
+		responseService.getResult(myInfoService.addMyTrainingModel(token, thisPK, trainingDate, blobModel))
 }

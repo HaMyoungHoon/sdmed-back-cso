@@ -55,11 +55,14 @@ object FConstants {
 	const val MODEL_USER_DEPT = "부서"
 	const val MODEL_USER_STATUS = "상태"
 	const val MODEL_USER_COMPANY_NAME = "사업자"
+	const val MODEL_USER_COMPANY_INNER_NAME = "사업자내부명"
 	const val MODEL_USER_COMPANY_NUMBER = "사업자등록번호"
 	const val MODEL_USER_COMPANY_ADDRESS = "회사주소"
 	const val MODEL_USER_BANK_ACCOUNT = "은행계좌번호"
-	const val MODEL_USER_COUNT = 12
-	const val MODEL_USER_INSERT_INTO = "INSERT INTO UserDataModel (thisPK, id, pw, name, mail, phoneNumber, role, dept, status, companyName, companyNumber, companyAddress, bankAccount, regDate) VALUES "
+	const val MODEL_USER_CSO_REPORT_DATE = "CSO신고일"
+	const val MODEL_USER_CONTRACT_DATE = "CSO계약일"
+	const val MODEL_USER_COUNT = 15
+	const val MODEL_USER_INSERT_INTO = "INSERT INTO UserDataModel (thisPK, id, pw, name, mail, phoneNumber, role, dept, status, companyName, companyInnerName, companyNumber, companyAddress, bankAccount, csoReportDate, contractDate, regDate) VALUES "
 	const val MODEL_USER_CHILD_INSERT_INTO = "INSERT INTO UserChildPKModel (thisPK, motherPK, childPK) VALUES "
 	const val MODEL_USER_CHILD_DELETE_BY_MOTHER_PK = "DELETE FROM UserChildPKModel WHERE motherPK =  "
 
@@ -101,30 +104,30 @@ object FConstants {
 	const val MODEL_HOS_COUNT = 24
 	const val MODEL_HOS_INSERT_INTO = "INSERT INTO HospitalModel (thisPK, code, orgName, innerName, ownerName, taxpayerNumber, phoneNumber, faxNumber, zipCode, address, addressDetail, businessType, businessItem, billType, licenseNumber, nursingHomeNumber, contractType, deliveryDiv, mail, mobilePhone, openDate, closeDate, manager, etc1, etc2, imageUrl, inVisible) VALUES "
 
-	const val MODEL_MEDICINE_CODE = "코드"
-	const val MODEL_MEDICINE_MAIN_INGREDIENT_CODE = "주성분코드"
-	const val MODEL_MEDICINE_KD_CODE = "제품코드"
-	const val MODEL_MEDICINE_STANDARD_CODE = "표준코드"
 	const val MODEL_MEDICINE_MAKER_NAME = "제조사"
-	const val MODEL_MEDICINE_MAKER_CODE = "제조사코드"
 	const val MODEL_MEDICINE_NAME = "제품명"
 	const val MODEL_MEDICINE_INNER_NAME = "내부명"
+	const val MODEL_MEDICINE_KD_CODE = "제품코드"
+	const val MODEL_MEDICINE_CUSTOM_PRICE = "기준가"
+	const val MODEL_MEDICINE_CHARGE = "요율"
 	const val MODEL_MEDICINE_STANDARD = "규격"
+	const val MODEL_MEDICINE_ETC1 = "비고1"
+	const val MODEL_MEDICINE_MAIN_INGREDIENT_CODE = "성분코드"
+	const val MODEL_MEDICINE_CODE = "코드"
 	const val MODEL_MEDICINE_ACCOUNT_UNIT = "계산단위"
-	const val MODEL_MEDICINE_CHARGE = "수수료율"
-	const val MODEL_MEDICINE_CUSTOM_PRICE = "지정가"
 	const val MODEL_MEDICINE_TYPE = "제품종류"
 	const val MODEL_MEDICINE_METHOD = "제제구분"
 	const val MODEL_MEDICINE_CATEGORY = "특수구분"
 	const val MODEL_MEDICINE_GROUP = "제품그룹"
 	const val MODEL_MEDICINE_DIV = "제품구분"
-	const val MODEL_MEDICINE_RANK = "제품등급"
 	const val MODEL_MEDICINE_STORAGE_TEMP = "보관온도"
 	const val MODEL_MEDICINE_STORAGE_BOX = "보관용기"
+	const val MODEL_MEDICINE_RANK = "제품등급"
+	const val MODEL_MEDICINE_STANDARD_CODE = "표준코드"
 	const val MODEL_MEDICINE_PACKAGE_UNIT = "포장단위"
 	const val MODEL_MEDICINE_UNIT = "단위"
-	const val MODEL_MEDICINE_ETC1 = "비고1"
 	const val MODEL_MEDICINE_ETC2 = "비고2"
+	const val MODEL_MEDICINE_MAKER_CODE = "제조사코드"
 	const val MODEL_MEDICINE_COUNT = 24
 	const val MODEL_MEDICINE_INSERT_INTO = "INSERT INTO MedicineModel (thisPK, code, mainIngredientCode, kdCode, standardCode, makerCode, innerName, orgName, customPrice, charge, inVisible) VALUES "
 	const val MODEL_MEDICINE_SUB_INSERT_INTO = "INSERT INTO MedicineSubModel (thisPK, code, standard, accountUnit, " +
@@ -158,10 +161,10 @@ object FConstants {
 	const val MODEL_EDI_DUE_DATE_PHARMA_CODE = "제약사코드"
 	const val MODEL_EDI_DUE_DATE_COUNT = 2
 
-	const val MODEL_USER_RELATION_ID = "아이디"
-	const val MODEL_USER_RELATION_HOSPITAL_CODE = "병원코드"
-	const val MODEL_USER_RELATION_PHARMA_CODE = "제약사코드"
-	const val MODEL_USER_RELATION_MEDICINE_CODE = "약품코드"
+	const val MODEL_USER_RELATION_COMPANY_INNER_NAME = "업체명"
+	const val MODEL_USER_RELATION_HOSPITAL_NAME = "병원명"
+	const val MODEL_USER_RELATION_PHARMA_NAME = "제약사명"
+	const val MODEL_USER_RELATION_MEDICINE_NAME = "제품명"
 	const val MODEL_USER_RELATION_COUNT = 4
 	const val MODEL_USER_RELATIONS_DELETE_WHERE_USER_PK = "DELETE FROM UserRelationModel WHERE userPK = "
 	const val MODEL_USER_RELATIONS_DELETE_WHERE_USER_PK_IN = "DELETE FROM UserRelationModel WHERE userPK IN "
@@ -203,7 +206,7 @@ object FConstants {
 	const val TRANSFER_HOSPITAL_CODE = "-88888"
 	const val TRANSFER_HOSPITAL_NAME = "이관처"
 
-	const val REGEX_CHECK_ID = "^[A-Za-z0-9가-힣]{3,20}\$"
+	const val REGEX_CHECK_ID = "^[a-zA-Z0-9가-힣!@#\$%^&*()/_\\-]{3,20}$"
 	// 숫자, 문자(영대소한글)
 	const val REGEX_CHECK_PASSWORD_0 = "^(?=.*[A-Za-z가-힣ㄱ-ㅎㅏ-ㅣ!@#\$%^&*()])(?=.*\\d)[A-Za-z가-힣ㄱ-ㅎㅏ-ㅣ\\d@\$!@#\$%^&*()]{8,20}\$"
 	// 숫자, 특수문자, 문자(영대소한글)

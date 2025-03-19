@@ -5,12 +5,16 @@ import sdmed.back.advice.exception.AuthenticationEntryPointException
 import sdmed.back.advice.exception.ConfirmPasswordUnMatchException
 import sdmed.back.advice.exception.CurrentPWNotMatchException
 import sdmed.back.advice.exception.SignUpPWConditionException
+import sdmed.back.advice.exception.UserTrainingFileUploadException
 import sdmed.back.config.FExtensions
 import sdmed.back.config.jpa.CSOJPAConfig
 import sdmed.back.model.common.user.UserRole
 import sdmed.back.model.common.user.UserRoles
+import sdmed.back.model.sqlCSO.BlobUploadModel
 import sdmed.back.model.sqlCSO.LogModel
 import sdmed.back.model.sqlCSO.user.UserDataModel
+import sdmed.back.model.sqlCSO.user.UserTrainingModel
+import java.util.Date
 
 open class MyInfoService: UserService() {
 	fun getMyData(token: String, childView: Boolean = false, relationView: Boolean = false, pharmaOwnMedicineView: Boolean = false, relationMedicineView: Boolean = true): UserDataModel {
@@ -20,6 +24,30 @@ open class MyInfoService: UserService() {
 			throw AuthenticationEntryPointException()
 		}
 		return getUserDataByPK(tokenUser.thisPK, childView, relationView, pharmaOwnMedicineView, relationMedicineView)
+	}
+	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
+	open fun addMyTrainingModel(token: String, userPK: String, trainingDate: Date, uploadModel: BlobUploadModel): UserTrainingModel {
+		isValid(token)
+		val tokenUser = getUserDataByToken(token)
+		isLive(tokenUser)
+		if (tokenUser.thisPK != userPK) {
+			throw AuthenticationEntryPointException()
+		}
+		val user = getUserDataByPK(userPK)
+		val buff = UserTrainingModel().safeCopy(uploadModel).apply {
+			this.userPK = userPK
+			this.trainingDate = trainingDate
+		}
+		if (userTrainingRepository.findByUserPKAndTrainingDate(buff.userPK, buff.trainingDate) != null) {
+			throw UserTrainingFileUploadException("already exist")
+		}
+
+		val ret = userTrainingRepository.save(buff)
+
+		val stackTrace = Thread.currentThread().stackTrace
+		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "${user.id} ${buff.blobUrl} : ${buff.trainingDate}")
+		logRepository.save(logModel)
+		return ret
 	}
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
 	open fun passwordChange(token: String, currentPW: String, afterPW: String, confirmPW: String): UserDataModel {

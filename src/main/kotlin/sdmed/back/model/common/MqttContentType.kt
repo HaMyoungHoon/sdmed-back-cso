@@ -10,4 +10,5 @@ enum class MqttContentType(var index: Int) {
 	EDI_RECEP(6),
 	EDI_FILE_ADD(7),
 	EDI_FILE_DELETE(8),
+	USER_FILE_ADD(9),
 }

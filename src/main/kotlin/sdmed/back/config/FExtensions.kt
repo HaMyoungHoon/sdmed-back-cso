@@ -92,8 +92,14 @@ object FExtensions {
 	fun parseIntDateToSqlDate(year: Int, month: Int, day: Int): Date {
 		return parseStringToSqlDate("${"%04d".format(year)}-${"%02d".format(month)}-${"%02d".format(day)}", "yyyy-MM-dd")
 	}
-	fun parseStringToJavaDate(date: String?, pattern: String) = LocalDate.parse(date, DateTimeFormatter.ofPattern(pattern)).let {
-		Date.from(it.atStartOfDay(getZoneId()).toInstant())
+	fun parseStringToJavaDate(date: String?, pattern: String) = date?.let {
+		if (it.isNotBlank()) {
+			LocalDate.parse(it, DateTimeFormatter.ofPattern(pattern)).let {
+				Date.from(it.atStartOfDay(getZoneId()).toInstant())
+			}
+		} else {
+			null
+		}
 	}
 	fun toZeroTime(date: Date) =
 		Date.from(date.toInstant().atZone(getZoneId()).toLocalDateTime().toLocalDate().atStartOfDay().atZone(getZoneId()).toInstant())

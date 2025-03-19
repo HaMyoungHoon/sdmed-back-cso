@@ -15,6 +15,7 @@ import sdmed.back.model.sqlCSO.request.RequestModel
 import sdmed.back.model.sqlCSO.user.UserDataModel
 import sdmed.back.model.sqlCSO.user.UserFileModel
 import sdmed.back.model.sqlCSO.user.UserFileType
+import sdmed.back.model.sqlCSO.user.UserTrainingModel
 import sdmed.back.repository.sqlCSO.*
 import java.sql.Timestamp
 import java.util.*
@@ -26,6 +27,7 @@ open class UserService: FServiceBase() {
 	@Autowired lateinit var medicineSubRepository: IMedicineSubRepository
 	@Autowired lateinit var medicineIngredientRepository: IMedicineIngredientRepository
 	@Autowired lateinit var userRelationRepository: IUserRelationRepository
+	@Autowired lateinit var userTrainingRepository: IUserTrainingRepository
 	@Autowired lateinit var pharmaMedicineRelationRepository: IPharmaMedicineRelationRepository
 
 	fun getUserData(token: String, userPK: String, childView: Boolean = false, relationView: Boolean = false, pharmaOwnMedicineView: Boolean = false): UserDataModel {
@@ -54,7 +56,7 @@ open class UserService: FServiceBase() {
 
 		return ret
 	}
-	fun getUserDataByPK(thisPK: String, childView: Boolean = false, relationView: Boolean = false, pharmaOwnMedicineView: Boolean = false, relationMedicineView: Boolean = true): UserDataModel {
+	fun getUserDataByPK(thisPK: String, childView: Boolean = false, relationView: Boolean = false, pharmaOwnMedicineView: Boolean = false, relationMedicineView: Boolean = true, trainingModelView: Boolean = false): UserDataModel {
 		val ret = userDataRepository.findByThisPK(thisPK) ?: throw UserNotFoundException()
 		ret.fileList = userFileRepository.findAllByUserPK(ret.thisPK).toMutableList()
 		if (childView) {
@@ -66,6 +68,9 @@ open class UserService: FServiceBase() {
 		}
 		if (relationView) {
 			ret.hosList = mergeRel(ret.thisPK, pharmaOwnMedicineView, relationMedicineView)
+		}
+		if (trainingModelView) {
+			ret.trainingList = userTrainingRepository.findAllByUserPKOrderByTrainingDateDesc(thisPK).toMutableList()
 		}
 
 		return ret
@@ -254,6 +259,29 @@ open class UserService: FServiceBase() {
 		}
 		val stackTrace = Thread.currentThread().stackTrace
 		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "${user.id} ${userFileType} : ${blobModel.blobUrl}")
+		logRepository.save(logModel)
+		return ret
+	}
+	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
+	open fun addUserTrainingModel(token: String, userPK: String, trainingDate: Date, uploadModel: BlobUploadModel): UserTrainingModel {
+		isValid(token)
+		val tokenUser = getUserDataByToken(token)
+		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.UserChanger))) {
+			throw AuthenticationEntryPointException()
+		}
+		val user = getUserDataByPK(userPK)
+		val buff = UserTrainingModel().safeCopy(uploadModel).apply {
+			this.userPK = userPK
+			this.trainingDate = trainingDate
+		}
+		if (userTrainingRepository.findByUserPKAndTrainingDate(buff.userPK, buff.trainingDate) != null) {
+			throw UserTrainingFileUploadException("already exist")
+		}
+
+		val ret = userTrainingRepository.save(buff)
+
+		val stackTrace = Thread.currentThread().stackTrace
+		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "${user.id} ${buff.blobUrl} : ${buff.trainingDate}")
 		logRepository.save(logModel)
 		return ret
 	}
