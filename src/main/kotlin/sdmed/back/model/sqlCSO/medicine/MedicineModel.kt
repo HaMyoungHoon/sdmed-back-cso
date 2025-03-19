@@ -79,60 +79,60 @@ data class MedicineModel(
 	}
 	override fun indexSet(data: String?, index: Int) {
 		when (index) {
-			0 -> {
+			1 -> orgName = data ?: ""
+			2 -> innerName = data ?: ""
+			3 -> kdCode = data ?: ""
+			4 -> customPrice = data?.toIntOrNull() ?: 0
+			5 -> charge = data?.toIntOrNull() ?: 50
+			6 -> medicineSubModel.standard = data ?: ""
+			7 -> medicineSubModel.etc1 = data ?: ""
+			8 -> mainIngredientCode = data ?: ""
+			9 -> {
 				code = data ?: ""
 				medicineSubModel.code = code
 			}
-			1 -> mainIngredientCode = data ?: ""
-			2 -> kdCode = data ?: ""
-			3 -> standardCode = data?.toLongOrNull() ?: 0
-			5 -> makerCode = data ?: ""
-			6 -> orgName = data ?: ""
-			7 -> innerName = data ?: ""
-			8 -> medicineSubModel.standard = data ?: ""
-			9 -> medicineSubModel.accountUnit = data?.toDoubleOrNull() ?: 0.0
-			10 -> charge = data?.toIntOrNull() ?: 50
-			11 -> customPrice = data?.toIntOrNull() ?: 0
-			12 -> medicineSubModel.medicineType = MedicineType.parseString(data)
-			13 -> medicineSubModel.medicineMethod = MedicineMethod.parseString(data)
-			14 -> medicineSubModel.medicineCategory = MedicineCategory.parseString(data)
-			15 -> medicineSubModel.medicineGroup = MedicineGroup.parseString(data)
-			16 -> medicineSubModel.medicineDiv = MedicineDiv.parseString(data)
-			17 -> medicineSubModel.medicineRank = MedicineRank.parseString(data)
-			18 -> medicineSubModel.medicineStorageTemp = MedicineStorageTemp.parseString(data)
-			19 -> medicineSubModel.medicineStorageBox = MedicineStorageBox.parseString(data)
+			10 -> medicineSubModel.accountUnit = data?.toDoubleOrNull() ?: 0.0
+			11 -> medicineSubModel.medicineType = MedicineType.parseString(data)
+			12 -> medicineSubModel.medicineMethod = MedicineMethod.parseString(data)
+			13 -> medicineSubModel.medicineCategory = MedicineCategory.parseString(data)
+			14 -> medicineSubModel.medicineGroup = MedicineGroup.parseString(data)
+			15 -> medicineSubModel.medicineDiv = MedicineDiv.parseString(data)
+			16 -> medicineSubModel.medicineStorageTemp = MedicineStorageTemp.parseString(data)
+			17 -> medicineSubModel.medicineStorageBox = MedicineStorageBox.parseString(data)
+			18 -> medicineSubModel.medicineRank = MedicineRank.parseString(data)
+			19 -> standardCode = data?.toLongOrNull() ?: 0
 			20 -> medicineSubModel.packageUnit = data?.toIntOrNull() ?: 0
 			21 -> medicineSubModel.unit = data ?: ""
-			22 -> medicineSubModel.etc1 = data ?: ""
-			23 -> medicineSubModel.etc2 = data ?: ""
+			22 -> medicineSubModel.etc2 = data ?: ""
+			23 -> makerCode = data ?: ""
 		}
 	}
 	override fun titleGet(index: Int): String {
 		return when (index) {
-			0 -> FConstants.MODEL_MEDICINE_CODE
-			1 -> FConstants.MODEL_MEDICINE_MAIN_INGREDIENT_CODE
-			2 -> FConstants.MODEL_MEDICINE_KD_CODE
-			3 -> FConstants.MODEL_MEDICINE_STANDARD_CODE
-			4 -> FConstants.MODEL_MEDICINE_MAKER_NAME
-			5 -> FConstants.MODEL_MEDICINE_MAKER_CODE
-			6 -> FConstants.MODEL_MEDICINE_NAME
-			7 -> FConstants.MODEL_MEDICINE_INNER_NAME
-			8 -> FConstants.MODEL_MEDICINE_STANDARD
-			9 -> FConstants.MODEL_MEDICINE_ACCOUNT_UNIT
-			10 -> FConstants.MODEL_MEDICINE_CHARGE
-			11 -> FConstants.MODEL_MEDICINE_CUSTOM_PRICE
-			12 -> FConstants.MODEL_MEDICINE_TYPE
-			13 -> FConstants.MODEL_MEDICINE_METHOD
-			14 -> FConstants.MODEL_MEDICINE_CATEGORY
-			15 -> FConstants.MODEL_MEDICINE_GROUP
-			16 -> FConstants.MODEL_MEDICINE_DIV
-			17 -> FConstants.MODEL_MEDICINE_RANK
-			18 -> FConstants.MODEL_MEDICINE_STORAGE_TEMP
-			19 -> FConstants.MODEL_MEDICINE_STORAGE_BOX
+			0 -> FConstants.MODEL_MEDICINE_MAKER_NAME
+			1 -> FConstants.MODEL_MEDICINE_NAME
+			2 -> FConstants.MODEL_MEDICINE_INNER_NAME
+			3 -> FConstants.MODEL_MEDICINE_KD_CODE
+			4 -> FConstants.MODEL_MEDICINE_CUSTOM_PRICE
+			5 -> FConstants.MODEL_MEDICINE_CHARGE
+			6 -> FConstants.MODEL_MEDICINE_STANDARD
+			7 -> FConstants.MODEL_MEDICINE_ETC1
+			8 -> FConstants.MODEL_MEDICINE_MAIN_INGREDIENT_CODE
+			9 -> FConstants.MODEL_MEDICINE_CODE
+			10 -> FConstants.MODEL_MEDICINE_ACCOUNT_UNIT
+			11 -> FConstants.MODEL_MEDICINE_TYPE
+			12 -> FConstants.MODEL_MEDICINE_METHOD
+			13 -> FConstants.MODEL_MEDICINE_CATEGORY
+			14 -> FConstants.MODEL_MEDICINE_GROUP
+			15 -> FConstants.MODEL_MEDICINE_DIV
+			16 -> FConstants.MODEL_MEDICINE_STORAGE_TEMP
+			17 -> FConstants.MODEL_MEDICINE_STORAGE_BOX
+			18 -> FConstants.MODEL_MEDICINE_RANK
+			19 -> FConstants.MODEL_MEDICINE_STANDARD_CODE
 			20 -> FConstants.MODEL_MEDICINE_PACKAGE_UNIT
 			21 -> FConstants.MODEL_MEDICINE_UNIT
-			22 -> FConstants.MODEL_MEDICINE_ETC1
-			23 -> FConstants.MODEL_MEDICINE_ETC2
+			22 -> FConstants.MODEL_MEDICINE_ETC2
+			23 -> FConstants.MODEL_MEDICINE_MAKER_CODE
 			else -> ""
 		}
 	}

@@ -18,10 +18,10 @@ spring:
       connection-timeout: 5000
       validation-timeout: 2000
       minimum-idle: 10
-      idle-timeout: 600000
-      max-lifetime: 1800000
-      keepalive-time: 60000
-      leak-detection-threshold: 20000
+      idle-timeout: 6000
+      max-lifetime: 18000
+      keepalive-time: 600
+      leak-detection-threshold: 200
       connection-test-query: "SELECT 1"
 
   messages:

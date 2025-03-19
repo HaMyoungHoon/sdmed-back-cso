@@ -19,25 +19,35 @@ open class UserInfoService: UserService() {
 	fun getList(token: String): List<UserDataModel> {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
-		if (haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee))) {
-			return userDataRepository.findAllByOrderByNameDesc()
+		val ret = if (haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee))) {
+			userDataRepository.findAllByOrderByNameDesc()
 //			return userDataRepository.findAllByOrderByNameDesc().toMutableList().run {
 //				filter { it.thisPK != tokenUser.thisPK }
 //			}
+		} else {
+			userDataRepository.selectWhereDeptOrderByNameAsc(UserRoles.of(UserDept.TaxPayer, UserDept.Personal).getFlag()).run {
+				filter { it.thisPK != tokenUser.thisPK }
+			}
 		}
 
-		return userDataRepository.selectWhereDeptOrderByNameAsc(UserRoles.of(UserDept.TaxPayer, UserDept.Personal).getFlag()).run {
-			filter { it.thisPK != tokenUser.thisPK }
+		val userTrainingList = userTrainingRepository.selectAllByRecentDataUserPKIn(ret.map { it.thisPK })
+		val userTrainingMap = userTrainingList.associateBy { it.userPK }
+		for (user in ret) {
+			userTrainingMap[user.thisPK]?.let {
+				user.trainingList.add(it)
+			}
 		}
+
+		return ret
 	}
-	fun getData(token: String, userPK: String, childView: Boolean = false, relationView: Boolean = false, pharmaOwnMedicineView: Boolean = false, relationMedicineView: Boolean = true): UserDataModel {
+	fun getData(token: String, userPK: String, childView: Boolean = false, relationView: Boolean = false, pharmaOwnMedicineView: Boolean = false, relationMedicineView: Boolean = true, trainingModelView: Boolean = true): UserDataModel {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.UserChanger))) {
 			throw AuthenticationEntryPointException()
 		}
 
-		return getUserDataByPK(userPK, childView, relationView, pharmaOwnMedicineView, relationMedicineView)
+		return getUserDataByPK(userPK, childView, relationView, pharmaOwnMedicineView, relationMedicineView, trainingModelView)
 	}
 	fun getListChildAble(token: String, thisPK: String): List<UserDataModel> {
 		isValid(token)
@@ -83,36 +93,26 @@ open class UserInfoService: UserService() {
 			throw AuthenticationEntryPointException()
 		}
 
-		var index = 0
-		val userDataModel = excelFileParser.userUploadExcelParse(tokenUser.id, file)
+		val excelModel = excelFileParser.userUploadExcelParse(tokenUser.id, file).distinctBy { x -> Pair(x.id, x.companyInnerName)  }
 		val already: MutableList<UserDataModel> = mutableListOf()
-		while (true) {
-			if (userDataModel.count() > index + 500) {
-				already.addAll(userDataRepository.findAllByIdIn(userDataModel.subList(index, index + 500).map { it.id }))
-			} else {
-				already.addAll(userDataRepository.findAllByIdIn(userDataModel.subList(index, userDataModel.count()).map { it.id }))
-				break
-			}
-			index += 500
-		}
-		userDataModel.removeIf { x -> x.id in already.map { y -> y.id } }
-		if (userDataModel.isEmpty()) {
-			return "count : 0"
-		}
-		userDataModel.onEach { x ->
+		excelModel.chunked(500).forEach { x -> already.addAll(userDataRepository.findAllByIdIn(x.map { y -> y.id })) }
+		var retCount = 0
+		val saveList = excelModel.toMutableList()
+		saveList.removeIf { x -> x.id in already.map { y -> y.id } }
+		saveList.onEach { x ->
 			x.pw = fAmhohwa.encrypt(x.pw)
 		}
-		index = 0
-		var retCount = 0
-		while (true) {
-			if (userDataModel.count() > index + 500) {
-				retCount += insertAll(userDataModel.subList(index, index + 500))
-			} else {
-				retCount += insertAll(userDataModel.subList(index, userDataModel.count()))
-				break
+		saveList.chunked(500).forEach { x -> retCount += insertAll(x) }
+		if (already.isNotEmpty()) {
+			val buffMap = excelModel.associateBy { it.id }
+			already.forEach { x ->
+				val buff = buffMap[x.id]
+				if (buff != null) {
+					x.safeCopy(buff)
+				}
 			}
-			index += 500
 		}
+		already.chunked(500).forEach { x -> retCount += updateAll(x) }
 		val stackTrace = Thread.currentThread().stackTrace
 		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "add user count : $retCount")
 		logRepository.save(logModel)
@@ -152,12 +152,27 @@ open class UserInfoService: UserService() {
 		return "count $retCount"
 	}
 	private fun insertAll(data: List<UserDataModel>): Int {
+		if (data.isEmpty()) {
+			return 0
+		}
 		val values: String = data.stream().map{it.insertString()}.collect(Collectors.joining(","))
 		val sqlString = "${FConstants.MODEL_USER_INSERT_INTO}$values"
 		val ret = entityManager.createNativeQuery(sqlString).executeUpdate()
 		entityManager.flush()
 		entityManager.clear()
 		return ret
+	}
+	private fun updateAll(data: List<UserDataModel>): Int {
+		if (data.isEmpty()) {
+			return 0
+		}
+
+		data.forEach { x ->
+			entityManager.merge(x)
+		}
+		entityManager.flush()
+		entityManager.clear()
+		return data.size
 	}
 	fun deleteMothersChild(motherPK: String) {
 		val sqlString = "${FConstants.MODEL_USER_CHILD_DELETE_BY_MOTHER_PK} '$motherPK'"

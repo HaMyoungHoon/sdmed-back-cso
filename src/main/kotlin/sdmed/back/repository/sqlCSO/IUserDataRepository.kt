@@ -22,6 +22,9 @@ interface IUserDataRepository: JpaRepository<UserDataModel, String> {
 	@Query("SELECT a FROM UserDataModel a " +
 			"WHERE a.thisPK = :thisPK")
 	fun selectByPK(thisPK: String): UserDataModel?
+	@Query("SELECT a FROM UserDataModel a " +
+			"WHERE a.companyInnerName = :companyInnerName")
+	fun selectByCompanyInnerName(companyInnerName: String): UserDataModel?
 	@Query("SELECT * FROM UserDataModel " +
 			"WHERE dept & :flag > 0 " +
 			"ORDER BY name Asc", nativeQuery = true)

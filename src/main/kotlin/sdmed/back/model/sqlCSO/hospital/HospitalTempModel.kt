@@ -39,7 +39,7 @@ data class HospitalTempModel(
 	@Column(columnDefinition = "text")
 	var websiteUrl: String = "",
 	@Column
-	var openDate: Date = Date(),
+	var openDate: Date? = Date(),
 	@Column
 	var longitude: Double = 0.0,
 	@Column

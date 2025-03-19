@@ -99,6 +99,46 @@ open class UserMappingService: UserService() {
 		}
 
 		val saveBuff = mutableListOf<UserHosPharmaMedicinePairModel>()
+		val excelModel = excelFileParser.userMappingDateUploadExcelParse(tokenUser.id, file).distinctBy { it.companyInnerName to it.hospitalName to it.pharmaName to it.medicineName }
+		val userGroup = excelModel.groupBy { it.companyInnerName }
+		userGroup.forEach { (companyInnerName, model) ->
+			val user = userDataRepository.selectByCompanyInnerName(companyInnerName) ?: return@forEach
+			val existHos = hospitalRepository.findAllByOrgNameIn(model.map { it.hospitalName }).associateBy { it.orgName }
+			val existPharma = pharmaRepository.findAllByOrgNameIn(model.map { it.pharmaName }).associateBy { it.orgName }
+			val existMedicine = medicineRepository.findAllByOrgNameIn(model.map { it.medicineName }).associateBy { it.orgName }
+			val filterModel = model.filter { code ->
+				existHos.containsKey(code.hospitalName) &&
+						existPharma.containsKey(code.pharmaName) &&
+						existMedicine.containsKey(code.medicineName)
+			}
+
+			saveBuff.addAll(filterModel.map { x -> UserHosPharmaMedicinePairModel().apply {
+				this.userPK = user.thisPK
+				this.hosPK = existHos[x.hospitalName]!!.thisPK
+				this.pharmaPK = existPharma[x.pharmaName]!!.thisPK
+				this.medicinePK = existMedicine[x.medicineName]!!.thisPK
+			}})
+		}
+		if (saveBuff.isEmpty()) {
+			return 0
+		}
+
+		deleteRelationByUserPKIn(saveBuff.map { it.userPK })
+		insertRelation(saveBuff)
+		val stackTrace = Thread.currentThread().stackTrace
+		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "${saveBuff.size} hos-pharma-medicine relation change")
+		logRepository.save(logModel)
+		return saveBuff.size
+	}
+	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
+	open fun userRelationUploadOld(token: String, file: MultipartFile): Int {
+		isValid(token)
+		val tokenUser = getUserDataByToken(token)
+		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.EdiChanger))) {
+			throw AuthenticationEntryPointException()
+		}
+
+		val saveBuff = mutableListOf<UserHosPharmaMedicinePairModel>()
 		val excelModel = excelFileParser.userMappingDateUploadExcelParse(tokenUser.id, file).distinctBy { it.id to it.hospitalCode to it.pharmaCode to it.medicineCode }
 		val userGroup = excelModel.groupBy { it.id }
 		userGroup.forEach { (id, model) ->

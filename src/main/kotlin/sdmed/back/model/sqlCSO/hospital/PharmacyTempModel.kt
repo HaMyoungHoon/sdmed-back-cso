@@ -34,7 +34,7 @@ data class PharmacyTempModel(
 	@Column(columnDefinition = "nvarchar(255)")
 	var phoneNumber: String = "",
 	@Column
-	var openDate: Date = Date(),
+	var openDate: Date? = Date(),
 	@Column
 	var longitude: Double = 0.0,
 	@Column
