@@ -42,11 +42,13 @@ data class UserDataModel(
 	@Column(columnDefinition = "nvarchar(255)", nullable = false)
 	var companyNumber: String = "",
 	@Column(columnDefinition = "nvarchar(255)", nullable = false)
+	var companyOwner: String = "",
+	@Column(columnDefinition = "nvarchar(255)", nullable = false)
 	var companyAddress: String = "",
 	@Column(columnDefinition = "nvarchar(255)", nullable = false)
 	var bankAccount: String = "",
-	@Column
-	var csoReportDate: Date? = null,
+	@Column(columnDefinition = "nvarchar(50)", nullable = false)
+	var csoReportNumber: String = "",
 	@Column
 	var contractDate: Date? = null,
 	@Column
@@ -76,9 +78,10 @@ data class UserDataModel(
 		this.companyName = data.companyName
 		this.companyInnerName = data.companyInnerName
 		this.companyNumber = data.companyNumber
+		this.companyOwner = data.companyOwner
 		this.companyAddress = data.companyAddress
 		this.bankAccount = data.bankAccount
-		this.csoReportDate = data.csoReportDate
+		this.csoReportNumber = data.csoReportNumber
 		this.contractDate = data.contractDate
 		return this
 	}
@@ -113,10 +116,11 @@ data class UserDataModel(
 			8 -> companyName
 			9 -> companyInnerName
 			10 -> companyNumber
-			11 -> companyAddress
-			12 -> bankAccount
-			13 -> FExtensions.parseDateTimeString(csoReportDate, "yyyy-MM-dd") ?: ""
-			14 -> FExtensions.parseDateTimeString(contractDate, "yyyy-MM-dd") ?: ""
+			11 -> companyOwner
+			12 -> companyAddress
+			13 -> bankAccount
+			14 -> csoReportNumber
+			15 -> FExtensions.parseDateTimeString(contractDate, "yyyy-MM-dd") ?: ""
 			else -> ""
 		}
 	}
@@ -141,10 +145,11 @@ data class UserDataModel(
 			8 -> companyName = data ?: ""
 			9 -> companyInnerName = data ?: ""
 			10 -> companyNumber = data ?: ""
-			11 -> companyAddress = data ?: ""
-			12 -> bankAccount = data ?: ""
-			13 -> csoReportDate = FExtensions.parseStringToJavaDate(data, "yyyyMMdd")
-			14 -> contractDate = FExtensions.parseStringToJavaDate(data, "yyyyMMdd")
+			11 -> companyOwner = data ?: ""
+			12 -> companyAddress = data ?: ""
+			13 -> bankAccount = data ?: ""
+			14 -> csoReportNumber = data ?: ""
+			15 -> contractDate = FExtensions.parseStringToJavaDate(data, "yyyyMMdd")
 		}
 	}
 	override fun titleGet(index: Int): String {
@@ -160,10 +165,11 @@ data class UserDataModel(
 			8 -> FConstants.MODEL_USER_COMPANY_NAME
 			9 -> FConstants.MODEL_USER_COMPANY_INNER_NAME
 			10 -> FConstants.MODEL_USER_COMPANY_NUMBER
-			11 -> FConstants.MODEL_USER_COMPANY_ADDRESS
-			12 -> FConstants.MODEL_USER_BANK_ACCOUNT
-			13 -> FConstants.MODEL_USER_CSO_REPORT_DATE
-			14 -> FConstants.MODEL_USER_CONTRACT_DATE
+			11 -> FConstants.MODEL_USER_COMPANY_OWNER
+			12 -> FConstants.MODEL_USER_COMPANY_ADDRESS
+			13 -> FConstants.MODEL_USER_BANK_ACCOUNT
+			14 -> FConstants.MODEL_USER_CSO_REPORT_NUMBER
+			15 -> FConstants.MODEL_USER_CONTRACT_DATE
 			else -> ""
 		}
 	}
@@ -195,10 +201,9 @@ data class UserDataModel(
 		val companyNumber = FExtensions.escapeString(companyNumber)
 		val companyAddress = FExtensions.escapeString(companyAddress)
 		val bankAccount = FExtensions.escapeString(bankAccount)
-		val csoReportDateString = FExtensions.parseDateTimeString(csoReportDate, "yyyy-MM-dd HH:mm:ss")
 		val contractDateString = FExtensions.parseDateTimeString(contractDate, "yyyy-MM-dd HH:mm:ss")
 		val regDateString = FExtensions.parseDateTimeString(regDate, "yyyy-MM-dd HH:mm:ss")
-		return "('$thisPK', '$id', '$pw', '$name', '$mail', '$phoneNumber', '$role', '$dept', '${status.index}', '$companyName', '$companyInnerName', '$companyNumber', '$companyAddress', '$bankAccount', '$csoReportDateString', '$contractDateString', '$regDateString')"
+		return "('$thisPK', '$id', '$pw', '$name', '$mail', '$phoneNumber', '$role', '$dept', '${status.index}', '$companyName', '$companyInnerName', '$companyNumber', '$companyOwner', '$companyAddress', '$bankAccount', '$csoReportNumber', '$contractDateString', '$regDateString')"
 	}
 
 	override fun toString(): String {
@@ -213,9 +218,10 @@ data class UserDataModel(
 		ret += "companyName: ${companyName}, "
 		ret += "companyInnerName: ${companyInnerName}, "
 		ret += "companyNumber: ${companyNumber}, "
+		ret += "companyOwner: ${companyOwner}, "
 		ret += "companyAddress: ${companyAddress}, "
 		ret += "bankAccount: ${bankAccount}, "
-		ret += "csoReportDate : ${csoReportDate}, "
+		ret += "csoReportNumber : ${csoReportNumber}, "
 		ret += "contractDate: $contractDate"
 		return ret
 	}
