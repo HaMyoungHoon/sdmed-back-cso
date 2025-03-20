@@ -13,37 +13,37 @@ data class MedicineModel(
 	@Id
 	@Column(columnDefinition = "nvarchar(36)", updatable = false, nullable = false)
 	var thisPK: String = UUID.randomUUID().toString(),
-	@Column(columnDefinition = "nvarchar(50)", nullable = false, unique = true)
-	var code: String = "",
-	@Column(columnDefinition = "nvarchar(255)")
-	var mainIngredientCode: String = "",
-	@Column(columnDefinition = "nvarchar(20)")
-	var kdCode: String = "",
-	@Column
-	var standardCode: Long = 0L,
-	@Transient
-	var clientName: String? = null,
 	@Transient
 	var makerName: String? = null,
-	@Column(columnDefinition = "nvarchar(50)", nullable = false)
-	var makerCode: String = "",
-	// mysql
 	@Column(columnDefinition = "text")
-//	@Column(columnDefinition = "nvarchar(max)")
 	var orgName: String = "",
 	@Column(columnDefinition = "text")
 	var innerName: String = "",
+	@Column(columnDefinition = "nvarchar(20)")
+	var kdCode: String = "",
 	@Column
 	var customPrice: Int = 0,
 	@Column(nullable = false)
 	@ColumnDefault("50")
 	var charge: Int = 50,
+	@Column(columnDefinition = "nvarchar(100)")
+	var standard: String = "",
+	@Column(columnDefinition = "text")
+	var etc1: String = "",
+	@Column(columnDefinition = "nvarchar(255)")
+	var mainIngredientCode: String = "",
+	@Column(columnDefinition = "nvarchar(50)", nullable = false, unique = true)
+	var code: String = "",
+	@Column(columnDefinition = "nvarchar(50)", nullable = false)
+	var makerCode: String = "",
+	@Column
+	var medicineDiv: MedicineDiv = MedicineDiv.Open,
 	@Column(columnDefinition = "bit default 0", nullable = false)
 	var inVisible: Boolean = false,
 	@Transient
-	var maxPrice: Int = 0,
+	var clientName: String? = null,
 	@Transient
-	var medicineSubModel: MedicineSubModel = MedicineSubModel(),
+	var maxPrice: Int = 0,
 	@Transient
 	var medicineIngredientModel: MedicineIngredientModel = MedicineIngredientModel(),
 	@Transient
@@ -51,29 +51,26 @@ data class MedicineModel(
 ): FExcelParseModel() {
 	constructor(buff: MedicineModel, makerName: String?, clientName: String?) : this() {
 		this.thisPK = buff.thisPK
-		this.code = buff.code
-		this.mainIngredientCode = buff.mainIngredientCode
-		this.kdCode = buff.kdCode
-		this.standardCode = buff.standardCode
-		this.clientName = clientName
 		this.makerName = makerName
-		this.makerCode = buff.makerCode
 		this.orgName = buff.orgName
 		this.innerName = buff.innerName
+		this.kdCode = buff.kdCode
 		this.customPrice = buff.customPrice
 		this.charge = buff.charge
+		this.standard = buff.standard
+		this.etc1 = buff.etc1
+		this.mainIngredientCode = buff.mainIngredientCode
+		this.code = buff.code
+		this.makerCode = buff.makerCode
+		this.medicineDiv = buff.medicineDiv
 		this.inVisible = buff.inVisible
+		this.clientName = clientName
 		this.maxPrice = buff.maxPrice
-		this.medicineSubModel = buff.medicineSubModel
 		this.medicineIngredientModel = buff.medicineIngredientModel
 		this.medicinePriceModel = buff.medicinePriceModel
 	}
 	@Transient
 	override var dataCount = FConstants.MODEL_MEDICINE_COUNT
-	fun genSub() {
-		medicineSubModel.thisPK = UUID.randomUUID().toString()
-		medicineSubModel.code = code
-	}
 	fun init() {
 		maxPrice = medicinePriceModel.maxByOrNull { it.applyDate }?.maxPrice ?: customPrice
 	}
@@ -84,27 +81,12 @@ data class MedicineModel(
 			3 -> kdCode = data ?: ""
 			4 -> customPrice = data?.toIntOrNull() ?: 0
 			5 -> charge = data?.toIntOrNull() ?: 50
-			6 -> medicineSubModel.standard = data ?: ""
-			7 -> medicineSubModel.etc1 = data ?: ""
+			6 -> standard = data ?: ""
+			7 -> etc1 = data ?: ""
 			8 -> mainIngredientCode = data ?: ""
-			9 -> {
-				code = data ?: ""
-				medicineSubModel.code = code
-			}
-			10 -> medicineSubModel.accountUnit = data?.toDoubleOrNull() ?: 0.0
-			11 -> medicineSubModel.medicineType = MedicineType.parseString(data)
-			12 -> medicineSubModel.medicineMethod = MedicineMethod.parseString(data)
-			13 -> medicineSubModel.medicineCategory = MedicineCategory.parseString(data)
-			14 -> medicineSubModel.medicineGroup = MedicineGroup.parseString(data)
-			15 -> medicineSubModel.medicineDiv = MedicineDiv.parseString(data)
-			16 -> medicineSubModel.medicineStorageTemp = MedicineStorageTemp.parseString(data)
-			17 -> medicineSubModel.medicineStorageBox = MedicineStorageBox.parseString(data)
-			18 -> medicineSubModel.medicineRank = MedicineRank.parseString(data)
-			19 -> standardCode = data?.toLongOrNull() ?: 0
-			20 -> medicineSubModel.packageUnit = data?.toIntOrNull() ?: 0
-			21 -> medicineSubModel.unit = data ?: ""
-			22 -> medicineSubModel.etc2 = data ?: ""
-			23 -> makerCode = data ?: ""
+			9 -> code = data ?: ""
+			10 -> makerCode = data ?: ""
+			11 -> medicineDiv = MedicineDiv.parseString(data)
 		}
 	}
 	override fun titleGet(index: Int): String {
@@ -119,20 +101,8 @@ data class MedicineModel(
 			7 -> FConstants.MODEL_MEDICINE_ETC1
 			8 -> FConstants.MODEL_MEDICINE_MAIN_INGREDIENT_CODE
 			9 -> FConstants.MODEL_MEDICINE_CODE
-			10 -> FConstants.MODEL_MEDICINE_ACCOUNT_UNIT
-			11 -> FConstants.MODEL_MEDICINE_TYPE
-			12 -> FConstants.MODEL_MEDICINE_METHOD
-			13 -> FConstants.MODEL_MEDICINE_CATEGORY
-			14 -> FConstants.MODEL_MEDICINE_GROUP
-			15 -> FConstants.MODEL_MEDICINE_DIV
-			16 -> FConstants.MODEL_MEDICINE_STORAGE_TEMP
-			17 -> FConstants.MODEL_MEDICINE_STORAGE_BOX
-			18 -> FConstants.MODEL_MEDICINE_RANK
-			19 -> FConstants.MODEL_MEDICINE_STANDARD_CODE
-			20 -> FConstants.MODEL_MEDICINE_PACKAGE_UNIT
-			21 -> FConstants.MODEL_MEDICINE_UNIT
-			22 -> FConstants.MODEL_MEDICINE_ETC2
 			23 -> FConstants.MODEL_MEDICINE_MAKER_CODE
+			15 -> FConstants.MODEL_MEDICINE_DIV
 			else -> ""
 		}
 	}
@@ -151,19 +121,19 @@ data class MedicineModel(
 		val mainIngredientCode = FExtensions.escapeString(mainIngredientCode)
 		val innerName = FExtensions.escapeString(innerName)
 		val orgName = FExtensions.escapeString(orgName)
-		return "('$thisPK', '$code', '$mainIngredientCode', '$kdCode', '$standardCode', '$makerCode', '$innerName', '$orgName', '$customPrice', '$charge', ${if (inVisible) 1 else 0})"
+		return "('$thisPK', '$orgName', '$innerName', '$kdCode', '$customPrice', '$charge', '$standard', '$etc1', '$mainIngredientCode', '$code', '$makerCode', '${medicineDiv.index}', ${if (inVisible) 1 else 0})"
 	}
-	fun insertSubString() = medicineSubModel.insertString()
-
 	fun safeCopy(rhs: MedicineModel): MedicineModel {
 		this.mainIngredientCode = rhs.mainIngredientCode
 		this.kdCode = rhs.kdCode
-		this.standardCode = rhs.standardCode
+		this.standard = rhs.standard
 		this.makerCode = rhs.makerCode
 		this.orgName = rhs.orgName
 		this.innerName = rhs.innerName
 		this.customPrice = rhs.customPrice
 		this.charge = rhs.charge
+		this.etc1 = rhs.etc1
+		this.medicineDiv = rhs.medicineDiv
 		return this
 	}
 }

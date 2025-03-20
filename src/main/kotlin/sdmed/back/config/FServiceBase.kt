@@ -12,7 +12,6 @@ import sdmed.back.model.common.user.UserRoles
 import sdmed.back.model.common.user.UserStatus
 import sdmed.back.model.sqlCSO.medicine.MedicineIngredientModel
 import sdmed.back.model.sqlCSO.medicine.MedicineModel
-import sdmed.back.model.sqlCSO.medicine.MedicineSubModel
 import sdmed.back.model.sqlCSO.user.UserDataModel
 import sdmed.back.repository.sqlCSO.*
 
@@ -49,11 +48,7 @@ open class FServiceBase {
 		return haveRole(user, targetRole)
 	}
 
-	protected fun medicineMerge(mother: List<MedicineModel>, sub: List<MedicineSubModel>, ingredient: List<MedicineIngredientModel>) {
-		val subMap = sub.associateBy { it.code }
-		mother.map { x ->
-			subMap[x.code]?.let { y -> x.medicineSubModel = y }
-		}
+	protected fun medicineMerge(mother: List<MedicineModel>, ingredient: List<MedicineIngredientModel>) {
 		val ingredientMap = ingredient.associateBy { it.mainIngredientCode }
 		mother.map { x ->
 			ingredientMap[x.mainIngredientCode]?.let { y -> x.medicineIngredientModel = y }

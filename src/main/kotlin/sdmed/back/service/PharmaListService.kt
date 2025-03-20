@@ -7,23 +7,18 @@ import sdmed.back.advice.exception.AuthenticationEntryPointException
 import sdmed.back.advice.exception.PharmaExistException
 import sdmed.back.advice.exception.PharmaNotFoundException
 import sdmed.back.config.FConstants
-import sdmed.back.config.FExtensions
 import sdmed.back.config.jpa.CSOJPAConfig
 import sdmed.back.model.common.user.UserRole
 import sdmed.back.model.common.user.UserRoles
 import sdmed.back.model.sqlCSO.LogModel
-import sdmed.back.model.sqlCSO.medicine.MedicineIngredientModel
 import sdmed.back.model.sqlCSO.medicine.MedicineModel
-import sdmed.back.model.sqlCSO.medicine.MedicineSubModel
 import sdmed.back.model.sqlCSO.pharma.PharmaMedicineRelationModel
 import sdmed.back.model.sqlCSO.pharma.PharmaModel
 import sdmed.back.repository.sqlCSO.IMedicineIngredientRepository
-import sdmed.back.repository.sqlCSO.IMedicineSubRepository
 import java.util.*
 import java.util.stream.Collectors
 
 open class PharmaListService: PharmaService() {
-	@Autowired lateinit var medicineSubRepository: IMedicineSubRepository
 	@Autowired lateinit var medicineIngredientRepository: IMedicineIngredientRepository
 	fun getList(token: String): List<PharmaModel> {
 		isValid(token)
@@ -46,9 +41,8 @@ open class PharmaListService: PharmaService() {
 		}
 		val exist = pharmaMedicineRelationRepository.findAllByMedicinePKIn(ret.map { it.thisPK })
 		ret = ret.filterNot { it.thisPK in exist.map { it.medicinePK } }
-		val sub = medicineSubRepository.findALlByCodeInOrderByCode(ret.map { it.code })
 		val ingredient = medicineIngredientRepository.findAllByMainIngredientCodeIn(ret.map { it.mainIngredientCode })
-		medicineMerge(ret, sub, ingredient)
+		medicineMerge(ret, ingredient)
 		return ret
 	}
 

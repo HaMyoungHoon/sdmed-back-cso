@@ -24,7 +24,6 @@ open class MedicineListService: MedicineService() {
 		isValid(token)
 
 		val ret = medicineRepository.findByThisPK(thisPK) ?: throw MedicineNotFoundException()
-		medicineSubRepository.findByCode(ret.code)?.let { ret.medicineSubModel = it }
 		medicineIngredientRepository.findByMainIngredientCode(ret.mainIngredientCode)?.let { ret.medicineIngredientModel = it }
 		ret.medicinePriceModel = if (withAllPrice) {
 			medicinePriceRepository.findAllByKdCodeOrderByApplyDateDesc(ret.kdCode).toMutableList()
@@ -90,8 +89,6 @@ open class MedicineListService: MedicineService() {
 
 		data.thisPK = UUID.randomUUID().toString()
 		val ret = medicineRepository.save(data)
-		data.genSub()
-		medicineSubRepository.save(data.medicineSubModel)
 		val stackTrace = Thread.currentThread().stackTrace
 		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "add medicine : ${data.thisPK}")
 		logRepository.save(logModel)
@@ -106,7 +103,6 @@ open class MedicineListService: MedicineService() {
 		}
 
 		val ret = medicineRepository.save(data)
-		medicineSubRepository.save(data.medicineSubModel)
 		val stackTrace = Thread.currentThread().stackTrace
 		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "${data.orgName} modify")
 		logRepository.save(logModel)

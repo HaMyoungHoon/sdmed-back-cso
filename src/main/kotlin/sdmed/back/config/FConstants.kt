@@ -104,25 +104,10 @@ object FConstants {
 	const val MODEL_MEDICINE_ETC1 = "비고1"
 	const val MODEL_MEDICINE_MAIN_INGREDIENT_CODE = "성분코드"
 	const val MODEL_MEDICINE_CODE = "코드"
-	const val MODEL_MEDICINE_ACCOUNT_UNIT = "계산단위"
-	const val MODEL_MEDICINE_TYPE = "제품종류"
-	const val MODEL_MEDICINE_METHOD = "제제구분"
-	const val MODEL_MEDICINE_CATEGORY = "특수구분"
-	const val MODEL_MEDICINE_GROUP = "제품그룹"
-	const val MODEL_MEDICINE_DIV = "제품구분"
-	const val MODEL_MEDICINE_STORAGE_TEMP = "보관온도"
-	const val MODEL_MEDICINE_STORAGE_BOX = "보관용기"
-	const val MODEL_MEDICINE_RANK = "제품등급"
-	const val MODEL_MEDICINE_STANDARD_CODE = "표준코드"
-	const val MODEL_MEDICINE_PACKAGE_UNIT = "포장단위"
-	const val MODEL_MEDICINE_UNIT = "단위"
-	const val MODEL_MEDICINE_ETC2 = "비고2"
 	const val MODEL_MEDICINE_MAKER_CODE = "제조사코드"
-	const val MODEL_MEDICINE_COUNT = 24
-	const val MODEL_MEDICINE_INSERT_INTO = "INSERT INTO MedicineModel (thisPK, code, mainIngredientCode, kdCode, standardCode, makerCode, innerName, orgName, customPrice, charge, inVisible) VALUES "
-	const val MODEL_MEDICINE_SUB_INSERT_INTO = "INSERT INTO MedicineSubModel (thisPK, code, standard, accountUnit, " +
-			"medicineType, medicineMethod, medicineCategory, medicineGroup, medicineDiv, medicineRank, medicineStorageTemp, medicineStorageBox, " +
-			"packageUnit, unit, etc1, etc2) VALUES "
+	const val MODEL_MEDICINE_DIV = "제품구분"
+	const val MODEL_MEDICINE_COUNT = 12
+	const val MODEL_MEDICINE_INSERT_INTO = "INSERT INTO MedicineModel (thisPK, orgName, innerName, kdCode, customPrice, charge, standard, etc1, mainIngredientCode, code, makerCode, medicineDiv, inVisible) VALUES "
 
 	const val MODEL_MEDICINE_PRICE_INDEX = "연번"
 	const val MODEL_MEDICINE_PRICE_METHOD = "투여"

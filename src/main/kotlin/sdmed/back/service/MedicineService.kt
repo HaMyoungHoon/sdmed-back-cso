@@ -10,16 +10,13 @@ import sdmed.back.model.common.user.UserRoles
 import sdmed.back.model.sqlCSO.medicine.MedicineIngredientModel
 import sdmed.back.model.sqlCSO.medicine.MedicineModel
 import sdmed.back.model.sqlCSO.medicine.MedicinePriceModel
-import sdmed.back.model.sqlCSO.medicine.MedicineSubModel
 import sdmed.back.repository.sqlCSO.IMedicineIngredientRepository
 import sdmed.back.repository.sqlCSO.IMedicinePriceRepository
 import sdmed.back.repository.sqlCSO.IMedicineRepository
-import sdmed.back.repository.sqlCSO.IMedicineSubRepository
 import java.util.stream.Collectors.joining
 
 open class MedicineService: FServiceBase() {
 	@Autowired lateinit var medicineRepository: IMedicineRepository
-	@Autowired lateinit var medicineSubRepository: IMedicineSubRepository
 	@Autowired lateinit var medicineIngredientRepository: IMedicineIngredientRepository
 	@Autowired lateinit var medicinePriceRepository: IMedicinePriceRepository
 
@@ -31,9 +28,8 @@ open class MedicineService: FServiceBase() {
 		} else {
 			medicineRepository.selectAllByInvisibleOpenOrderByCode()
 		}
-		val sub = medicineSubRepository.findAllByOrderByCode()
 		val ingredient = medicineIngredientRepository.findAllByOrderByMainIngredientCode()
-		medicineMerge(ret, sub, ingredient)
+		medicineMerge(ret, ingredient)
 		if (withAllPrice) {
 			val allPrice = medicinePriceRepository.findAllByOrderByApplyDateDesc()
 			medicinePriceMerge(ret, allPrice)
@@ -52,9 +48,8 @@ open class MedicineService: FServiceBase() {
 		} else {
 			medicineRepository.selectAllByInvisibleOpenLikeOrderByCode(searchString)
 		}
-		val sub = medicineSubRepository.findALlByCodeInOrderByCode(ret.map { it.code })
 		val ingredient = medicineIngredientRepository.findAllByMainIngredientCodeIn(ret.map { it.mainIngredientCode })
-		medicineMerge(ret, sub, ingredient)
+		medicineMerge(ret, ingredient)
 		if (withAllPrice) {
 			val allPrice = medicinePriceRepository.findAllByKdCodeIn(ret.map { it.kdCode })
 			medicinePriceMerge(ret, allPrice)
@@ -74,9 +69,8 @@ open class MedicineService: FServiceBase() {
 		} else {
 			medicineRepository.selectPagingByInvisibleOpenOrderByCode(pageable)
 		}
-		val sub = medicineSubRepository.findALlByCodeInOrderByCode(ret.content.map { it.code })
 		val ingredient = medicineIngredientRepository.findAllByMainIngredientCodeIn(ret.content.map { it.mainIngredientCode })
-		medicineMerge(ret.content, sub, ingredient)
+		medicineMerge(ret.content, ingredient)
 		if (withAllPrice) {
 			val allPrice = medicinePriceRepository.findAllByKdCodeIn(ret.content.map { it.kdCode })
 			medicinePriceMerge(ret.content, allPrice)
@@ -99,9 +93,8 @@ open class MedicineService: FServiceBase() {
 		} else {
 			medicineRepository.selectPagingByInvisibleOpenLikeOrderByCode(searchString, pageable)
 		}
-		val sub = medicineSubRepository.findALlByCodeInOrderByCode(ret.content.map { it.code })
 		val ingredient = medicineIngredientRepository.findAllByMainIngredientCodeIn(ret.content.map { it.mainIngredientCode })
-		medicineMerge(ret.content, sub, ingredient)
+		medicineMerge(ret.content, ingredient)
 		if (withAllPrice) {
 			val allPrice = medicinePriceRepository.findAllByKdCodeIn(ret.content.map { it.kdCode })
 			medicinePriceMerge(ret.content, allPrice)
@@ -131,7 +124,7 @@ open class MedicineService: FServiceBase() {
 			}
 		}
 	}
-	protected fun insertMedicineAll(data: List<MedicineModel>, withSub: Boolean = true): Int {
+	protected fun insertMedicineAll(data: List<MedicineModel>): Int {
 		if (data.isEmpty()) {
 			return 0
 		}
@@ -140,47 +133,9 @@ open class MedicineService: FServiceBase() {
 		val ret = entityManager.createNativeQuery(sqlString).executeUpdate()
 		entityManager.flush()
 		entityManager.clear()
-		if (withSub) {
-			insertMedicineSubAll(data.map { it.medicineSubModel }.filter { it.code.isNotBlank() })
-		}
 		return ret
 	}
-	protected fun insertMedicineSubAll(data: List<MedicineSubModel>): Int {
-		if (data.isEmpty()) {
-			return 0
-		}
-		val already = medicineSubRepository.findALlByCodeInOrderByCode(data.map { it.code }).distinctBy { it.thisPK }.filter { it.code.isNotBlank() }
-		val saveList = data.filterNot { x -> x.code in already.map { y -> y.code } }
-		var ret = 0
-		if (saveList.isNotEmpty()) {
-			ret = medicineSubRepository.saveAll(saveList).size
-		}
-		if (already.isNotEmpty()) {
-			val buffMap = data.associateBy { it.code }
-			if (already.isNotEmpty()) {
-				already.forEach { x ->
-					val buff = buffMap[x.code]
-					if (buff != null) {
-						x.safeCopy(buff)
-					}
-				}
-			}
-			ret += already.size
-			already.forEach { x ->
-				entityManager.merge(x)
-			}
-			entityManager.flush()
-			entityManager.clear()
-		}
-		return ret
-//		val values = data.stream().map{it.insertString()}.collect(joining(","))
-//		val sqlString = "${FConstants.MODEL_MEDICINE_SUB_INSERT_INTO}$values"
-//		val ret = entityManager.createNativeQuery(sqlString).executeUpdate()
-//		entityManager.flush()
-//		entityManager.clear()
-//		return ret
-	}
-	protected fun updateMedicineAll(data: List<MedicineModel>, withSub: Boolean = true): Int {
+	protected fun updateMedicineAll(data: List<MedicineModel>): Int {
 		if (data.isEmpty()) {
 			return 0
 		}
@@ -190,9 +145,6 @@ open class MedicineService: FServiceBase() {
 		}
 		entityManager.flush()
 		entityManager.clear()
-		if (withSub) {
-			insertMedicineSubAll(data.map { it.medicineSubModel }.filter { it.code.isNotBlank() })
-		}
 		return ret
 	}
 	protected fun insertMedicineIngredientAll(data: List<MedicineIngredientModel>): Int {

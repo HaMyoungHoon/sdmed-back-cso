@@ -49,8 +49,7 @@ interface IMedicineRepository: JpaRepository<MedicineModel, String> {
 			"LEFT JOIN PharmaModel b ON a.makerCode = b.code " +
 			"LEFT JOIN PharmaMedicineRelationModel c ON a.thisPK = c.medicinePK " +
 			"LEFT JOIN PharmaModel d ON c.pharmaPK = d.thisPK " +
-			"LEFT JOIN MedicineSubModel e ON a.code = e.code " +
-			"WHERE a.inVisible = :inVisible AND e.medicineDiv = :medicineDiv " +
+			"WHERE a.inVisible = :inVisible AND a.medicineDiv = :medicineDiv " +
 			"ORDER BY a.code ASC")
 	fun selectAllByInvisibleOpenOrderByCode(inVisible: Boolean = false, medicineDiv: MedicineDiv = MedicineDiv.Open): List<MedicineModel>
 
@@ -70,9 +69,8 @@ interface IMedicineRepository: JpaRepository<MedicineModel, String> {
 			"LEFT JOIN PharmaModel b ON a.makerCode = b.code " +
 			"LEFT JOIN PharmaMedicineRelationModel c ON a.thisPK = c.medicinePK " +
 			"LEFT JOIN PharmaModel d ON c.pharmaPK = d.thisPK " +
-			"LEFT JOIN MedicineSubModel e ON a.code = e.code " +
 			"LEFT JOIN MedicineIngredientModel f ON a.mainIngredientCode = f.mainIngredientCode " +
-			"WHERE a.inVisible = :inVisible AND e.medicineDiv = :medicineDiv " +
+			"WHERE a.inVisible = :inVisible AND a.medicineDiv = :medicineDiv " +
 			"AND (a.orgName LIKE %:searchString% OR a.kdCode LIKE %:searchString% OR b.orgName LIKE %:searchString% OR d.orgName LIKE %:searchString% OR f.mainIngredientName LIKE %:searchString%) " +
 			"ORDER BY a.code ASC")
 	fun selectAllByInvisibleOpenLikeOrderByCode(searchString: String, inVisible: Boolean = false, medicineDiv: MedicineDiv = MedicineDiv.Open): List<MedicineModel>
@@ -91,8 +89,7 @@ interface IMedicineRepository: JpaRepository<MedicineModel, String> {
 			"LEFT JOIN PharmaModel b ON a.makerCode = b.code " +
 			"LEFT JOIN PharmaMedicineRelationModel c ON a.thisPK = c.medicinePK " +
 			"LEFT JOIN PharmaModel d ON c.pharmaPK = d.thisPK " +
-			"LEFT JOIN MedicineSubModel e ON a.code = e.code " +
-			"WHERE a.inVisible = :inVisible AND e.medicineDiv = :medicineDiv " +
+			"WHERE a.inVisible = :inVisible AND a.medicineDiv = :medicineDiv " +
 			"ORDER BY a.code ASC")
 	fun selectPagingByInvisibleOpenOrderByCode(pageable: Pageable, inVisible: Boolean = false, medicineDiv: MedicineDiv = MedicineDiv.Open): Page<MedicineModel>
 
@@ -111,9 +108,8 @@ interface IMedicineRepository: JpaRepository<MedicineModel, String> {
 			"LEFT JOIN PharmaModel b ON a.makerCode = b.code " +
 			"LEFT JOIN PharmaMedicineRelationModel c ON a.thisPK = c.medicinePK " +
 			"LEFT JOIN PharmaModel d ON c.pharmaPK = d.thisPK " +
-			"LEFT JOIN MedicineSubModel e ON a.code = e.code " +
 			"LEFT JOIN MedicineIngredientModel f ON a.mainIngredientCode = f.mainIngredientCode " +
-			"WHERE a.inVisible = :inVisible AND e.medicineDiv = :medicineDiv " +
+			"WHERE a.inVisible = :inVisible AND a.medicineDiv = :medicineDiv " +
 			"AND (a.orgName LIKE %:searchString% OR a.kdCode LIKE %:searchString% OR b.orgName LIKE %:searchString% OR d.orgName LIKE %:searchString% OR f.mainIngredientName LIKE %:searchString%) " +
 			"ORDER BY a.code ASC")
 	fun selectPagingByInvisibleOpenLikeOrderByCode(searchString: String, pageable: Pageable, inVisible: Boolean = false, medicineDiv: MedicineDiv = MedicineDiv.Open): Page<MedicineModel>

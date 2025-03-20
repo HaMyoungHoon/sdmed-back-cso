@@ -24,7 +24,6 @@ open class UserService: FServiceBase() {
 	@Autowired lateinit var hospitalRepository: IHospitalRepository
 	@Autowired lateinit var pharmaRepository: IPharmaRepository
 	@Autowired lateinit var medicineRepository: IMedicineRepository
-	@Autowired lateinit var medicineSubRepository: IMedicineSubRepository
 	@Autowired lateinit var medicineIngredientRepository: IMedicineIngredientRepository
 	@Autowired lateinit var userRelationRepository: IUserRelationRepository
 	@Autowired lateinit var userTrainingRepository: IUserTrainingRepository
@@ -318,9 +317,8 @@ open class UserService: FServiceBase() {
 		} else {
 			mutableListOf()
 		}
-		val sub = medicineSubRepository.findALlByCodeInOrderByCode(medicineBuff.map { it.code })
 		val ingredient = medicineIngredientRepository.findAllByMainIngredientCodeIn(medicineBuff.map { it.mainIngredientCode })
-		medicineMerge(medicineBuff, sub, ingredient)
+		medicineMerge(medicineBuff, ingredient)
 		val medicineMap = medicineBuff.associateBy { it.thisPK }
 		for (rel in userRelationModel) {
 			val hos = hosMap[rel.hosPK] ?: continue
