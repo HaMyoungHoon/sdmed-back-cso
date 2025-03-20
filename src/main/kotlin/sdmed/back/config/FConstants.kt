@@ -91,7 +91,6 @@ object FConstants {
 	const val MODEL_RETROACTIVE_RULE = "소급기준"
 	const val MODEL_INNER_SETTLEMENT_RULE = "내부정산기준"
 	const val MODEL_OUTER_SETTLEMENT_RULE = "외부정산기준"
-	const val MODEL_MANAGER = "영업담당"
 	const val MODEL_ETC1 = "비고1"
 	const val MODEL_ETC2 = "비고2"
 	const val MODEL_PHARMA_COUNT = 26
@@ -100,10 +99,9 @@ object FConstants {
 	const val MODEL_PHARMA_MEDICINE_RELATIONS_DELETE_WHERE_PHARMA_PK = "DELETE FROM PharmaMedicineRelationModel WHERE pharmaPK = "
 	const val MODEL_PHARMA_MEDICINE_RELATIONS_INSERT_INTO = "INSERT INTO PharmaMedicineRelationModel (thisPK, pharmaPK, medicinePK) VALUES "
 
-	const val MODEL_LICENSE_NUMBER = "면허번호"
 	const val MODEL_NURSING_HOME_NUMBER = "요양기관번호"
-	const val MODEL_HOS_COUNT = 24
-	const val MODEL_HOS_INSERT_INTO = "INSERT INTO HospitalModel (thisPK, code, orgName, innerName, ownerName, taxpayerNumber, phoneNumber, faxNumber, zipCode, address, addressDetail, businessType, businessItem, billType, licenseNumber, nursingHomeNumber, contractType, deliveryDiv, mail, mobilePhone, openDate, closeDate, manager, etc1, etc2, imageUrl, inVisible) VALUES "
+	const val MODEL_HOS_COUNT = 14
+	const val MODEL_HOS_INSERT_INTO = "INSERT INTO HospitalModel (thisPK, code, orgName, innerName, ownerName, taxpayerNumber, address, phoneNumber, faxNumber, zipCode, businessType, businessItem, nursingHomeNumber, etc1, etc2, imageUrl, inVisible) VALUES "
 
 	const val MODEL_MEDICINE_MAKER_NAME = "제조사"
 	const val MODEL_MEDICINE_NAME = "제품명"

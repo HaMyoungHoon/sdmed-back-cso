@@ -3,13 +3,8 @@ package sdmed.back.model.sqlCSO.hospital
 import jakarta.persistence.*
 import sdmed.back.config.FConstants
 import sdmed.back.config.FExtensions
-import sdmed.back.model.common.BillType
-import sdmed.back.model.common.ContractType
-import sdmed.back.model.common.DeliveryDiv
 import sdmed.back.model.sqlCSO.FExcelParseModel
 import sdmed.back.model.sqlCSO.pharma.PharmaModel
-import java.lang.StringBuilder
-import java.sql.Date
 import java.util.*
 
 @Entity
@@ -28,52 +23,24 @@ data class HospitalModel(
 	@Column(columnDefinition = "nvarchar(255)", nullable = false)
 	var taxpayerNumber: String = "",
 	@Column(columnDefinition = "nvarchar(255)", nullable = false)
+	var address: String = "",
+	@Column(columnDefinition = "nvarchar(255)", nullable = false)
 	var phoneNumber: String = "",
 	@Column(columnDefinition = "nvarchar(255)", nullable = false)
 	var faxNumber: String = "",
 	@Column(columnDefinition = "nvarchar(100)", nullable = false)
 	var zipCode: String = "",
 	@Column(columnDefinition = "nvarchar(255)", nullable = false)
-	var address: String = "",
-	@Column(columnDefinition = "nvarchar(255)", nullable = false)
-	var addressDetail: String = "",
-	@Column(columnDefinition = "nvarchar(255)", nullable = false)
 	var businessType: String = "",
 	@Column(columnDefinition = "nvarchar(255)", nullable = false)
 	var businessItem: String = "",
-	@Column(nullable = false)
-	var billType: BillType = BillType.None,
-	// 거래처 종류 넣어야 하나?
-	// 거래처그룹 넣어야 하나?
-	@Column(nullable = false)
-	var contractType: ContractType = ContractType.None,
-	@Column(nullable = false)
-	var deliveryDiv: DeliveryDiv = DeliveryDiv.None,
-	@Column(columnDefinition = "nvarchar(255)", nullable = false)
-	var licenseNumber: String = "",
 	@Column(columnDefinition = "nvarchar(255)", nullable = false)
 	var nursingHomeNumber: String = "",
-	@Column(columnDefinition = "nvarchar(255)", nullable = false)
-	var mail: String = "",
-	@Column(columnDefinition = "nvarchar(255)", nullable = false)
-	var mobilePhone: String = "",
-	@Column
-	var openDate: Date? = null,
-	@Column
-	var closeDate: Date? = null,
-	// mysql
 	@Column(columnDefinition = "text", nullable = false)
-//	@Column(columnDefinition = "nvarchar(max)", nullable = false)
 	var etc1: String = "",
-	// mysql
 	@Column(columnDefinition = "text", nullable = false)
-//	@Column(columnDefinition = "nvarchar(max)", nullable = false)
 	var etc2: String = "",
-	@Column(columnDefinition = "nvarchar(255)")
-	var manager: String = "",
-	// mysql
 	@Column(columnDefinition = "text", nullable = false)
-//	@Column(columnDefinition = "nvarchar(max)", nullable = false)
 	var imageUrl: String = "",
 	@Column(columnDefinition = "bit default 0", nullable = false)
 	var inVisible: Boolean = false,
@@ -89,25 +56,15 @@ data class HospitalModel(
 			2 -> innerName
 			3 -> ownerName
 			4 -> taxpayerNumber
-			5 -> phoneNumber
-			6 -> faxNumber
-			7 -> zipCode
-			8 -> address
-			9 -> addressDetail
-			10 -> businessType
-			11 -> businessItem
-			12 -> billType.desc
-			13 -> contractType.desc
-			14 -> deliveryDiv.desc
-			15 -> licenseNumber
-			16 -> nursingHomeNumber
-			17 -> mail
-			18 -> mobilePhone
-			19 -> FExtensions.parseDateTimeString(openDate, "yyyy-MM-dd")
-			20 -> FExtensions.parseDateTimeString(closeDate, "yyyy-MM-dd")
-			21 -> manager
-			22 -> etc1
-			23 -> etc2
+			5 -> address
+			6 -> phoneNumber
+			7 -> faxNumber
+			8 -> zipCode
+			9 -> businessType
+			10 -> businessItem
+			11 -> nursingHomeNumber
+			12 -> etc1
+			13 -> etc2
 			else -> ""
 		}
 	}
@@ -118,25 +75,15 @@ data class HospitalModel(
 			2 -> innerName = data ?: ""
 			3 -> ownerName = data ?: ""
 			4 -> taxpayerNumber = data ?: ""
-			5 -> phoneNumber = data ?: ""
-			6 -> faxNumber = data ?: ""
-			7 -> zipCode = data ?: ""
-			8 -> address = data ?: ""
-			9 -> addressDetail = data ?: ""
-			10 -> businessType = data ?: ""
-			11 -> businessItem = data ?: ""
-			12 -> billType = BillType.parseString(data)
-			13 -> licenseNumber = data ?: ""
-			14 -> nursingHomeNumber = data ?: ""
-			15 -> contractType = ContractType.parseString(data)
-			16 -> deliveryDiv = DeliveryDiv.parseString(data)
-			17 -> mail = data ?: ""
-			18 -> mobilePhone = data ?: ""
-			19 -> openDate = if (data.isNullOrEmpty()) null else FExtensions.parseStringToSqlDate(data, "yyyy-MM-dd")
-			20 -> closeDate = if (data.isNullOrEmpty()) null else FExtensions.parseStringToSqlDate(data, "yyyy-MM-dd")
-			21 -> manager = data ?: ""
-			22 -> etc1 = data ?: ""
-			23 -> etc2 = data ?: ""
+			5 -> address = data ?: ""
+			6 -> phoneNumber = data ?: ""
+			7 -> faxNumber = data ?: ""
+			8 -> zipCode = data ?: ""
+			9 -> businessType = data ?: ""
+			10 -> businessItem = data ?: ""
+			11 -> nursingHomeNumber = data ?: ""
+			12 -> etc1 = data ?: ""
+			13 -> etc2 = data ?: ""
 		}
 	}
 	override fun titleGet(index: Int): String {
@@ -146,25 +93,15 @@ data class HospitalModel(
 			2 -> FConstants.MODEL_INNER_NAME
 			3 -> FConstants.MODEL_OWNER_NAME
 			4 -> FConstants.MODEL_TAX_PAYER
-			5 -> FConstants.MODEL_PHONE
-			6 -> FConstants.MODEL_FAX
-			7 -> FConstants.MODEL_ZIP_CODE
-			8 -> FConstants.MODEL_ADDRESS
-			9 -> FConstants.MODEL_ADDRESS_DETAIL
-			10 -> FConstants.MODEL_BIZ_TYPE
-			11 -> FConstants.MODEL_BIZ_ITEM
-			12 -> FConstants.MODEL_BILL_TYPE
-			13 -> FConstants.MODEL_LICENSE_NUMBER
-			14 -> FConstants.MODEL_NURSING_HOME_NUMBER
-			15 -> FConstants.MODEL_CONTRACT_TYPE
-			16 -> FConstants.MODEL_DELIVERY
-			17 -> FConstants.MODEL_MAIL
-			18 -> FConstants.MODEL_MOBILE_PHONE
-			19 -> FConstants.MODEL_OPEN_DATE
-			20 -> FConstants.MODEL_CLOSE_DATE
-			21 -> FConstants.MODEL_MANAGER
-			22 -> FConstants.MODEL_ETC1
-			23 -> FConstants.MODEL_ETC2
+			5 -> FConstants.MODEL_ADDRESS
+			6 -> FConstants.MODEL_PHONE
+			7 -> FConstants.MODEL_FAX
+			8 -> FConstants.MODEL_ZIP_CODE
+			9 -> FConstants.MODEL_BIZ_TYPE
+			10 -> FConstants.MODEL_BIZ_ITEM
+			11 -> FConstants.MODEL_NURSING_HOME_NUMBER
+			21 -> FConstants.MODEL_ETC1
+			22 -> FConstants.MODEL_ETC2
 			else -> ""
 		}
 	}
@@ -202,42 +139,25 @@ data class HospitalModel(
 		val faxNumber = FExtensions.escapeString(faxNumber)
 		val zipCode = FExtensions.escapeString(zipCode)
 		val address = FExtensions.escapeString(address)
-		val addressDetail = FExtensions.escapeString(addressDetail)
 		val businessType = FExtensions.escapeString(businessType)
 		val businessItem = FExtensions.escapeString(businessItem)
-		val licenseNumber = FExtensions.escapeString(licenseNumber)
 		val nursingHomeNumber = FExtensions.escapeString(nursingHomeNumber)
-		val mail = FExtensions.escapeString(mail)
-		val mobilePhone = FExtensions.escapeString(mobilePhone)
-		val openDateString: String = openDate?.let { "'${FExtensions.parseDateTimeString(it, "yyyy-MM-dd")}'" } ?: "null"
-		val closeDateString: String = closeDate?.let { "'${FExtensions.parseDateTimeString(it, "yyyy-MM-dd")}'" } ?: "null"
-		val manager = FExtensions.escapeString(manager)
 		val etc1 = FExtensions.escapeString(etc1)
 		val etc2 = FExtensions.escapeString(etc2)
-		return "('$thisPK', '$code', '$orgName', '$innerName', '$ownerName', '$taxpayerNumber', '$phoneNumber', '$faxNumber', '$zipCode', '$address', '$addressDetail', '$businessType', '$businessItem', '${billType.index}', '$licenseNumber', '$nursingHomeNumber', '${contractType.index}', '${deliveryDiv.index}', '$mail', '$mobilePhone', $openDateString, $closeDateString, '$manager', '$etc1', '$etc2', '$imageUrl', ${if (inVisible) 1 else 0})"
+		return "('$thisPK', '$code', '$orgName', '$innerName', '$ownerName', '$taxpayerNumber', '$address', '$phoneNumber', '$faxNumber', '$zipCode', '$businessType', '$businessItem', '$nursingHomeNumber', '$etc1', '$etc2', '$imageUrl', ${if (inVisible) 1 else 0})"
 	}
 	fun safeCopy(rhs: HospitalModel): HospitalModel {
 		this.orgName = rhs.orgName
 		this.innerName = rhs.innerName
 		this.ownerName = rhs.ownerName
 		this.taxpayerNumber = rhs.taxpayerNumber
+		this.address = rhs.address
 		this.phoneNumber = rhs.phoneNumber
 		this.faxNumber = rhs.faxNumber
 		this.zipCode = rhs.zipCode
-		this.address = rhs.address
-		this.addressDetail = rhs.addressDetail
 		this.businessType = rhs.businessType
 		this.businessItem = rhs.businessItem
-		this.billType = rhs.billType
-		this.contractType = rhs.contractType
-		this.deliveryDiv = rhs.deliveryDiv
-		this.licenseNumber = rhs.licenseNumber
 		this.nursingHomeNumber = rhs.nursingHomeNumber
-		this.mail = rhs.mail
-		this.mobilePhone = rhs.mobilePhone
-		this.openDate = rhs.openDate
-		this.closeDate = rhs.closeDate
-		this.manager = rhs.manager
 		this.etc1 = rhs.etc1
 		this.etc2 = rhs.etc2
 		this.imageUrl = rhs.imageUrl
