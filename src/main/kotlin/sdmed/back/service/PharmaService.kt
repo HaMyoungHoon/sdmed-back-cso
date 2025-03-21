@@ -9,7 +9,6 @@ import sdmed.back.repository.sqlCSO.*
 open class PharmaService: FServiceBase() {
 	@Autowired lateinit var pharmaRepository: IPharmaRepository
 	@Autowired lateinit var medicineRepository: IMedicineRepository
-	@Autowired lateinit var pharmaMedicineRelationRepository: IPharmaMedicineRelationRepository
 
 	fun getPharmaAllSearch(token: String, searchString: String, isSearchTypeCode: Boolean = true): List<PharmaModel> {
 		if (searchString.isEmpty()) {
@@ -36,8 +35,7 @@ open class PharmaService: FServiceBase() {
 
 		val ret = pharmaRepository.findByThisPK(pharmaPK) ?: throw PharmaNotFoundException()
 		if (pharmaOwnMedicineView) {
-			val relation = pharmaMedicineRelationRepository.findAllByPharmaPK(pharmaPK)
-			ret.medicineList = medicineRepository.findAllByThisPKIn(relation.map { it.medicinePK }).sortedBy { it.code }.toMutableList()
+			ret.medicineList = medicineRepository.findAllByClientCodeOrderByOrgNameAsc(ret.code).toMutableList()
 		}
 		return ret
 	}

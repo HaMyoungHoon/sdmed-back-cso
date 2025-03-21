@@ -87,17 +87,13 @@ object FConstants {
 	const val MODEL_PHARMA_COUNT = 15
 	const val MODEL_PHARMA_INSERT_INTO = "INSERT INTO PharmaModel (thisPK, code, orgName, innerName, ownerName, taxpayerNumber, address, phoneNumber, faxNumber, zipCode, openDate, retroactiveRule, innerSettlementRule, outerSettlementRule, etc1, etc2, imageUrl, inVisible) VALUES "
 
-	const val MODEL_PHARMA_MEDICINE_RELATIONS_DELETE_WHERE_PHARMA_PK = "DELETE FROM PharmaMedicineRelationModel WHERE pharmaPK = "
-	const val MODEL_PHARMA_MEDICINE_RELATIONS_INSERT_INTO = "INSERT INTO PharmaMedicineRelationModel (thisPK, pharmaPK, medicinePK) VALUES "
-
 	const val MODEL_NURSING_HOME_NUMBER = "요양기관번호"
 	const val MODEL_HOS_COUNT = 14
 	const val MODEL_HOS_INSERT_INTO = "INSERT INTO HospitalModel (thisPK, code, orgName, innerName, ownerName, taxpayerNumber, address, phoneNumber, faxNumber, zipCode, businessType, businessItem, nursingHomeNumber, etc1, etc2, imageUrl, inVisible) VALUES "
 
-	const val MODEL_MEDICINE_MAKER_NAME = "제조사"
 	const val MODEL_MEDICINE_NAME = "제품명"
-	const val MODEL_MEDICINE_INNER_NAME = "내부명"
-	const val MODEL_MEDICINE_KD_CODE = "제품코드"
+	const val MODEL_MEDICINE_INNER_NAME = "제품내부명"
+	const val MODEL_MEDICINE_KD_CODE = "기준가코드"
 	const val MODEL_MEDICINE_CUSTOM_PRICE = "기준가"
 	const val MODEL_MEDICINE_CHARGE = "요율"
 	const val MODEL_MEDICINE_STANDARD = "규격"
@@ -105,9 +101,10 @@ object FConstants {
 	const val MODEL_MEDICINE_MAIN_INGREDIENT_CODE = "성분코드"
 	const val MODEL_MEDICINE_CODE = "코드"
 	const val MODEL_MEDICINE_MAKER_CODE = "제조사코드"
+	const val MODEL_MEDICINE_CLIENT_CODE = "발주처코드"
 	const val MODEL_MEDICINE_DIV = "제품구분"
 	const val MODEL_MEDICINE_COUNT = 12
-	const val MODEL_MEDICINE_INSERT_INTO = "INSERT INTO MedicineModel (thisPK, orgName, innerName, kdCode, customPrice, charge, standard, etc1, mainIngredientCode, code, makerCode, medicineDiv, inVisible) VALUES "
+	const val MODEL_MEDICINE_INSERT_INTO = "INSERT INTO MedicineModel (thisPK, orgName, innerName, kdCode, customPrice, charge, standard, etc1, mainIngredientCode, code, makerCode, clientCode, medicineDiv, inVisible) VALUES "
 
 	const val MODEL_MEDICINE_PRICE_INDEX = "연번"
 	const val MODEL_MEDICINE_PRICE_METHOD = "투여"

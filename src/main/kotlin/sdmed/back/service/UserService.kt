@@ -27,7 +27,6 @@ open class UserService: FServiceBase() {
 	@Autowired lateinit var medicineIngredientRepository: IMedicineIngredientRepository
 	@Autowired lateinit var userRelationRepository: IUserRelationRepository
 	@Autowired lateinit var userTrainingRepository: IUserTrainingRepository
-	@Autowired lateinit var pharmaMedicineRelationRepository: IPharmaMedicineRelationRepository
 
 	fun getUserData(token: String, userPK: String, childView: Boolean = false, relationView: Boolean = false, pharmaOwnMedicineView: Boolean = false): UserDataModel {
 		isValid(token)
@@ -74,7 +73,7 @@ open class UserService: FServiceBase() {
 
 		return ret
 	}
-	fun getUserDataWithRelationByPK(thisPK: String) = getUserDataByPK(thisPK).apply { hosList = mergeRel(thisPK) }
+	fun getUserDataWithRelationByPK(thisPK: String) = getUserDataByPK(thisPK, pharmaOwnMedicineView = true)
 
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
 	open fun signIn(id: String, pw: String): String {
@@ -308,8 +307,7 @@ open class UserService: FServiceBase() {
 		val hosMap = hospitalRepository.findAllByThisPKIn(userRelationModel.map { it.hosPK }).associateBy { it.thisPK }
 		val pharmaMap = pharmaRepository.findAllByThisPKIn(userRelationModel.map { it.pharmaPK }).onEach {
 			if (pharmaOwnMedicineView) {
-				val relation = pharmaMedicineRelationRepository.findAllByPharmaPK(it.thisPK)
-				it.medicineList = medicineRepository.findAllByThisPKIn(relation.map { x -> x.medicinePK }).toMutableList()
+				it.medicineList = medicineRepository.findAllByClientCodeOrderByOrgNameAsc(it.code).toMutableList()
 			}
 		}.associateBy { it.thisPK }
 		val medicineBuff = if (relationMedicineView) {

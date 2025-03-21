@@ -13,8 +13,6 @@ data class MedicineModel(
 	@Id
 	@Column(columnDefinition = "nvarchar(36)", updatable = false, nullable = false)
 	var thisPK: String = UUID.randomUUID().toString(),
-	@Transient
-	var makerName: String? = null,
 	@Column(columnDefinition = "text")
 	var orgName: String = "",
 	@Column(columnDefinition = "text")
@@ -36,12 +34,16 @@ data class MedicineModel(
 	var code: String = "",
 	@Column(columnDefinition = "nvarchar(50)", nullable = false)
 	var makerCode: String = "",
+	@Column(columnDefinition = "nvarchar(50)", nullable = false)
+	var clientCode: String = "",
+	@Transient
+	var makerName: String? = null,
+	@Transient
+	var clientName: String? = null,
 	@Column
 	var medicineDiv: MedicineDiv = MedicineDiv.Open,
 	@Column(columnDefinition = "bit default 0", nullable = false)
 	var inVisible: Boolean = false,
-	@Transient
-	var clientName: String? = null,
 	@Transient
 	var maxPrice: Int = 0,
 	@Transient
@@ -51,7 +53,6 @@ data class MedicineModel(
 ): FExcelParseModel() {
 	constructor(buff: MedicineModel, makerName: String?, clientName: String?) : this() {
 		this.thisPK = buff.thisPK
-		this.makerName = makerName
 		this.orgName = buff.orgName
 		this.innerName = buff.innerName
 		this.kdCode = buff.kdCode
@@ -62,12 +63,14 @@ data class MedicineModel(
 		this.mainIngredientCode = buff.mainIngredientCode
 		this.code = buff.code
 		this.makerCode = buff.makerCode
+		this.clientCode = buff.clientCode
 		this.medicineDiv = buff.medicineDiv
 		this.inVisible = buff.inVisible
-		this.clientName = clientName
 		this.maxPrice = buff.maxPrice
 		this.medicineIngredientModel = buff.medicineIngredientModel
 		this.medicinePriceModel = buff.medicinePriceModel
+		this.makerName = makerName
+		this.clientName = clientName
 	}
 	@Transient
 	override var dataCount = FConstants.MODEL_MEDICINE_COUNT
@@ -76,33 +79,34 @@ data class MedicineModel(
 	}
 	override fun indexSet(data: String?, index: Int) {
 		when (index) {
-			1 -> orgName = data ?: ""
-			2 -> innerName = data ?: ""
-			3 -> kdCode = data ?: ""
-			4 -> customPrice = data?.toIntOrNull() ?: 0
-			5 -> charge = data?.toIntOrNull() ?: 50
-			6 -> standard = data ?: ""
-			7 -> etc1 = data ?: ""
-			8 -> mainIngredientCode = data ?: ""
-			9 -> code = data ?: ""
-			10 -> makerCode = data ?: ""
+			0 -> orgName = data ?: ""
+			1 -> innerName = data ?: ""
+			2 -> kdCode = data ?: ""
+			3 -> customPrice = data?.toIntOrNull() ?: 0
+			4 -> charge = data?.toIntOrNull() ?: 50
+			5 -> standard = data ?: ""
+			6 -> etc1 = data ?: ""
+			7 -> mainIngredientCode = data ?: ""
+			8 -> code = data ?: ""
+			9 -> makerCode = data ?: ""
+			10 -> clientCode = data ?: ""
 			11 -> medicineDiv = MedicineDiv.parseString(data)
 		}
 	}
 	override fun titleGet(index: Int): String {
 		return when (index) {
-			0 -> FConstants.MODEL_MEDICINE_MAKER_NAME
-			1 -> FConstants.MODEL_MEDICINE_NAME
-			2 -> FConstants.MODEL_MEDICINE_INNER_NAME
-			3 -> FConstants.MODEL_MEDICINE_KD_CODE
-			4 -> FConstants.MODEL_MEDICINE_CUSTOM_PRICE
-			5 -> FConstants.MODEL_MEDICINE_CHARGE
-			6 -> FConstants.MODEL_MEDICINE_STANDARD
-			7 -> FConstants.MODEL_MEDICINE_ETC1
-			8 -> FConstants.MODEL_MEDICINE_MAIN_INGREDIENT_CODE
-			9 -> FConstants.MODEL_MEDICINE_CODE
-			23 -> FConstants.MODEL_MEDICINE_MAKER_CODE
-			15 -> FConstants.MODEL_MEDICINE_DIV
+			0 -> FConstants.MODEL_MEDICINE_NAME
+			1 -> FConstants.MODEL_MEDICINE_INNER_NAME
+			2 -> FConstants.MODEL_MEDICINE_KD_CODE
+			3 -> FConstants.MODEL_MEDICINE_CUSTOM_PRICE
+			4 -> FConstants.MODEL_MEDICINE_CHARGE
+			5 -> FConstants.MODEL_MEDICINE_STANDARD
+			6 -> FConstants.MODEL_MEDICINE_ETC1
+			7 -> FConstants.MODEL_MEDICINE_MAIN_INGREDIENT_CODE
+			8 -> FConstants.MODEL_MEDICINE_CODE
+			9 -> FConstants.MODEL_MEDICINE_MAKER_CODE
+			10 -> FConstants.MODEL_MEDICINE_CLIENT_CODE
+			11 -> FConstants.MODEL_MEDICINE_DIV
 			else -> ""
 		}
 	}
@@ -121,18 +125,19 @@ data class MedicineModel(
 		val mainIngredientCode = FExtensions.escapeString(mainIngredientCode)
 		val innerName = FExtensions.escapeString(innerName)
 		val orgName = FExtensions.escapeString(orgName)
-		return "('$thisPK', '$orgName', '$innerName', '$kdCode', '$customPrice', '$charge', '$standard', '$etc1', '$mainIngredientCode', '$code', '$makerCode', '${medicineDiv.index}', ${if (inVisible) 1 else 0})"
+		return "('$thisPK', '$orgName', '$innerName', '$kdCode', '$customPrice', '$charge', '$standard', '$etc1', '$mainIngredientCode', '$code', '$makerCode', '$clientCode', '${medicineDiv.index}', ${if (inVisible) 1 else 0})"
 	}
 	fun safeCopy(rhs: MedicineModel): MedicineModel {
-		this.mainIngredientCode = rhs.mainIngredientCode
-		this.kdCode = rhs.kdCode
-		this.standard = rhs.standard
-		this.makerCode = rhs.makerCode
 		this.orgName = rhs.orgName
 		this.innerName = rhs.innerName
+		this.kdCode = rhs.kdCode
 		this.customPrice = rhs.customPrice
 		this.charge = rhs.charge
+		this.standard = rhs.standard
 		this.etc1 = rhs.etc1
+		this.mainIngredientCode = rhs.mainIngredientCode
+		this.makerCode = rhs.makerCode
+		this.clientCode = rhs.clientCode
 		this.medicineDiv = rhs.medicineDiv
 		return this
 	}

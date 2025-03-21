@@ -33,14 +33,15 @@ class PharmaListController: FControllerBase() {
 	@GetMapping(value = ["/data/{thisPK}"])
 	fun getData(@RequestHeader token: String,
 	            @PathVariable thisPK: String,
-							@RequestParam(required = false) pharmaOwnMedicineView: Boolean = false) =
+				@RequestParam(required = false) pharmaOwnMedicineView: Boolean = false) =
 		responseService.getResult(pharmaListService.getData(token, thisPK, pharmaOwnMedicineView))
 	@Operation(summary = "약품 검색")
 	@GetMapping(value = ["/medicine/list"])
 	fun getMedicine(@RequestHeader token: String,
+					@RequestParam thisPK: String,
 	                @RequestParam searchString: String,
 	                @RequestParam(required = false) isSearchTypeCode: Boolean = false) =
-		responseService.getResult(pharmaListService.getMedicineSearch(token, searchString, isSearchTypeCode))
+		responseService.getResult(pharmaListService.getMedicineSearch(token, thisPK, searchString, isSearchTypeCode))
 	@Operation(summary = "엑셀 샘플 다운로드")
 	@GetMapping(value = ["/file/sample"])
 	fun getExcelSample(): ResponseEntity<Resource> =
@@ -49,16 +50,6 @@ class PharmaListController: FControllerBase() {
 				.contentType(MediaType.parseMediaType(ContentsType.type_xlsx))
 				.contentLength(x.file.length())
 				.header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=\"excel_upload_sample.xlsx\"")
-				.body(x)
-		}
-	@Operation(summary = "제약사-약품 엑셀 샘플 다운로드")
-	@GetMapping(value = ["/file/sample/pharmaMedicine"])
-	fun getPharmaMedicineExcelSample(): ResponseEntity<Resource> =
-		FExtensions.sampleFileDownload(FExcelParserType.PHARMA_MEDICINE).let { x ->
-			ResponseEntity.ok()
-				.contentType(MediaType.parseMediaType(ContentsType.type_xlsx))
-				.contentLength(x.file.length())
-				.header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=\"pharma-medicine_excel_upload_sample.xlsx\"")
 				.body(x)
 		}
 
@@ -89,11 +80,6 @@ class PharmaListController: FControllerBase() {
 		pharmaData.imageUrl = blobUrl
 		return responseService.getResult(pharmaListService.pharmaDataModify(token, pharmaData))
 	}
-	@Operation(summary = "제약사-약품 엑셀 파일 업로드")
-	@PostMapping(value = ["/file/excel/pharmaMedicine"], consumes = ["multipart/form-data"])
-	fun postPharmaMedicineExcel(@RequestHeader token: String,
-	                            @RequestParam file: MultipartFile) =
-		responseService.getResult(pharmaListService.pharmaMedicineUpload(token, file))
 
 	@Operation(summary = "제약사 정보 수정")
 	@PutMapping(value = ["/data"])
@@ -103,7 +89,7 @@ class PharmaListController: FControllerBase() {
 	@Operation(summary = "약품 넣기")
 	@PutMapping(value = ["/data/{thisPK}/medicine/list"])
 	fun putMedicine(@RequestHeader token: String,
-									@PathVariable thisPK: String,
+					@PathVariable thisPK: String,
 									@RequestBody medicinePKList: List<String>) =
 		responseService.getResult(pharmaListService.modPharmaDrugList(token, thisPK, medicinePKList))
 	@Operation(summary = "제약사 사업자 등록증 업로드")

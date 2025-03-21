@@ -10,7 +10,6 @@ import sdmed.back.model.sqlCSO.hospital.PharmacyTempModel
 import sdmed.back.model.sqlCSO.medicine.MedicineIngredientModel
 import sdmed.back.model.sqlCSO.medicine.MedicineModel
 import sdmed.back.model.sqlCSO.medicine.MedicinePriceModel
-import sdmed.back.model.sqlCSO.pharma.PharmaMedicineExcelParsingModel
 import sdmed.back.model.sqlCSO.pharma.PharmaModel
 import sdmed.back.model.sqlCSO.user.UserDataModel
 import sdmed.back.model.sqlCSO.user.UserMappingBuffModel
@@ -69,38 +68,6 @@ class FExcelFileParser {
 		}
 
 		return ret
-	}
-	fun pharmaMedicineUploadExcelParse(uploaderID: String, file: MultipartFile): MutableList<PharmaMedicineExcelParsingModel> {
-		FExtensions.folderExist(FExcelParserType.PHARMA_MEDICINE)
-		val copiedLocation = FExtensions.fileCopy(file, FExcelParserType.PHARMA_MEDICINE, uploaderID)
-		val excelSheetHandler = ExcelSheetHandler.readExcel(copiedLocation.toFile())
-
-		if (!PharmaMedicineExcelParsingModel().findHeader(excelSheetHandler.header)) {
-			FExtensions.fileDelete(copiedLocation)
-			throw PharmaDataFileUploadException()
-		}
-
-		val ret: MutableList<PharmaMedicineExcelParsingModel> = mutableListOf()
-		excelSheetHandler.rows.forEach { x ->
-			val model = PharmaMedicineExcelParsingModel()
-			val setRowRet = model.rowSet(x)
-			if (setRowRet == null) {
-				FExtensions.fileDelete(copiedLocation)
-				throw PharmaDataFileUploadException(model.errorString())
-			}
-			if (setRowRet == false) {
-				return@forEach
-			}
-			ret.add(model)
-		}
-
-		return ret.groupBy { it.pharmaCode }.map { (pharmaCode, group) ->
-			val mergedSubCodeList = group.flatMap { it.medicineCodeList }.distinct().toMutableList()
-			PharmaMedicineExcelParsingModel().apply {
-				this.pharmaCode = pharmaCode
-				this.medicineCodeList = mergedSubCodeList
-			}
-		}.toMutableList()
 	}
 	fun hospitalUploadExcelParse(uploaderID: String, file: MultipartFile): MutableList<HospitalModel> {
 		FExtensions.folderExist(FExcelParserType.HOSPITAL)

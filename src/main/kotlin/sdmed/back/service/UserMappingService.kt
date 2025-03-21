@@ -105,18 +105,18 @@ open class UserMappingService: UserService() {
 			val user = userDataRepository.selectByCompanyInnerName(companyInnerName) ?: return@forEach
 			val existHos = hospitalRepository.findAllByOrgNameIn(model.map { it.hospitalName }).associateBy { it.orgName }
 			val existPharma = pharmaRepository.findAllByOrgNameIn(model.map { it.pharmaName }).associateBy { it.orgName }
-			val existMedicine = medicineRepository.findAllByOrgNameIn(model.map { it.medicineName }).associateBy { it.orgName }
+			val existMedicine = medicineRepository.selectAllOrgNameInWithPharmaName(model.map { it.medicineName }).associateBy { Pair(it.orgName, it.clientName) }
 			val filterModel = model.filter { code ->
 				existHos.containsKey(code.hospitalName) &&
 						existPharma.containsKey(code.pharmaName) &&
-						existMedicine.containsKey(code.medicineName)
+						existMedicine.containsKey(Pair(code.medicineName, code.pharmaName))
 			}
 
 			saveBuff.addAll(filterModel.map { x -> UserHosPharmaMedicinePairModel().apply {
 				this.userPK = user.thisPK
 				this.hosPK = existHos[x.hospitalName]!!.thisPK
 				this.pharmaPK = existPharma[x.pharmaName]!!.thisPK
-				this.medicinePK = existMedicine[x.medicineName]!!.thisPK
+				this.medicinePK = existMedicine[Pair(x.medicineName, x.pharmaName)]!!.thisPK
 			}})
 		}
 		if (saveBuff.isEmpty()) {

@@ -15,8 +15,10 @@ interface IMedicineRepository: JpaRepository<MedicineModel, String> {
 	fun findAllByOrderByCode(): List<MedicineModel>
 	fun findAllByThisPKIn(medicinePK: List<String>): List<MedicineModel>
 	fun findAllByCodeIn(code: List<String>): List<MedicineModel>
-	fun findAllByOrgNameIn(innerNames: List<String>): List<MedicineModel>
+	fun findAllByOrgNameIn(orgNames: List<String>): List<MedicineModel>
 	fun findAllByInnerNameIn(innerNames: List<String>): List<MedicineModel>
+	fun findAllByMakerCodeOrderByOrgNameAsc(code: String): List<MedicineModel>
+	fun findAllByClientCodeOrderByOrgNameAsc(code: String): List<MedicineModel>
 
 	@Query("SELECT a.* FROM MedicineModel a " +
 			"WHERE a.inVisible = :inVisible AND (a.code LIKE %:code% OR a.kdCode LIKE %:kdCode%) " +
@@ -34,83 +36,82 @@ interface IMedicineRepository: JpaRepository<MedicineModel, String> {
 			"ORDER BY a.code ASC")
 	fun selectAllByInVisibleOrderByCode(inVisible: Boolean = false): List<MedicineModel>
 
-
-	@Query("SELECT new sdmed.back.model.sqlCSO.medicine.MedicineModel(a, b.orgName, d.orgName) " +
+	@Query("SELECT new sdmed.back.model.sqlCSO.medicine.MedicineModel(a, b.orgName, c.orgName) " +
 			"FROM MedicineModel a " +
 			"LEFT JOIN PharmaModel b ON a.makerCode = b.code " +
-			"LEFT JOIN PharmaMedicineRelationModel c ON a.thisPK = c.medicinePK " +
-			"LEFT JOIN PharmaModel d ON c.pharmaPK = d.thisPK " +
+			"LEFT JOIN PharmaModel c ON a.clientCode = c.code " +
+			"WHERE a.orgName IN (:orgNames) " +
+			"ORDER BY a.code ASC")
+	fun selectAllOrgNameInWithPharmaName(orgNames: List<String>): List<MedicineModel>
+
+	@Query("SELECT new sdmed.back.model.sqlCSO.medicine.MedicineModel(a, b.orgName, c.orgName) " +
+			"FROM MedicineModel a " +
+			"LEFT JOIN PharmaModel b ON a.makerCode = b.code " +
+			"LEFT JOIN PharmaModel c ON a.clientCode = c.code " +
 			"WHERE a.inVisible = :inVisible " +
 			"ORDER BY a.code ASC")
 	fun selectAllByInvisibleOrderByCode(inVisible: Boolean = false): List<MedicineModel>
 
-	@Query("SELECT new sdmed.back.model.sqlCSO.medicine.MedicineModel(a, b.orgName, d.orgName) " +
+	@Query("SELECT new sdmed.back.model.sqlCSO.medicine.MedicineModel(a, b.orgName, c.orgName) " +
 			"FROM MedicineModel a " +
 			"LEFT JOIN PharmaModel b ON a.makerCode = b.code " +
-			"LEFT JOIN PharmaMedicineRelationModel c ON a.thisPK = c.medicinePK " +
-			"LEFT JOIN PharmaModel d ON c.pharmaPK = d.thisPK " +
+			"LEFT JOIN PharmaModel c ON a.clientCode = c.code " +
 			"WHERE a.inVisible = :inVisible AND a.medicineDiv = :medicineDiv " +
 			"ORDER BY a.code ASC")
 	fun selectAllByInvisibleOpenOrderByCode(inVisible: Boolean = false, medicineDiv: MedicineDiv = MedicineDiv.Open): List<MedicineModel>
 
-	@Query("SELECT new sdmed.back.model.sqlCSO.medicine.MedicineModel(a, b.orgName, d.orgName) " +
+	@Query("SELECT new sdmed.back.model.sqlCSO.medicine.MedicineModel(a, b.orgName, c.orgName) " +
 			"FROM MedicineModel a " +
 			"LEFT JOIN PharmaModel b ON a.makerCode = b.code " +
-			"LEFT JOIN PharmaMedicineRelationModel c ON a.thisPK = c.medicinePK " +
-			"LEFT JOIN PharmaModel d ON c.pharmaPK = d.thisPK " +
+			"LEFT JOIN PharmaModel c ON a.clientCode = c.code " +
 			"LEFT JOIN MedicineIngredientModel e ON a.mainIngredientCode = e.mainIngredientCode " +
 			"WHERE a.inVisible = :inVisible " +
-			"AND (a.orgName LIKE %:searchString% OR a.kdCode LIKE %:searchString% OR b.orgName LIKE %:searchString% OR d.orgName LIKE %:searchString% OR e.mainIngredientName LIKE %:searchString%) " +
+			"AND (a.orgName LIKE %:searchString% OR a.kdCode LIKE %:searchString% OR b.orgName LIKE %:searchString% OR c.orgName LIKE %:searchString% OR e.mainIngredientName LIKE %:searchString%) " +
 			"ORDER BY a.code ASC")
 	fun selectAllByInvisibleLikeOrderByCode(searchString: String, inVisible: Boolean = false): List<MedicineModel>
 
-	@Query("SELECT new sdmed.back.model.sqlCSO.medicine.MedicineModel(a, b.orgName, d.orgName) " +
+	@Query("SELECT new sdmed.back.model.sqlCSO.medicine.MedicineModel(a, b.orgName, c.orgName) " +
 			"FROM MedicineModel a " +
 			"LEFT JOIN PharmaModel b ON a.makerCode = b.code " +
-			"LEFT JOIN PharmaMedicineRelationModel c ON a.thisPK = c.medicinePK " +
-			"LEFT JOIN PharmaModel d ON c.pharmaPK = d.thisPK " +
+			"LEFT JOIN PharmaModel c ON a.clientCode = c.code " +
 			"LEFT JOIN MedicineIngredientModel f ON a.mainIngredientCode = f.mainIngredientCode " +
 			"WHERE a.inVisible = :inVisible AND a.medicineDiv = :medicineDiv " +
-			"AND (a.orgName LIKE %:searchString% OR a.kdCode LIKE %:searchString% OR b.orgName LIKE %:searchString% OR d.orgName LIKE %:searchString% OR f.mainIngredientName LIKE %:searchString%) " +
+			"AND (a.orgName LIKE %:searchString% OR a.kdCode LIKE %:searchString% OR b.orgName LIKE %:searchString% OR c.orgName LIKE %:searchString% OR f.mainIngredientName LIKE %:searchString%) " +
 			"ORDER BY a.code ASC")
 	fun selectAllByInvisibleOpenLikeOrderByCode(searchString: String, inVisible: Boolean = false, medicineDiv: MedicineDiv = MedicineDiv.Open): List<MedicineModel>
 
-	@Query("SELECT new sdmed.back.model.sqlCSO.medicine.MedicineModel(a, b.orgName, d.orgName) " +
+	@Query("SELECT new sdmed.back.model.sqlCSO.medicine.MedicineModel(a, b.orgName, c.orgName) " +
 			"FROM MedicineModel a " +
 			"LEFT JOIN PharmaModel b ON a.makerCode = b.code " +
-			"LEFT JOIN PharmaMedicineRelationModel c ON a.thisPK = c.medicinePK " +
-			"LEFT JOIN PharmaModel d ON c.pharmaPK = d.thisPK " +
+			"LEFT JOIN PharmaModel c ON a.clientCode = c.code " +
 			"WHERE a.inVisible = :inVisible " +
 			"ORDER BY a.code ASC")
 	fun selectPagingByInvisibleOrderByCode(pageable: Pageable, inVisible: Boolean = false): Page<MedicineModel>
 
-	@Query("SELECT new sdmed.back.model.sqlCSO.medicine.MedicineModel(a, b.orgName, d.orgName) " +
+	@Query("SELECT new sdmed.back.model.sqlCSO.medicine.MedicineModel(a, b.orgName, c.orgName) " +
 			"FROM MedicineModel a " +
 			"LEFT JOIN PharmaModel b ON a.makerCode = b.code " +
-			"LEFT JOIN PharmaMedicineRelationModel c ON a.thisPK = c.medicinePK " +
-			"LEFT JOIN PharmaModel d ON c.pharmaPK = d.thisPK " +
+			"LEFT JOIN PharmaModel c ON a.clientCode = c.code " +
 			"WHERE a.inVisible = :inVisible AND a.medicineDiv = :medicineDiv " +
 			"ORDER BY a.code ASC")
 	fun selectPagingByInvisibleOpenOrderByCode(pageable: Pageable, inVisible: Boolean = false, medicineDiv: MedicineDiv = MedicineDiv.Open): Page<MedicineModel>
 
-	@Query("SELECT new sdmed.back.model.sqlCSO.medicine.MedicineModel(a, b.orgName, d.orgName) " +
+	@Query("SELECT new sdmed.back.model.sqlCSO.medicine.MedicineModel(a, b.orgName, c.orgName) " +
 			"FROM MedicineModel a " +
 			"LEFT JOIN PharmaModel b ON a.makerCode = b.code " +
-			"LEFT JOIN PharmaMedicineRelationModel c ON a.thisPK = c.medicinePK " +
-			"LEFT JOIN PharmaModel d ON c.pharmaPK = d.thisPK " +
+			"LEFT JOIN PharmaModel c ON a.clientCode = c.code " +
 			"LEFT JOIN MedicineIngredientModel e ON a.mainIngredientCode = e.mainIngredientCode " +
 			"WHERE a.inVisible = :inVisible " +
-			"AND (a.orgName LIKE %:searchString% OR a.kdCode LIKE %:searchString% OR b.orgName LIKE %:searchString% OR d.orgName LIKE %:searchString% OR e.mainIngredientName LIKE %:searchString%) " +
+			"AND (a.orgName LIKE %:searchString% OR a.kdCode LIKE %:searchString% OR b.orgName LIKE %:searchString% OR c.orgName LIKE %:searchString% OR e.mainIngredientName LIKE %:searchString%) " +
 			"ORDER BY a.code ASC")
 	fun selectPagingByInvisibleLikeOrderByCode(searchString: String, pageable: Pageable, inVisible: Boolean = false): Page<MedicineModel>
-	@Query("SELECT new sdmed.back.model.sqlCSO.medicine.MedicineModel(a, b.orgName, d.orgName) " +
+	@Query("SELECT new sdmed.back.model.sqlCSO.medicine.MedicineModel(a, b.orgName, c.orgName) " +
 			"FROM MedicineModel a " +
 			"LEFT JOIN PharmaModel b ON a.makerCode = b.code " +
-			"LEFT JOIN PharmaMedicineRelationModel c ON a.thisPK = c.medicinePK " +
-			"LEFT JOIN PharmaModel d ON c.pharmaPK = d.thisPK " +
+			"LEFT JOIN PharmaModel c ON a.clientCode = c.code " +
 			"LEFT JOIN MedicineIngredientModel f ON a.mainIngredientCode = f.mainIngredientCode " +
 			"WHERE a.inVisible = :inVisible AND a.medicineDiv = :medicineDiv " +
-			"AND (a.orgName LIKE %:searchString% OR a.kdCode LIKE %:searchString% OR b.orgName LIKE %:searchString% OR d.orgName LIKE %:searchString% OR f.mainIngredientName LIKE %:searchString%) " +
+			"AND (a.orgName LIKE %:searchString% OR a.kdCode LIKE %:searchString% OR b.orgName LIKE %:searchString% OR c.orgName LIKE %:searchString% OR f.mainIngredientName LIKE %:searchString%) " +
 			"ORDER BY a.code ASC")
 	fun selectPagingByInvisibleOpenLikeOrderByCode(searchString: String, pageable: Pageable, inVisible: Boolean = false, medicineDiv: MedicineDiv = MedicineDiv.Open): Page<MedicineModel>
 }

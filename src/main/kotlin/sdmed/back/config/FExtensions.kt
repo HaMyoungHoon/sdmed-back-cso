@@ -41,7 +41,6 @@ object FExtensions {
 		val ret = when (excelType) {
 			FExcelParserType.USER -> userExcelDir
 			FExcelParserType.PHARMA -> pharmaExcelDir
-			FExcelParserType.PHARMA_MEDICINE -> pharmaExcelDir
 			FExcelParserType.HOSPITAL -> hospitalExcelDir
 			FExcelParserType.MEDICINE -> medicineExcelDir
 			FExcelParserType.MEDICINE_INGREDIENT -> medicineIngredientExcelDir
@@ -137,7 +136,6 @@ object FExtensions {
 		val filePath = when (excelType) {
 			FExcelParserType.USER -> Paths.get("${userExcelDir}/excel_upload_sample.xlsx").toAbsolutePath().normalize()
 			FExcelParserType.PHARMA -> Paths.get("${pharmaExcelDir}/excel_upload_sample.xlsx").toAbsolutePath().normalize()
-			FExcelParserType.PHARMA_MEDICINE -> Paths.get("${pharmaExcelDir}/pharma-medicine_excel_upload_sample.xlsx").toAbsolutePath().normalize()
 			FExcelParserType.HOSPITAL -> Paths.get("${hospitalExcelDir}/excel_upload_sample.xlsx").toAbsolutePath().normalize()
 			FExcelParserType.MEDICINE -> Paths.get("${medicineExcelDir}/excel_upload_sample.xlsx").toAbsolutePath().normalize()
 			FExcelParserType.MEDICINE_INGREDIENT -> Paths.get("${medicineIngredientExcelDir}/excel_upload_sample.xlsx").toAbsolutePath().normalize()
