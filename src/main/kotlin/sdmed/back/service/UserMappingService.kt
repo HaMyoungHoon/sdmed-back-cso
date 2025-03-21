@@ -25,6 +25,7 @@ open class UserMappingService: UserService() {
 		if (haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee))) {
 			return userDataRepository.selectByRoleAndStatusOrderByNameAsc(UserRole.BusinessMan.flag, UserStatus.Live.index).toMutableList().filter { it.thisPK != tokenUser.thisPK }
 		}
+		isLive(tokenUser)
 
 		return arrayListOf()
 	}
@@ -43,6 +44,7 @@ open class UserMappingService: UserService() {
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee))) {
 			throw AuthenticationEntryPointException()
 		}
+		isLive(tokenUser)
 
 		// 약품 없이도 넣어달라고 했는데
 		// post 하는 쪾에서 상당히 문제가 됨 미사용 약품이나 잘못된 코드로 약품을 넣어도 들어가게끔 되어버림 왜냐면 진짜 그 약품 있는 거임? 체크 하고
@@ -97,6 +99,7 @@ open class UserMappingService: UserService() {
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.EdiChanger))) {
 			throw AuthenticationEntryPointException()
 		}
+		isLive(tokenUser)
 
 		val saveBuff = mutableListOf<UserHosPharmaMedicinePairModel>()
 		val excelModel = excelFileParser.userMappingDateUploadExcelParse(tokenUser.id, file).distinctBy { it.companyInnerName to it.hospitalName to it.pharmaName to it.medicineName }

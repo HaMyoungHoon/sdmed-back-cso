@@ -104,6 +104,7 @@ class CommonController: FControllerBase() {
 		if (!userService.haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee, UserRole.BusinessMan))) {
 			throw AuthenticationEntryPointException()
 		}
+		userService.isLive(tokenUser)
 		return responseService.getResult(azureBlobService.getBlobStorageInfo())
 	}
 	@GetMapping(value = ["/generate/sas"])
@@ -115,6 +116,7 @@ class CommonController: FControllerBase() {
 		if (!userService.haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee, UserRole.BusinessMan))) {
 			throw AuthenticationEntryPointException()
 		}
+		userService.isLive(tokenUser)
 
 		val key = azureBlobService.generateSas(containerName, blobName)
 		return responseService.getResult(key)
@@ -128,6 +130,7 @@ class CommonController: FControllerBase() {
 		if (!userService.haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee, UserRole.BusinessMan))) {
 			throw AuthenticationEntryPointException()
 		}
+		userService.isLive(tokenUser)
 
 		val key = azureBlobService.generateSasList(containerName, blobName)
 		return responseService.getResult(key)

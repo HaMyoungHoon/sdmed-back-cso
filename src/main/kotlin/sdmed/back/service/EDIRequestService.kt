@@ -25,6 +25,7 @@ open class EDIRequestService: EDIService() {
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.BusinessMan))) {
 			throw AuthenticationEntryPointException()
 		}
+		isLive(tokenUser)
 
 		return ediApplyDateRepository.selectAllByUse()
 	}
@@ -34,6 +35,7 @@ open class EDIRequestService: EDIService() {
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.BusinessMan))) {
 			throw AuthenticationEntryPointException()
 		}
+		isLive(tokenUser)
 		val year = FExtensions.parseDateTimeString(applyDate, "yyyy") ?: throw NotValidOperationException()
 		val month = FExtensions.parseDateTimeString(applyDate, "MM") ?: throw NotValidOperationException()
 		val ret = userRelationRepository.selectAllMyHospital(tokenUser.thisPK).distinctBy { it.thisPK }
@@ -55,6 +57,7 @@ open class EDIRequestService: EDIService() {
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.BusinessMan))) {
 			throw AuthenticationEntryPointException()
 		}
+		isLive(tokenUser)
 
 		val ret = userRelationRepository.selectAllByInvisible().distinctBy { it.thisPK }
 		if (withMedicine) {

@@ -38,6 +38,7 @@ open class HospitalListService: HospitalService() {
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.HospitalChanger))) {
 			throw AuthenticationEntryPointException()
 		}
+		isLive(tokenUser)
 		if (data.code == FConstants.NEW_HOSPITAL_CODE) {
 			throw NotValidOperationException()
 		}

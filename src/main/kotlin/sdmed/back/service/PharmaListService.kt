@@ -21,8 +21,7 @@ open class PharmaListService: PharmaService() {
 	@Autowired lateinit var medicineIngredientRepository: IMedicineIngredientRepository
 	fun getList(token: String): List<PharmaModel> {
 		isValid(token)
-		val tokenUser = getUserDataByToken(token)
-		isLive(tokenUser)
+		isLive(getUserDataByToken(token))
 
 		return pharmaRepository.selectAllByInvisibleOrderByCode()
 	}
@@ -33,6 +32,7 @@ open class PharmaListService: PharmaService() {
 		}
 
 		isValid(token)
+		isLive(getUserDataByToken(token))
 		val pharma = pharmaRepository.findByThisPK(pharmaPK) ?: throw PharmaNotFoundException()
 		var ret = if (isSearchTypeCode) {
 			medicineRepository.selectAllByCodeLikeOrKdCodeLike(searchString, searchString)
@@ -52,6 +52,7 @@ open class PharmaListService: PharmaService() {
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.PharmaChanger))) {
 			throw AuthenticationEntryPointException()
 		}
+		isLive(tokenUser)
 
 		val exist = pharmaRepository.findByCode(data.code)
 		if (exist != null) {

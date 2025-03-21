@@ -28,6 +28,7 @@ open class QnAListService: QnAService() {
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee, UserRole.BusinessMan))) {
 			throw AuthenticationEntryPointException()
 		}
+		isLive(tokenUser)
 
 		return qnaHeaderRepository.findAllByUserPKOrderByRegDateDesc(tokenUser.thisPK)
 	}
@@ -37,6 +38,7 @@ open class QnAListService: QnAService() {
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee, UserRole.BusinessMan))) {
 			throw AuthenticationEntryPointException()
 		}
+		isLive(tokenUser)
 
 		return qnaHeaderRepository.selectAllLIKEUserPkOrderByRegDateDesc(tokenUser.thisPK, searchString)
 	}
@@ -47,6 +49,7 @@ open class QnAListService: QnAService() {
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee, UserRole.BusinessMan))) {
 			throw AuthenticationEntryPointException()
 		}
+		isLive(tokenUser)
 
 		return qnaHeaderRepository.findAllByUserPKOrderByRegDateDesc(tokenUser.thisPK, pageable)
 	}
@@ -57,6 +60,7 @@ open class QnAListService: QnAService() {
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee, UserRole.BusinessMan))) {
 			throw AuthenticationEntryPointException()
 		}
+		isLive(tokenUser)
 
 		return qnaHeaderRepository.selectAllLIKEUserPkOrderByRegDateDesc(tokenUser.thisPK, searchString, pageable)
 	}
@@ -66,6 +70,7 @@ open class QnAListService: QnAService() {
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee))) {
 			throw AuthenticationEntryPointException()
 		}
+		isLive(tokenUser)
 
 		return qnaHeaderRepository.selectAllHaveToReply()
 	}
@@ -75,6 +80,7 @@ open class QnAListService: QnAService() {
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee))) {
 			throw AuthenticationEntryPointException()
 		}
+		isLive(tokenUser)
 
 		val childPK = userChildPKRepository.selectAllByMotherPK(tokenUser.thisPK)
 		return qnaHeaderRepository.findAllByUserPKInOrderByRegDateDesc(childPK)
@@ -85,6 +91,7 @@ open class QnAListService: QnAService() {
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee))) {
 			throw AuthenticationEntryPointException()
 		}
+		isLive(tokenUser)
 		val queryDate = FExtensions.getStartEndQueryDate(startDate, endDate)
 
 		return qnaHeaderRepository.selectAllByDate(queryDate.first, queryDate.second)
@@ -93,6 +100,7 @@ open class QnAListService: QnAService() {
 	fun getHeaderData(token: String, thisPK: String): QnAHeaderModel {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
+		isLive(tokenUser)
 		return if (haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee))) {
 			qnaHeaderRepository.findByThisPKOrderByRegDateDesc(thisPK) ?: throw QnAHeaderNotExistException()
 		} else if (haveRole(tokenUser, UserRole.BusinessMan.toS())) {
@@ -102,6 +110,7 @@ open class QnAListService: QnAService() {
 	fun getContentData(token: String, thisPK: String): QnAContentModel {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
+		isLive(tokenUser)
 		val data = if (haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee))) {
 			qnaHeaderRepository.findByThisPKOrderByRegDateDesc(thisPK) ?: throw QnAHeaderNotExistException()
 		} else if (haveRole(tokenUser, UserRole.BusinessMan.toS())) {

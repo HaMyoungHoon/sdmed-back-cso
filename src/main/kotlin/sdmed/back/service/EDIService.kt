@@ -182,6 +182,7 @@ open class EDIService: FServiceBase() {
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee))) {
 			return ediApplyDateRepository.selectByApplyDateAndUse(year, month) != null
 		}
+		isLive(tokenUser)
 		return ediApplyDateRepository.selectByApplyDate(year, month) != null
 	}
 }

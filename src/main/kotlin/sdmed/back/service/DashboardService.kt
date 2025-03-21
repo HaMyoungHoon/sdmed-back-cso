@@ -24,6 +24,7 @@ open class DashboardService: FServiceBase() {
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee))) {
 			throw AuthenticationEntryPointException()
 		}
+		isLive(tokenUser)
 		val childPKList = userChildPKRepository.selectAllByMotherPK(tokenUser.thisPK)
 
 		return requestRepository.findAllByResponseTypeNotAndRequestUserPKInOrderByRequestDateDesc(requestUserPK = childPKList)
@@ -34,6 +35,7 @@ open class DashboardService: FServiceBase() {
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee))) {
 			throw AuthenticationEntryPointException()
 		}
+		isLive(tokenUser)
 
 		return requestRepository.selectAllByNoResponse()
 	}
@@ -43,6 +45,7 @@ open class DashboardService: FServiceBase() {
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee))) {
 			throw AuthenticationEntryPointException()
 		}
+		isLive(tokenUser)
 
 		val queryDate = FExtensions.getStartEndQueryDate(startDate, endDate)
 		return requestRepository.selectAllByBetweenRequestDate(queryDate.first, queryDate.second)
@@ -54,6 +57,7 @@ open class DashboardService: FServiceBase() {
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee))) {
 			throw AuthenticationEntryPointException()
 		}
+		isLive(tokenUser)
 		return requestRepository.findByRequestItemPK(requestItemPK)
 	}
 
@@ -63,6 +67,7 @@ open class DashboardService: FServiceBase() {
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee))) {
 			throw AuthenticationEntryPointException()
 		}
+		isLive(tokenUser)
 
 		return getUserDataPK(thisPK)
 	}
@@ -73,6 +78,7 @@ open class DashboardService: FServiceBase() {
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee))) {
 			throw AuthenticationEntryPointException()
 		}
+		isLive(tokenUser)
 
 		val queryDate = FExtensions.getStartEndQueryDate(startDate, endDate)
 		return requestRepository.selectCountOfResponseType(queryDate.first, queryDate.second)
@@ -84,6 +90,7 @@ open class DashboardService: FServiceBase() {
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee))) {
 			throw AuthenticationEntryPointException()
 		}
+		isLive(tokenUser)
 
 		val queryDate = FExtensions.getStartEndQueryDate(startDate, endDate)
 		return requestRepository.selectTop10RequestUser(queryDate.first, queryDate.second)
@@ -96,6 +103,7 @@ open class DashboardService: FServiceBase() {
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee))) {
 			throw AuthenticationEntryPointException()
 		}
+		isLive(tokenUser)
 
 		val requestModel = requestRepository.findByThisPK(thisPK) ?: throw RequestModelNotFoundException()
 		if (requestModel.responseType != ResponseType.None) {
@@ -120,6 +128,7 @@ open class DashboardService: FServiceBase() {
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee))) {
 			throw AuthenticationEntryPointException()
 		}
+		isLive(tokenUser)
 
 		val data = requestRepository.findByThisPK(thisPK) ?: throw RequestModelNotFoundException()
 

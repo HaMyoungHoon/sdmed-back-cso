@@ -22,6 +22,7 @@ open class EDIDueDateService: EDIService() {
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee, UserRole.BusinessMan))) {
 			throw AuthenticationEntryPointException()
 		}
+		isLive(tokenUser)
 		val year = FExtensions.parseDateTimeString(date, "yyyy") ?: throw NotValidOperationException()
 		val month = FExtensions.parseDateTimeString(date, "MM") ?: throw NotValidOperationException()
 		return if (isYear) ediPharmaDueDateRepository.selectAllByThisYearDueDate(year)
@@ -33,6 +34,7 @@ open class EDIDueDateService: EDIService() {
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee, UserRole.BusinessMan))) {
 			throw AuthenticationEntryPointException()
 		}
+		isLive(tokenUser)
 		val year = FExtensions.parseDateTimeString(date, "yyyy") ?: throw NotValidOperationException()
 		val month = FExtensions.parseDateTimeString(date, "MM") ?: throw NotValidOperationException()
 		val myPharmaPK = userRelationModel.findAllByUserPK(tokenUser.thisPK).map { it.pharmaPK }
@@ -47,6 +49,7 @@ open class EDIDueDateService: EDIService() {
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee, UserRole.BusinessMan))) {
 			throw AuthenticationEntryPointException()
 		}
+		isLive(tokenUser)
 
 		val queryDate = FExtensions.getStartEndQueryDate(startDate, endDate)
 		return ediPharmaDueDateRepository.selectAllByThisYearMonthRangeDueDate(queryDate.first, queryDate.second)
@@ -57,6 +60,7 @@ open class EDIDueDateService: EDIService() {
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee, UserRole.BusinessMan))) {
 			throw AuthenticationEntryPointException()
 		}
+		isLive(tokenUser)
 		val myPharmaPK = userRelationModel.findAllByUserPK(tokenUser.thisPK).map { it.pharmaPK }
 		val queryDate = FExtensions.getStartEndQueryDate(startDate, endDate)
 		return ediPharmaDueDateRepository.selectAllByThisYearMonthRangeDueDate(queryDate.first, queryDate.second).filter { it.pharmaPK in myPharmaPK }
@@ -67,6 +71,7 @@ open class EDIDueDateService: EDIService() {
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee, UserRole.BusinessMan))) {
 			throw AuthenticationEntryPointException()
 		}
+		isLive(tokenUser)
 
 		return ediPharmaDueDateRepository.selectAllByPharmaThisYearDueDate(pharmaPK, year)
 	}
@@ -76,6 +81,7 @@ open class EDIDueDateService: EDIService() {
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee, UserRole.BusinessMan))) {
 			throw AuthenticationEntryPointException()
 		}
+		isLive(tokenUser)
 		val year = FExtensions.parseDateTimeString(date, "yyyy") ?: throw NotValidOperationException()
 		val month = FExtensions.parseDateTimeString(date, "MM") ?: throw NotValidOperationException()
 
@@ -92,6 +98,7 @@ open class EDIDueDateService: EDIService() {
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee, UserRole.BusinessMan))) {
 			throw AuthenticationEntryPointException()
 		}
+		isLive(tokenUser)
 
 		return ediPharmaDueDateRepository.selectPharmaListByThisYearMonthDueDate(year, month)
 	}
@@ -110,6 +117,7 @@ open class EDIDueDateService: EDIService() {
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.EdiChanger))) {
 			throw AuthenticationEntryPointException()
 		}
+		isLive(tokenUser)
 
 		val excelModel = excelFileParser.ediDueDateUploadExcelParse(tokenUser.id, file).distinctBy { it.pharmaCode to it.year to it.month }
 		val pharmaList = pharmaRepository.findAllByCodeIn(excelModel.map { it.pharmaCode })
@@ -157,6 +165,7 @@ open class EDIDueDateService: EDIService() {
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.EdiChanger))) {
 			throw AuthenticationEntryPointException()
 		}
+		isLive(tokenUser)
 
 		val pharma = pharmaRepository.findByThisPK(pharmaPK) ?: throw PharmaNotFoundException()
 		if (ediPharmaDueDateRepository.selectByPharmaThisYearMonthDueDate(pharmaPK, year, month) != null) {
@@ -182,6 +191,7 @@ open class EDIDueDateService: EDIService() {
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.EdiChanger))) {
 			throw AuthenticationEntryPointException()
 		}
+		isLive(tokenUser)
 		val year = FExtensions.parseDateTimeString(date, "yyyy") ?: throw NotValidOperationException()
 		val month = FExtensions.parseDateTimeString(date, "MM") ?: throw NotValidOperationException()
 		val day = FExtensions.parseDateTimeString(date, "dd") ?: throw NotValidOperationException()
@@ -219,6 +229,7 @@ open class EDIDueDateService: EDIService() {
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.EdiChanger))) {
 			throw AuthenticationEntryPointException()
 		}
+		isLive(tokenUser)
 
 		val buff = ediPharmaDueDateRepository.findByThisPK(thisPK) ?: throw EDIPharmaDueDateNotExistException()
 
@@ -250,6 +261,7 @@ open class EDIDueDateService: EDIService() {
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.EdiChanger))) {
 			throw AuthenticationEntryPointException()
 		}
+		isLive(tokenUser)
 
 		pharmaRepository.findByThisPK(pharmaPK) ?: throw PharmaNotFoundException()
 		val dueDate = ediPharmaDueDateRepository.selectAllByPharmaThisYearMonthDueDate(pharmaPK, year, month)

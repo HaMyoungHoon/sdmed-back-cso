@@ -65,6 +65,7 @@ class HospitalListController: FControllerBase() {
 		if (!hospitalListService.haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.HospitalChanger))) {
 			throw AuthenticationEntryPointException()
 		}
+		hospitalListService.isLive(tokenUser)
 
 		val today = FExtensions.getDateTimeString("yyyyMMdd")
 		val hospitalData = hospitalListService.getData(token, thisPK)
@@ -88,6 +89,7 @@ class HospitalListController: FControllerBase() {
 		if (!hospitalListService.haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.HospitalChanger))) {
 			throw AuthenticationEntryPointException()
 		}
+		hospitalListService.isLive(tokenUser)
 
 		val hospitalData = hospitalListService.getData(token, thisPK)
 		azureBlobService.blobUploadSave(blobModel.newSave())

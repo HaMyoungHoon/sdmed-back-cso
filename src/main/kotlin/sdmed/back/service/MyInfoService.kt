@@ -23,6 +23,7 @@ open class MyInfoService: UserService() {
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee, UserRole.BusinessMan))) {
 			throw AuthenticationEntryPointException()
 		}
+		isLive(tokenUser)
 		return getUserDataByPK(tokenUser.thisPK, childView, relationView, pharmaOwnMedicineView, relationMedicineView, trainingModelView)
 	}
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)

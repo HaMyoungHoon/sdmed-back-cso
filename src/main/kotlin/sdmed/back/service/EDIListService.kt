@@ -16,6 +16,7 @@ open class EDIListService: EDIService() {
 	fun getEDIUploadList(token: String, withFile: Boolean, startDate: Date, endDate: Date): List<EDIUploadModel> {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
+		isLive(tokenUser)
 		val queryDate = FExtensions.getStartEndQueryDate(startDate, endDate)
 		val ret = if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee))) {
 			ediUploadRepository.selectAllByMe(tokenUser.thisPK, queryDate.first, queryDate.second)
@@ -41,6 +42,7 @@ open class EDIListService: EDIService() {
 	fun getEDIUploadListMyChild(token: String, withFile: Boolean, startDate: Date, endDate: Date): List<EDIUploadModel> {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
+		isLive(tokenUser)
 		val queryDate = FExtensions.getStartEndQueryDate(startDate, endDate)
 		val ret = if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee))) {
 			ediUploadRepository.selectAllByMe(tokenUser.thisPK, queryDate.first, queryDate.second)

@@ -24,6 +24,7 @@ class EDIUploadCheckService: EDIService() {
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.EdiChanger))) {
 			throw AuthenticationEntryPointException()
 		}
+		isLive(tokenUser)
 		val year = FExtensions.parseDateTimeString(date, "yyyy") ?: throw NotValidOperationException()
 		val month = FExtensions.parseDateTimeString(date, "MM") ?: throw NotValidOperationException()
 		val userList = getUserList(token, isMyChild).map { it.thisPK }
@@ -56,6 +57,7 @@ class EDIUploadCheckService: EDIService() {
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.EdiChanger))) {
 			throw AuthenticationEntryPointException()
 		}
+		isLive(tokenUser)
 		val targetUser = getUserDataPK(userPK)
 		val year = FExtensions.parseDateTimeString(date, "yyyy") ?: throw NotValidOperationException()
 		val month = FExtensions.parseDateTimeString(date, "MM") ?: throw NotValidOperationException()

@@ -23,6 +23,7 @@ open class MedicineService: FServiceBase() {
 	protected fun getAllMedicine(token: String, withAllPrice: Boolean = false): List<MedicineModel> {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
+		isLive(tokenUser)
 		val ret = if (haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee))) {
 			medicineRepository.selectAllByInvisibleOrderByCode()
 		} else {
@@ -43,6 +44,7 @@ open class MedicineService: FServiceBase() {
 	protected fun getLikeMedicine(token: String, searchString: String, withAllPrice: Boolean = false): List<MedicineModel> {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
+		isLive(tokenUser)
 		val ret = if (haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee))) {
 			medicineRepository.selectAllByInvisibleLikeOrderByCode(searchString)
 		} else {
@@ -63,6 +65,7 @@ open class MedicineService: FServiceBase() {
 	protected fun getPagingAllMedicine(token: String, page: Int, size: Int, withAllPrice: Boolean = false): Page<MedicineModel> {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
+		isLive(tokenUser)
 		val pageable = PageRequest.of(page, size)
 		val ret = if (haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee))) {
 			medicineRepository.selectPagingByInvisibleOrderByCode(pageable)
@@ -87,6 +90,7 @@ open class MedicineService: FServiceBase() {
 		}
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
+		isLive(tokenUser)
 		val pageable = PageRequest.of(page, size)
 		val ret = if (haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee))) {
 			medicineRepository.selectPagingByInvisibleLikeOrderByCode(searchString, pageable)

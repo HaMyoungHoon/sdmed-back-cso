@@ -73,6 +73,7 @@ class PharmaListController: FControllerBase() {
 		if (!pharmaListService.haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.PharmaChanger))) {
 			throw AuthenticationEntryPointException()
 		}
+		pharmaListService.isLive(tokenUser)
 
 		val today = FExtensions.getDateTimeString("yyyyMMdd")
 		val pharmaData = pharmaListService.getData(token, thisPK)
@@ -102,6 +103,7 @@ class PharmaListController: FControllerBase() {
 		if (!pharmaListService.haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.PharmaChanger))) {
 			throw AuthenticationEntryPointException()
 		}
+		pharmaListService.isLive(tokenUser)
 
 		val pharmaData = pharmaListService.getPharmaData(token, thisPK)
 		azureBlobService.blobUploadSave(blobModel.newSave())

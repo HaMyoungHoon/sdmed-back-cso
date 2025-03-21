@@ -34,6 +34,7 @@ open class UserService: FServiceBase() {
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.UserChanger))) {
 			throw AuthenticationEntryPointException()
 		}
+		isLive(tokenUser)
 		if (userPK.isBlank()) {
 			return getUserDataByPK(tokenUser.thisPK, childView, relationView, pharmaOwnMedicineView)
 		}
@@ -139,6 +140,7 @@ open class UserService: FServiceBase() {
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.UserChanger))) {
 			throw AuthenticationEntryPointException()
 		}
+		isLive(tokenUser)
 
 		if (FExtensions.regexIdCheck(data.id) != true) {
 			throw SignUpIDConditionException()
@@ -183,6 +185,7 @@ open class UserService: FServiceBase() {
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.UserChanger))) {
 			throw AuthenticationEntryPointException()
 		}
+		isLive(tokenUser)
 
 		val pwBuff = changePW.trim()
 		val user = getUserDataByID(id)
@@ -204,6 +207,7 @@ open class UserService: FServiceBase() {
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.UserChanger))) {
 			throw AuthenticationEntryPointException()
 		}
+		isLive(tokenUser)
 
 		val pwBuff = changePW.trim()
 		val user = getUserDataByPK(userPK)
@@ -238,6 +242,7 @@ open class UserService: FServiceBase() {
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.UserChanger))) {
 			throw AuthenticationEntryPointException()
 		}
+		isLive(tokenUser)
 		val user = getUserDataByPK(userPK)
 		val userFile = userFileRepository.findByUserPKAndUserFileType(user.thisPK, userFileType)
 		val ret = if (userFile == null) {
@@ -267,6 +272,7 @@ open class UserService: FServiceBase() {
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.UserChanger))) {
 			throw AuthenticationEntryPointException()
 		}
+		isLive(tokenUser)
 		val user = getUserDataByPK(userPK)
 		val buff = UserTrainingModel().safeCopy(uploadModel).apply {
 			this.userPK = userPK
@@ -290,6 +296,7 @@ open class UserService: FServiceBase() {
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.UserChanger))) {
 			throw AuthenticationEntryPointException()
 		}
+		isLive(tokenUser)
 
 		val password = "123456789a"
 		val user = getUserDataByPK(userPK)

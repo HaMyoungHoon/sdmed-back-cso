@@ -19,6 +19,7 @@ open class UserInfoService: UserService() {
 	fun getList(token: String): List<UserDataModel> {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
+		isLive(tokenUser)
 		val ret = if (haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee))) {
 			userDataRepository.findAllByOrderByNameDesc()
 //			return userDataRepository.findAllByOrderByNameDesc().toMutableList().run {
@@ -46,6 +47,7 @@ open class UserInfoService: UserService() {
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.UserChanger))) {
 			throw AuthenticationEntryPointException()
 		}
+		isLive(tokenUser)
 
 		return getUserDataByPK(userPK, childView, relationView, pharmaOwnMedicineView, relationMedicineView, trainingModelView)
 	}
@@ -55,6 +57,7 @@ open class UserInfoService: UserService() {
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.UserChanger))) {
 			throw AuthenticationEntryPointException()
 		}
+		isLive(tokenUser)
 
 		return userDataRepository.selectAbleChild(thisPK)
 	}
@@ -66,6 +69,7 @@ open class UserInfoService: UserService() {
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.UserChanger))) {
 			throw AuthenticationEntryPointException()
 		}
+		isLive(tokenUser)
 
 		val buff = userDataRepository.findByThisPK(userData.thisPK) ?: throw UserNotFoundException()
 		if (buff.id == "mhha") {

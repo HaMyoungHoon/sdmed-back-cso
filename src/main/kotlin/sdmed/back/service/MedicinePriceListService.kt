@@ -19,10 +19,12 @@ open class MedicinePriceListService: MedicineService() {
 	fun getPagingLike(token: String, searchString: String, page: Int = 0, size: Int = 100, withAllPrice: Boolean = false) = getPagingLikeMedicine(token, searchString, page, size, withAllPrice)
 	fun getMedicinePriceList(token: String, kdCode: String): List<MedicinePriceModel> {
 		isValid(token)
+		isLive(getUserDataByToken(token))
 		return medicinePriceRepository.findAllByKdCodeOrderByApplyDateDesc(kdCode)
 	}
 	fun getPriceApplyDate(token: String): String {
 		isValid(token)
+		isLive(getUserDataByToken(token))
 		return medicinePriceRepository.selectLatestDate()
 	}
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
@@ -32,6 +34,7 @@ open class MedicinePriceListService: MedicineService() {
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.MedicineChanger))) {
 			throw AuthenticationEntryPointException()
 		}
+		isLive(tokenUser)
 
 		val excelModel = excelFileParser.medicinePriceUploadExcelParse(tokenUser.id, applyDate, file)
 		val already = medicinePriceRepository.selectAllByRecentData()
@@ -59,6 +62,7 @@ open class MedicinePriceListService: MedicineService() {
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.MedicineChanger))) {
 			throw AuthenticationEntryPointException()
 		}
+		isLive(tokenUser)
 
 		val excelModel = excelFileParser.medicineIngredientUploadExcelParse(tokenUser.id, file)
 		val already: MutableList<MedicineIngredientModel> = mutableListOf()

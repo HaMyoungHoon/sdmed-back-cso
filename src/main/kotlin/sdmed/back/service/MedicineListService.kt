@@ -22,6 +22,7 @@ open class MedicineListService: MedicineService() {
 	fun getList(token: String, withAllPrice: Boolean = false) = getAllMedicine(token, withAllPrice)
 	fun getMedicineData(token: String, thisPK: String, withAllPrice: Boolean = false): MedicineModel {
 		isValid(token)
+		isLive(getUserDataByToken(token))
 
 		val ret = medicineRepository.findByThisPK(thisPK) ?: throw MedicineNotFoundException()
 		medicineIngredientRepository.findByMainIngredientCode(ret.mainIngredientCode)?.let { ret.medicineIngredientModel = it }
@@ -35,10 +36,12 @@ open class MedicineListService: MedicineService() {
 	}
 	fun getMainIngredientList(token: String): List<MedicineIngredientModel> {
 		isValid(token)
+		isLive(getUserDataByToken(token))
 		return medicineIngredientRepository.findAll()
 	}
 	fun getPharmaList(token: String): List<PharmaModel> {
 		isValid(token)
+		isLive(getUserDataByToken(token))
 		return pharmaRepository.selectAllByInvisibleOrderByCode()
 	}
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
@@ -48,6 +51,7 @@ open class MedicineListService: MedicineService() {
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.MedicineChanger))) {
 			throw AuthenticationEntryPointException()
 		}
+		isLive(tokenUser)
 
 		val excelModel = excelFileParser.medicineUploadExcelParse(tokenUser.id, file)
 		val already: MutableList<MedicineModel> = mutableListOf()

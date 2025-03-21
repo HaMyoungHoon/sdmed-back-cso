@@ -23,6 +23,7 @@ class ExtraDashboardService: FServiceBase() {
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.BusinessMan))) {
 			throw AuthenticationEntryPointException()
 		}
+		isLive(tokenUser)
 
 		val year = FExtensions.parseDateTimeString(date, "yyyy") ?: throw NotValidOperationException()
 		val month = FExtensions.parseDateTimeString(date, "MM") ?: throw NotValidOperationException()
@@ -35,6 +36,7 @@ class ExtraDashboardService: FServiceBase() {
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.BusinessMan))) {
 			throw AuthenticationEntryPointException()
 		}
+		isLive(tokenUser)
 
 		val year = FExtensions.parseDateTimeString(date, "yyyy") ?: throw NotValidOperationException()
 		val month = FExtensions.parseDateTimeString(date, "MM") ?: throw NotValidOperationException()
@@ -52,6 +54,7 @@ class ExtraDashboardService: FServiceBase() {
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.BusinessMan))) {
 			throw AuthenticationEntryPointException()
 		}
+		isLive(tokenUser)
 
 		val year = FExtensions.parseDateTimeString(date, "yyyy") ?: throw NotValidOperationException()
 		val month = FExtensions.parseDateTimeString(date, "MM") ?: throw NotValidOperationException()
@@ -68,6 +71,7 @@ class ExtraDashboardService: FServiceBase() {
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.BusinessMan))) {
 			throw AuthenticationEntryPointException()
 		}
+		isLive(tokenUser)
 
 		val year = FExtensions.parseDateTimeString(date, "yyyy") ?: throw NotValidOperationException()
 		val month = FExtensions.parseDateTimeString(date, "MM") ?: throw NotValidOperationException()
@@ -85,6 +89,7 @@ class ExtraDashboardService: FServiceBase() {
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.BusinessMan))) {
 			throw AuthenticationEntryPointException()
 		}
+		isLive(tokenUser)
 
 		val year = FExtensions.parseDateTimeString(date, "yyyy") ?: throw NotValidOperationException()
 		val month = FExtensions.parseDateTimeString(date, "MM") ?: throw NotValidOperationException()
@@ -97,6 +102,7 @@ class ExtraDashboardService: FServiceBase() {
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.BusinessMan))) {
 			throw AuthenticationEntryPointException()
 		}
+		isLive(tokenUser)
 
 		val year = FExtensions.parseDateTimeString(date, "yyyy") ?: throw NotValidOperationException()
 		val month = FExtensions.parseDateTimeString(date, "MM") ?: throw NotValidOperationException()

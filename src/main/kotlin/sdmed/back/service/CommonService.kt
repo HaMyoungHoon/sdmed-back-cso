@@ -122,6 +122,7 @@ class CommonService: FServiceBase() {
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee))) {
 			throw AuthenticationEntryPointException()
 		}
+		isLive(tokenUser)
 		val pageable = PageRequest.of(page, size)
 		return logRepository.selectLogViewModel(pageable)
 	}
@@ -131,6 +132,7 @@ class CommonService: FServiceBase() {
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee))) {
 			throw AuthenticationEntryPointException()
 		}
+		isLive(tokenUser)
 		val pageable = PageRequest.of(page, size)
 		return ipLogRepository.selectIPLogModel(pageable)
 	}

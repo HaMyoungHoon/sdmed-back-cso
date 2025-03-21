@@ -21,6 +21,7 @@ open class EDIApplyDateService: EDIService() {
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.EdiChanger))) {
 			return ediApplyDateRepository.selectAllByUse()
 		}
+		isLive(tokenUser)
 
 		return ediApplyDateRepository.findAllByOrderByYearDescMonthDesc()
 	}
@@ -35,6 +36,7 @@ open class EDIApplyDateService: EDIService() {
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.EdiChanger))) {
 			throw AuthenticationEntryPointException()
 		}
+		isLive(tokenUser)
 
 		val year = FExtensions.parseDateTimeString(applyDate, "yyyy") ?: throw NotValidOperationException()
 		val month = FExtensions.parseDateTimeString(applyDate, "MM") ?: throw NotValidOperationException()
@@ -61,6 +63,7 @@ open class EDIApplyDateService: EDIService() {
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.EdiChanger))) {
 			throw AuthenticationEntryPointException()
 		}
+		isLive(tokenUser)
 
 		val data = ediApplyDateRepository.findByThisPK(thisPK) ?: throw EDIApplyDateNotExistException()
 		data.applyDateState = state
