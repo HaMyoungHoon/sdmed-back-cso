@@ -7,6 +7,7 @@ import sdmed.back.model.sqlCSO.edi.EDIHosBuffModel
 import sdmed.back.model.sqlCSO.edi.EDIMedicineBuffModel
 import sdmed.back.model.sqlCSO.edi.EDIPharmaBuffModel
 import sdmed.back.model.sqlCSO.pharma.PharmaModel
+import sdmed.back.model.sqlCSO.user.UserMappingExcelModel
 import sdmed.back.model.sqlCSO.user.UserRelationModel
 
 @Repository
@@ -18,7 +19,16 @@ interface IUserRelationRepository: JpaRepository<UserRelationModel, String> {
 	fun findAllByPharmaPKIn(pharmaPK: List<String>): List<UserRelationModel>
 	fun findAllByMedicinePK(medicinePK: String): List<UserRelationModel>
 	fun findAllByMedicinePKIn(medicinePK: List<String>): List<UserRelationModel>
-	fun findAllByHosPKAndPharmaPK(hosPK: String, pharmaPK: String): List<UserRelationModel>
+	fun findAllByUserPKAndHosPKAndPharmaPK(userPK: String, hosPK: String, pharmaPK: String): List<UserRelationModel>
+
+	@Query("SELECT new sdmed.back.model.sqlCSO.user.UserMappingExcelModel(b.id, b.companyInnerName, c.orgName, d.orgName, e.orgName) FROM UserRelationModel a " +
+			"LEFT JOIN UserDataModel b ON a.userPK = b.thisPK " +
+			"LEFT JOIN HospitalModel c ON a.hosPK = c.thisPK " +
+			"LEFT JOIN PharmaModel d ON a.pharmaPK = d.thisPK " +
+			"LEFT JOIN MedicineModel e ON a.medicinePK = e.thisPK " +
+			"WHERE b.companyInnerName IS NOT NULL AND c.orgName IS NOT NULL AND d.orgName IS NOT NULL AND e.orgName IS NOT NULL " +
+			"ORDER BY b.id, b.companyInnerName, c.orgName, d.orgName, e.orgName ASC")
+	fun selectAllExcelModel(): List<UserMappingExcelModel>
 
 	@Query("SELECT new sdmed.back.model.sqlCSO.edi.EDIHosBuffModel(a.thisPK, a.orgName) FROM HospitalModel a " +
 			"LEFT JOIN UserRelationModel b ON a.thisPK = b.hosPK " +

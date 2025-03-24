@@ -49,10 +49,9 @@ class UserMappingController: FControllerBase() {
 	@Operation(summary = "제약사 조회")
 	@GetMapping(value = ["/data/pharma/{hospitalPK}/{pharmaPK}"])
 	fun getPharmaData(@RequestHeader token: String,
-					  @PathVariable("hospitalPK") hospitalPK: String,
 	                  @PathVariable("pharmaPK") pharmaPK: String,
 	                  @RequestParam(required = false) pharmaOwnMedicineView: Boolean = false) =
-		responseService.getResult(userMappingService.getPharmaData(token, hospitalPK, pharmaPK, pharmaOwnMedicineView))
+		responseService.getResult(userMappingService.getPharmaData(token, pharmaPK, pharmaOwnMedicineView))
 
 	@Operation(summary = "유저-병원-제약사-약품 관계 변경")
 	@PutMapping(value = ["/data/user/{userPK}"])
@@ -76,4 +75,14 @@ class UserMappingController: FControllerBase() {
 	fun postExcel(@RequestHeader token: String,
 	              @RequestParam file: MultipartFile) =
 		responseService.getResult(userMappingService.userRelationUpload(token, file))
+	@Operation(summary = "유저-병원-제약사-약품 엑셀 다운로드")
+	@GetMapping(value = ["/file/download/excel"])
+	fun getDownloadExcel(@RequestHeader token: String): ResponseEntity<Resource> {
+		val ret = userMappingService.getDownloadExcel(token)
+		return ResponseEntity.ok()
+			.contentType(MediaType.parseMediaType(ContentsType.type_xlsx))
+			.contentLength(ret.file.length())
+			.header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=\"excel_upload_data.xlsx\"")
+			.body(ret)
+	}
 }

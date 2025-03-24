@@ -56,6 +56,11 @@ object FExtensions {
 			Paths.get(ret).toAbsolutePath().normalize()
 		}
 	}
+	fun fileCreate(excelType: FExcelParserType, specificWord: String): Path {
+		val fileName = "${getDateTimeString("yyyyMMddHHmmss")}_${specificWord}.xlsx"
+		val targetLocation = fileLocation(excelType).resolve(fileName)
+		return targetLocation
+	}
 	fun fileCopy(file: MultipartFile, excelType: FExcelParserType, specificWord: String): Path {
 		val fileName = "${getDateTimeString("yyyyMMddHHmmss")}_${specificWord}_${file.originalFilename ?: "userFile"}"
 		val targetLocation = fileLocation(excelType).resolve(fileName)

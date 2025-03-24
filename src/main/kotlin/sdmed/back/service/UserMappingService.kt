@@ -1,6 +1,8 @@
 package sdmed.back.service
 
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.core.io.Resource
+import org.springframework.core.io.UrlResource
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
 import sdmed.back.advice.exception.AuthenticationEntryPointException
@@ -15,13 +17,14 @@ import sdmed.back.model.sqlCSO.pharma.PharmaModel
 import sdmed.back.model.sqlCSO.user.HosPharmaMedicinePairModel
 import sdmed.back.model.sqlCSO.user.UserDataModel
 import sdmed.back.model.sqlCSO.user.UserHosPharmaMedicinePairModel
+import sdmed.back.model.sqlCSO.user.UserMappingExcelModel
 import java.util.stream.Collectors
 
 open class UserMappingService: UserService() {
 	@Autowired lateinit var hospitalService: HospitalService
 	@Autowired lateinit var pharmaService: PharmaService
 
-	fun getList(token: String, exceptMe: Boolean = true): List<UserDataModel> {
+	fun getList(token: String): List<UserDataModel> {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
 		if (haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee))) {
@@ -36,14 +39,16 @@ open class UserMappingService: UserService() {
 		hospitalService.getHospitalAllSearch(token, searchString, pharmaOwnMedicineView)
 	fun getPharmaAllSearch(token: String, searchString: String, isSearchTypeCode: Boolean = false) =
 		pharmaService.getPharmaAllSearch(token, searchString, isSearchTypeCode)
-	fun getPharmaData(token: String, hospitalPK: String, pharmaPK: String, pharmaOwnMedicineView: Boolean = false): PharmaModel {
+	fun getPharmaData(token: String, pharmaPK: String, pharmaOwnMedicineView: Boolean = false) =
+		pharmaService.getPharmaData(token, pharmaPK, pharmaOwnMedicineView)
+	fun getPharmaData(token: String, userPK: String, hospitalPK: String, pharmaPK: String, pharmaOwnMedicineView: Boolean = false): PharmaModel {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
 		isLive(tokenUser)
 
 		val ret = pharmaRepository.findByThisPK(pharmaPK) ?: throw PharmaNotFoundException()
 		if (pharmaOwnMedicineView) {
-			val medicinePKs = userRelationRepository.findAllByHosPKAndPharmaPK(hospitalPK, ret.thisPK).map { x -> x.medicinePK }
+			val medicinePKs = userRelationRepository.findAllByUserPKAndHosPKAndPharmaPK(userPK, hospitalPK, ret.thisPK).map { x -> x.medicinePK }
 			ret.medicineList = medicineRepository.findAllByThisPKIn(medicinePKs).toMutableList()
 		}
 		return ret
@@ -145,45 +150,16 @@ open class UserMappingService: UserService() {
 		logRepository.save(logModel)
 		return saveBuff.size
 	}
-	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
-	open fun userRelationUploadOld(token: String, file: MultipartFile): Int {
+	fun getDownloadExcel(token: String): Resource {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.EdiChanger))) {
 			throw AuthenticationEntryPointException()
 		}
-
-		val saveBuff = mutableListOf<UserHosPharmaMedicinePairModel>()
-		val excelModel = excelFileParser.userMappingDateUploadExcelParse(tokenUser.id, file).distinctBy { it.id to it.hospitalCode to it.pharmaCode to it.medicineCode }
-		val userGroup = excelModel.groupBy { it.id }
-		userGroup.forEach { (id, model) ->
-			val user = userDataRepository.selectById(id) ?: return@forEach
-			val existHos = hospitalRepository.findAllByCodeIn(model.map { it.hospitalCode }).associateBy { it.code }
-			val existPharma = pharmaRepository.findAllByCodeIn(model.map { it.pharmaCode }).associateBy { it.code }
-			val existMedicine = medicineRepository.findAllByCodeIn(model.map { it.medicineCode }).associateBy { it.code }
-			val filterModel = model.filter { code ->
-				existHos.containsKey(code.hospitalCode) &&
-						existPharma.containsKey(code.pharmaCode) &&
-						existMedicine.containsKey(code.medicineCode)
-			}
-
-			saveBuff.addAll(filterModel.map { x -> UserHosPharmaMedicinePairModel().apply {
-				this.userPK = user.thisPK
-				this.hosPK = existHos[x.hospitalCode]!!.thisPK
-				this.pharmaPK = existPharma[x.pharmaCode]!!.thisPK
-				this.medicinePK = existMedicine[x.medicineCode]!!.thisPK
-			}})
-		}
-
-		deleteRelationByUserPKIn(saveBuff.map { it.userPK })
-		if (saveBuff.isEmpty()) {
-			return 0
-		}
-		insertRelation(saveBuff)
-		val stackTrace = Thread.currentThread().stackTrace
-		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "${saveBuff.size} hos-pharma-medicine relation change")
-		logRepository.save(logModel)
-		return saveBuff.size
+		isLive(tokenUser)
+		val tableModel: List<UserMappingExcelModel> = userRelationRepository.selectAllExcelModel()
+		val fileUri = excelFileExport.userMappingExcelExport(tokenUser.id, tableModel)
+		return UrlResource(fileUri)
 	}
 	fun deleteRelationByUserPKIn(userPK: List<String>) {
 		val joinString = userPK.joinToString(",") { "'${it}'" }

@@ -25,6 +25,7 @@ open class FServiceBase {
 	@Autowired lateinit var logRepository: ILogRepository
 	@Autowired lateinit var fAmhohwa: FAmhohwa
 	@Autowired lateinit var excelFileParser: FExcelFileParser
+	@Autowired lateinit var excelFileExport: FExcelFileExport
 	@Autowired lateinit var entityManager: EntityManager
 
 	fun getUserDataID(id: String) = userDataRepository.selectById(id) ?: throw UserNotFoundException()
