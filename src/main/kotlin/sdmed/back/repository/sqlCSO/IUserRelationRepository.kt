@@ -18,6 +18,7 @@ interface IUserRelationRepository: JpaRepository<UserRelationModel, String> {
 	fun findAllByPharmaPKIn(pharmaPK: List<String>): List<UserRelationModel>
 	fun findAllByMedicinePK(medicinePK: String): List<UserRelationModel>
 	fun findAllByMedicinePKIn(medicinePK: List<String>): List<UserRelationModel>
+	fun findAllByHosPKAndPharmaPK(hosPK: String, pharmaPK: String): List<UserRelationModel>
 
 	@Query("SELECT new sdmed.back.model.sqlCSO.edi.EDIHosBuffModel(a.thisPK, a.orgName) FROM HospitalModel a " +
 			"LEFT JOIN UserRelationModel b ON a.thisPK = b.hosPK " +

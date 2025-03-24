@@ -164,4 +164,27 @@ data class PharmaModel(
 		this.etc2 = rhs.etc2
 		return this
 	}
+	fun clone(): PharmaModel {
+		return PharmaModel(thisPK,
+				code,
+				orgName,
+				innerName,
+				ownerName,
+				taxpayerNumber,
+				address,
+				phoneNumber,
+				faxNumber,
+				zipCode,
+				openDate,
+				retroactiveRule,
+				innerSettlementRule,
+				outerSettlementRule,
+				etc1,
+				etc2,
+				imageUrl,
+				inVisible,
+				medicineList.toMutableList(),
+				relationMedicineList.toMutableList()).apply {
+		}
+	}
 }

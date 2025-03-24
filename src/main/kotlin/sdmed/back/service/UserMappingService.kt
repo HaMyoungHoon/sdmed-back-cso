@@ -4,12 +4,14 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
 import sdmed.back.advice.exception.AuthenticationEntryPointException
+import sdmed.back.advice.exception.PharmaNotFoundException
 import sdmed.back.config.FConstants
 import sdmed.back.config.jpa.CSOJPAConfig
 import sdmed.back.model.common.user.UserRole
 import sdmed.back.model.common.user.UserRoles
 import sdmed.back.model.common.user.UserStatus
 import sdmed.back.model.sqlCSO.LogModel
+import sdmed.back.model.sqlCSO.pharma.PharmaModel
 import sdmed.back.model.sqlCSO.user.HosPharmaMedicinePairModel
 import sdmed.back.model.sqlCSO.user.UserDataModel
 import sdmed.back.model.sqlCSO.user.UserHosPharmaMedicinePairModel
@@ -34,8 +36,18 @@ open class UserMappingService: UserService() {
 		hospitalService.getHospitalAllSearch(token, searchString, pharmaOwnMedicineView)
 	fun getPharmaAllSearch(token: String, searchString: String, isSearchTypeCode: Boolean = false) =
 		pharmaService.getPharmaAllSearch(token, searchString, isSearchTypeCode)
-	fun getPharmaData(token: String, pharmaPK: String, pharmaOwnMedicineView: Boolean = false) =
-		pharmaService.getPharmaData(token, pharmaPK, pharmaOwnMedicineView)
+	fun getPharmaData(token: String, hospitalPK: String, pharmaPK: String, pharmaOwnMedicineView: Boolean = false): PharmaModel {
+		isValid(token)
+		val tokenUser = getUserDataByToken(token)
+		isLive(tokenUser)
+
+		val ret = pharmaRepository.findByThisPK(pharmaPK) ?: throw PharmaNotFoundException()
+		if (pharmaOwnMedicineView) {
+			val medicinePKs = userRelationRepository.findAllByHosPKAndPharmaPK(hospitalPK, ret.thisPK).map { x -> x.medicinePK }
+			ret.medicineList = medicineRepository.findAllByThisPKIn(medicinePKs).toMutableList()
+		}
+		return ret
+	}
 
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
 	open fun userRelationModify(token: String, userPK: String, hosPharmaMedicinePairModel: List<HosPharmaMedicinePairModel>): UserDataModel {

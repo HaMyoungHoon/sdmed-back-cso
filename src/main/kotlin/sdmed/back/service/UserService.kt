@@ -11,6 +11,7 @@ import sdmed.back.model.common.ResponseType
 import sdmed.back.model.common.user.*
 import sdmed.back.model.sqlCSO.*
 import sdmed.back.model.sqlCSO.hospital.HospitalModel
+import sdmed.back.model.sqlCSO.pharma.PharmaModel
 import sdmed.back.model.sqlCSO.request.RequestModel
 import sdmed.back.model.sqlCSO.user.UserDataModel
 import sdmed.back.model.sqlCSO.user.UserFileModel
@@ -311,12 +312,13 @@ open class UserService: FServiceBase() {
 	fun mergeRel(userPK: String, pharmaOwnMedicineView: Boolean = false, relationMedicineView: Boolean = true): MutableList<HospitalModel> {
 		var ret: MutableList<HospitalModel> = mutableListOf()
 		val userRelationModel = userRelationRepository.findAllByUserPK(userPK)
-		val hosMap = hospitalRepository.findAllByThisPKIn(userRelationModel.map { it.hosPK }).associateBy { it.thisPK }
-		val pharmaMap = pharmaRepository.findAllByThisPKIn(userRelationModel.map { it.pharmaPK }).onEach {
-			if (pharmaOwnMedicineView) {
+		val hosMap = hospitalRepository.findAllByThisPKIn(userRelationModel.map { it.hosPK })
+		val pharmaMap = pharmaRepository.findAllByThisPKIn(userRelationModel.map { it.pharmaPK })
+		if (pharmaOwnMedicineView) {
+			pharmaMap.onEach {
 				it.medicineList = medicineRepository.findAllByClientCodeOrderByOrgNameAsc(it.code).toMutableList()
 			}
-		}.associateBy { it.thisPK }
+		}
 		val medicineBuff = if (relationMedicineView) {
 			medicineRepository.findAllByThisPKIn(userRelationModel.map { it.medicinePK })
 		} else {
@@ -324,27 +326,21 @@ open class UserService: FServiceBase() {
 		}
 		val ingredient = medicineIngredientRepository.findAllByMainIngredientCodeIn(medicineBuff.map { it.mainIngredientCode })
 		medicineMerge(medicineBuff, ingredient)
-		val medicineMap = medicineBuff.associateBy { it.thisPK }
-		for (rel in userRelationModel) {
-			val hos = hosMap[rel.hosPK] ?: continue
-			val pharma = pharmaMap[rel.pharmaPK]
-			val medicine = medicineMap[rel.medicinePK]
-			if (pharma != null) {
+		for (hos in hosMap) {
+			val pharmaRel = userRelationModel.filter { x -> x.hosPK == hos.thisPK }
+			for (rel in pharmaRel) {
+				val pharma = hos.pharmaList.find { x -> x.thisPK == rel.pharmaPK } ?: pharmaMap.find { x -> x.thisPK == rel.pharmaPK }?.clone() ?: continue
+				val medicine = medicineBuff.find { x -> x.thisPK == rel.medicinePK }
 				if (medicine != null) {
 					pharma.relationMedicineList.add(medicine)
 				}
-				hos.pharmaList.add(pharma)
+				if (hos.pharmaList.find { x -> x.thisPK == rel.pharmaPK } == null) {
+					hos.pharmaList.add(pharma)
+				}
 			}
 			ret.add(hos)
 		}
 		ret = ret.distinct().toMutableList()
-		ret.onEach { x ->
-			x.pharmaList = x.pharmaList.distinct().toMutableList()
-			x.pharmaList.onEach { y ->
-				y.relationMedicineList = y.relationMedicineList.distinct().toMutableList()
-			}
-		}
-
 		return ret
 	}
 }

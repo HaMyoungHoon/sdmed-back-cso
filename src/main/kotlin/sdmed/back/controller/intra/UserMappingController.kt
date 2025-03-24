@@ -47,11 +47,12 @@ class UserMappingController: FControllerBase() {
 	                       @RequestParam(required = false) isSearchTypeCode: Boolean = false) =
 		responseService.getResult(userMappingService.getPharmaAllSearch(token, searchString, isSearchTypeCode))
 	@Operation(summary = "제약사 조회")
-	@GetMapping(value = ["/data/pharma/{pharmaPK}"])
+	@GetMapping(value = ["/data/pharma/{hospitalPK}/{pharmaPK}"])
 	fun getPharmaData(@RequestHeader token: String,
+					  @PathVariable("hospitalPK") hospitalPK: String,
 	                  @PathVariable("pharmaPK") pharmaPK: String,
 	                  @RequestParam(required = false) pharmaOwnMedicineView: Boolean = false) =
-		responseService.getResult(userMappingService.getPharmaData(token, pharmaPK, pharmaOwnMedicineView))
+		responseService.getResult(userMappingService.getPharmaData(token, hospitalPK, pharmaPK, pharmaOwnMedicineView))
 
 	@Operation(summary = "유저-병원-제약사-약품 관계 변경")
 	@PutMapping(value = ["/data/user/{userPK}"])
