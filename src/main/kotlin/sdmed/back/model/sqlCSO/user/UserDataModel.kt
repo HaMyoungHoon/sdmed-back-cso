@@ -201,9 +201,12 @@ data class UserDataModel(
 		val companyNumber = FExtensions.escapeString(companyNumber)
 		val companyAddress = FExtensions.escapeString(companyAddress)
 		val bankAccount = FExtensions.escapeString(bankAccount)
-		val contractDateString = FExtensions.parseDateTimeString(contractDate, "yyyy-MM-dd HH:mm:ss")
+		var contractDateString = "NULL"
+		FExtensions.parseDateTimeString(contractDate, "yyyy-MM-dd HH:mm:ss")?.let {
+			contractDateString = "'${it}'"
+		}
 		val regDateString = FExtensions.parseDateTimeString(regDate, "yyyy-MM-dd HH:mm:ss")
-		return "('$thisPK', '$id', '$pw', '$name', '$mail', '$phoneNumber', '$role', '$dept', '${status.index}', '$companyName', '$companyInnerName', '$companyNumber', '$companyOwner', '$companyAddress', '$bankAccount', '$csoReportNumber', '$contractDateString', '$regDateString')"
+		return "('$thisPK', '$id', '$pw', '$name', '$mail', '$phoneNumber', '$role', '$dept', '${status.index}', '$companyName', '$companyInnerName', '$companyNumber', '$companyOwner', '$companyAddress', '$bankAccount', '$csoReportNumber', $contractDateString, '$regDateString')"
 	}
 
 	override fun toString(): String {

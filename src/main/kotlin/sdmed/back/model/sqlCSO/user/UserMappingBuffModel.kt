@@ -5,7 +5,7 @@ import sdmed.back.model.sqlCSO.FExcelParseModel
 
 data class UserMappingBuffModel(
 	var companyInnerName: String = "",
-	var hospitalName: String = "",
+	var hospitalInnerName: String = "",
 	var pharmaName: String = "",
 	var medicineName: String = "",
 	var id: String = "",
@@ -17,7 +17,7 @@ data class UserMappingBuffModel(
 	override fun indexSet(data: String?, index: Int) {
 		when (index) {
 			0 -> companyInnerName = data ?: ""
-			1 -> hospitalName = data ?: ""
+			1 -> hospitalInnerName = data ?: ""
 			2 -> pharmaName = data ?: ""
 			3 -> medicineName = data ?: ""
 		}
@@ -33,14 +33,14 @@ data class UserMappingBuffModel(
 	}
 	override fun errorCondition(): Boolean {
 		if (companyInnerName.isBlank()) return true
-		if (hospitalName.isBlank()) return true
+		if (hospitalInnerName.isBlank()) return true
 		if (pharmaName.isBlank()) return true
 		if (medicineName.isBlank()) return true
 
 		return false
 	}
 	override fun errorString() = "${FConstants.MODEL_USER_RELATION_COMPANY_INNER_NAME} : ${companyInnerName}\n" +
-			"${FConstants.MODEL_USER_RELATION_HOSPITAL_NAME} : ${hospitalName}\n" +
+			"${FConstants.MODEL_USER_RELATION_HOSPITAL_NAME} : ${hospitalInnerName}\n" +
 			"${FConstants.MODEL_USER_RELATION_PHARMA_NAME} : ${pharmaName}\n" +
 			"${FConstants.MODEL_USER_RELATION_MEDICINE_NAME} : ${medicineName}"
 }

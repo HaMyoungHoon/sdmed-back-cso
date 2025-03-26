@@ -97,7 +97,7 @@ open class UserInfoService: UserService() {
 			throw AuthenticationEntryPointException()
 		}
 
-		val excelModel = excelFileParser.userUploadExcelParse(tokenUser.id, file).distinctBy { x -> Pair(x.id, x.companyInnerName)  }
+		val excelModel = excelFileParser.userUploadExcelParse(tokenUser.id, file).distinctBy { x -> x.id  }.distinctBy { x -> x.companyInnerName }
 		val already: MutableList<UserDataModel> = mutableListOf()
 		excelModel.chunked(500).forEach { x -> already.addAll(userDataRepository.findAllByIdIn(x.map { y -> y.id })) }
 		var retCount = 0

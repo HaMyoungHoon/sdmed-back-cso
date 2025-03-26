@@ -119,22 +119,22 @@ open class UserMappingService: UserService() {
 		isLive(tokenUser)
 
 		val saveBuff = mutableListOf<UserHosPharmaMedicinePairModel>()
-		val excelModel = excelFileParser.userMappingDateUploadExcelParse(tokenUser.id, file).distinctBy { it.companyInnerName to it.hospitalName to it.pharmaName to it.medicineName }
+		val excelModel = excelFileParser.userMappingDateUploadExcelParse(tokenUser.id, file).distinctBy { it.companyInnerName to it.hospitalInnerName to it.pharmaName to it.medicineName }
 		val userGroup = excelModel.groupBy { it.companyInnerName }
 		userGroup.forEach { (companyInnerName, model) ->
 			val user = userDataRepository.selectByCompanyInnerName(companyInnerName) ?: return@forEach
-			val existHos = hospitalRepository.findAllByOrgNameIn(model.map { it.hospitalName }).associateBy { it.orgName }
+			val existHos = hospitalRepository.findAllByInnerNameIn(model.map { it.hospitalInnerName }).associateBy { it.innerName }
 			val existPharma = pharmaRepository.findAllByOrgNameIn(model.map { it.pharmaName }).associateBy { it.orgName }
 			val existMedicine = medicineRepository.selectAllOrgNameInWithPharmaName(model.map { it.medicineName }).associateBy { Pair(it.orgName, it.clientName) }
 			val filterModel = model.filter { code ->
-				existHos.containsKey(code.hospitalName) &&
+				existHos.containsKey(code.hospitalInnerName) &&
 						existPharma.containsKey(code.pharmaName) &&
 						existMedicine.containsKey(Pair(code.medicineName, code.pharmaName))
 			}
 
 			saveBuff.addAll(filterModel.map { x -> UserHosPharmaMedicinePairModel().apply {
 				this.userPK = user.thisPK
-				this.hosPK = existHos[x.hospitalName]!!.thisPK
+				this.hosPK = existHos[x.hospitalInnerName]!!.thisPK
 				this.pharmaPK = existPharma[x.pharmaName]!!.thisPK
 				this.medicinePK = existMedicine[Pair(x.medicineName, x.pharmaName)]!!.thisPK
 			}})
