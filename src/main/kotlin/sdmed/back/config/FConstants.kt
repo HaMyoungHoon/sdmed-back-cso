@@ -68,8 +68,8 @@ object FConstants {
 	const val MODEL_USER_CHILD_DELETE_BY_MOTHER_PK = "DELETE FROM UserChildPKModel WHERE motherPK =  "
 
 	const val MODEL_CODE = "거래처코드"
-	const val MODEL_ORG_NAME = "사업자원어명"
 	const val MODEL_INNER_NAME = "사업자내부명"
+	const val MODEL_ORG_NAME = "사업자원어명"
 	const val MODEL_OWNER_NAME = "대표자명"
 	const val MODEL_TAX_PAYER = "사업자번호"
 	const val MODEL_ADDRESS = "주소"
@@ -85,11 +85,11 @@ object FConstants {
 	const val MODEL_ETC1 = "비고1"
 	const val MODEL_ETC2 = "비고2"
 	const val MODEL_PHARMA_COUNT = 15
-	const val MODEL_PHARMA_INSERT_INTO = "INSERT INTO PharmaModel (thisPK, code, orgName, innerName, ownerName, taxpayerNumber, address, phoneNumber, faxNumber, zipCode, openDate, retroactiveRule, innerSettlementRule, outerSettlementRule, etc1, etc2, imageUrl, inVisible) VALUES "
+	const val MODEL_PHARMA_INSERT_INTO = "INSERT INTO PharmaModel (thisPK, code, innerName, orgName, ownerName, taxpayerNumber, address, phoneNumber, faxNumber, zipCode, openDate, retroactiveRule, innerSettlementRule, outerSettlementRule, etc1, etc2, imageUrl, inVisible) VALUES "
 
 	const val MODEL_NURSING_HOME_NUMBER = "요양기관번호"
 	const val MODEL_HOS_COUNT = 14
-	const val MODEL_HOS_INSERT_INTO = "INSERT INTO HospitalModel (thisPK, code, orgName, innerName, ownerName, taxpayerNumber, address, phoneNumber, faxNumber, zipCode, businessType, businessItem, nursingHomeNumber, etc1, etc2, imageUrl, inVisible) VALUES "
+	const val MODEL_HOS_INSERT_INTO = "INSERT INTO HospitalModel (thisPK, code, innerName, orgName, ownerName, taxpayerNumber, address, phoneNumber, faxNumber, zipCode, businessType, businessItem, nursingHomeNumber, etc1, etc2, imageUrl, inVisible) VALUES "
 
 	const val MODEL_MEDICINE_NAME = "제품명"
 	const val MODEL_MEDICINE_INNER_NAME = "제품내부명"

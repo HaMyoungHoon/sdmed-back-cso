@@ -15,9 +15,9 @@ data class HospitalModel(
 	@Column(columnDefinition = "nvarchar(50)", nullable = false, unique = true)
 	var code: String = "",
 	@Column(columnDefinition = "nvarchar(255)", nullable = false)
-	var orgName: String = "",
-	@Column(columnDefinition = "nvarchar(255)", nullable = false)
 	var innerName: String = "",
+	@Column(columnDefinition = "nvarchar(255)", nullable = false)
+	var orgName: String = "",
 	@Column(columnDefinition = "nvarchar(255)", nullable = false)
 	var ownerName: String = "",
 	@Column(columnDefinition = "nvarchar(255)", nullable = false)
@@ -52,8 +52,8 @@ data class HospitalModel(
 	fun indexGet(index: Int): String {
 		return when (index) {
 			0 -> code
-			1 -> orgName
-			2 -> innerName
+			1 -> innerName
+			2 -> orgName
 			3 -> ownerName
 			4 -> taxpayerNumber
 			5 -> address
@@ -71,8 +71,8 @@ data class HospitalModel(
 	override fun indexSet(data: String?, index: Int) {
 		when (index) {
 			0 -> code = data ?: ""
-			1 -> orgName = data ?: ""
-			2 -> innerName = data ?: ""
+			1 -> innerName = data ?: ""
+			2 -> orgName = data ?: ""
 			3 -> ownerName = data ?: ""
 			4 -> taxpayerNumber = data ?: ""
 			5 -> address = data ?: ""
@@ -89,8 +89,8 @@ data class HospitalModel(
 	override fun titleGet(index: Int): String {
 		return when (index) {
 			0 -> FConstants.MODEL_CODE
-			1 -> FConstants.MODEL_ORG_NAME
-			2 -> FConstants.MODEL_INNER_NAME
+			1 -> FConstants.MODEL_INNER_NAME
+			2 -> FConstants.MODEL_ORG_NAME
 			3 -> FConstants.MODEL_OWNER_NAME
 			4 -> FConstants.MODEL_TAX_PAYER
 			5 -> FConstants.MODEL_ADDRESS
@@ -131,8 +131,8 @@ data class HospitalModel(
 		return ret.toString()
 	}
 	fun insertString(): String {
-		val orgName = FExtensions.escapeString(orgName)
 		val innerName = FExtensions.escapeString(innerName)
+		val orgName = FExtensions.escapeString(orgName)
 		val ownerName = FExtensions.escapeString(ownerName)
 		val taxpayerNumber = FExtensions.escapeString(taxpayerNumber)
 		val phoneNumber = FExtensions.escapeString(phoneNumber)
@@ -144,11 +144,11 @@ data class HospitalModel(
 		val nursingHomeNumber = FExtensions.escapeString(nursingHomeNumber)
 		val etc1 = FExtensions.escapeString(etc1)
 		val etc2 = FExtensions.escapeString(etc2)
-		return "('$thisPK', '$code', '$orgName', '$innerName', '$ownerName', '$taxpayerNumber', '$address', '$phoneNumber', '$faxNumber', '$zipCode', '$businessType', '$businessItem', '$nursingHomeNumber', '$etc1', '$etc2', '$imageUrl', ${if (inVisible) 1 else 0})"
+		return "('$thisPK', '$code', '$innerName', '$orgName', '$ownerName', '$taxpayerNumber', '$address', '$phoneNumber', '$faxNumber', '$zipCode', '$businessType', '$businessItem', '$nursingHomeNumber', '$etc1', '$etc2', '$imageUrl', ${if (inVisible) 1 else 0})"
 	}
 	fun safeCopy(rhs: HospitalModel): HospitalModel {
-		this.orgName = rhs.orgName
 		this.innerName = rhs.innerName
+		this.orgName = rhs.orgName
 		this.ownerName = rhs.ownerName
 		this.taxpayerNumber = rhs.taxpayerNumber
 		this.address = rhs.address
