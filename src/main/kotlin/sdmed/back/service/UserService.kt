@@ -240,8 +240,10 @@ open class UserService: FServiceBase() {
 	open fun userFileUrlModify(token: String, userPK: String, blobModel: BlobUploadModel, userFileType: UserFileType): UserFileModel {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
-		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.UserChanger))) {
-			throw AuthenticationEntryPointException()
+		if (tokenUser.thisPK != userPK) {
+			if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.UserChanger))) {
+				throw AuthenticationEntryPointException()
+			}
 		}
 		isLive(tokenUser)
 		val user = getUserDataByPK(userPK)
