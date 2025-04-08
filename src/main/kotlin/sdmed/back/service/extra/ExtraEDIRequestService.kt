@@ -3,8 +3,6 @@ package sdmed.back.service.extra
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.transaction.annotation.Transactional
 import sdmed.back.advice.exception.AuthenticationEntryPointException
-import sdmed.back.advice.exception.EDIFileNotExistException
-import sdmed.back.advice.exception.EDIUploadNotExistException
 import sdmed.back.advice.exception.EDIUploadPharmaExistException
 import sdmed.back.advice.exception.HospitalNotFoundException
 import sdmed.back.advice.exception.NotValidOperationException
@@ -15,25 +13,24 @@ import sdmed.back.model.common.RequestType
 import sdmed.back.model.common.user.UserRole
 import sdmed.back.model.common.user.UserRoles
 import sdmed.back.model.sqlCSO.LogModel
-import sdmed.back.model.sqlCSO.edi.EDIHosBuffModel
-import sdmed.back.model.sqlCSO.edi.EDIMedicineBuffModel
-import sdmed.back.model.sqlCSO.edi.EDIPharmaBuffModel
+import sdmed.back.model.sqlCSO.extra.ExtraEDIHosBuffModel
+import sdmed.back.model.sqlCSO.extra.ExtraEDIMedicineBuffModel
+import sdmed.back.model.sqlCSO.extra.ExtraEDIPharmaBuffModel
 import sdmed.back.model.sqlCSO.edi.EDIState
 import sdmed.back.model.sqlCSO.edi.EDIType
 import sdmed.back.model.sqlCSO.edi.EDIUploadModel
-import sdmed.back.model.sqlCSO.edi.EDIUploadPharmaFileModel
 import sdmed.back.model.sqlCSO.edi.EDIUploadPharmaModel
-import sdmed.back.model.sqlCSO.extra.ExtraEDIDueDateResponse
+import sdmed.back.model.sqlCSO.extra.ExtraEDIApplyDateResponse
 import sdmed.back.model.sqlCSO.hospital.HospitalModel
 import sdmed.back.model.sqlCSO.medicine.MedicineModel
 import sdmed.back.model.sqlCSO.request.RequestModel
-import sdmed.back.repository.sqlCSO.IUserRelationRepository
+import sdmed.back.repository.extra.ExtraUserRelationRepository
 import java.util.Date
 import java.util.UUID
 
 class ExtraEDIRequestService: ExtraEDIService() {
-    @Autowired lateinit var userRelationRepository: IUserRelationRepository
-    fun getApplyDateList(token: String): List<ExtraEDIDueDateResponse> {
+    @Autowired lateinit var extraUserRelationRepository: ExtraUserRelationRepository
+    fun getApplyDateList(token: String): List<ExtraEDIApplyDateResponse> {
         isValid(token)
         val tokenUser = getUserDataByToken(token)
         if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.BusinessMan))) {
@@ -43,7 +40,7 @@ class ExtraEDIRequestService: ExtraEDIService() {
 
         return extraEDIApplyDateRepository.selectAllByUse()
     }
-    fun getHospitalList(token: String, applyDate: Date, withChild: Boolean = true): List<EDIHosBuffModel> {
+    fun getHospitalList(token: String, applyDate: Date, withChild: Boolean = true): List<ExtraEDIHosBuffModel> {
         isValid(token)
         val tokenUser = getUserDataByToken(token)
         if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.BusinessMan))) {
@@ -52,10 +49,10 @@ class ExtraEDIRequestService: ExtraEDIService() {
         isLive(tokenUser)
         val year = FExtensions.parseDateTimeString(applyDate, "yyyy") ?: throw NotValidOperationException()
         val month = FExtensions.parseDateTimeString(applyDate, "MM") ?: throw NotValidOperationException()
-        val ret = userRelationRepository.selectAllMyHospital(tokenUser.thisPK).distinctBy { it.thisPK }
-        val pharma = userRelationRepository.selectAllMyPharmaAbleIn(tokenUser.thisPK, ret.map { it.thisPK }, year, month).distinctBy { Pair(it.thisPK, it.hosPK) }
+        val ret = extraUserRelationRepository.selectAllMyHospital(tokenUser.thisPK).distinctBy { it.thisPK }
+        val pharma = extraUserRelationRepository.selectAllMyPharmaAbleIn(tokenUser.thisPK, ret.map { it.thisPK }, year, month).distinctBy { Pair(it.thisPK, it.hosPK) }
         if (withChild) {
-            val medicine = userRelationRepository.selectAllMyMedicineIn(tokenUser.thisPK, ret.map { it.thisPK }).distinctBy { Triple(it.thisPK, it.pharmaPK, it.hosPK) }.filter { it.pharmaPK in pharma.map { it.thisPK } }
+            val medicine = extraUserRelationRepository.selectAllMyMedicineIn(tokenUser.thisPK, ret.map { it.thisPK }).distinctBy { Triple(it.thisPK, it.pharmaPK, it.hosPK) }.filter { it.pharmaPK in pharma.map { it.thisPK } }
             mergePharmaMedicine(pharma, medicine)
             mergeHosPharma(ret, pharma.toMutableList())
             return ret.toMutableList().apply {
@@ -65,7 +62,7 @@ class ExtraEDIRequestService: ExtraEDIService() {
 
         return ret
     }
-    fun getPharmaList(token: String, withMedicine: Boolean = false): List<EDIPharmaBuffModel> {
+    fun getPharmaList(token: String, withMedicine: Boolean = false): List<ExtraEDIPharmaBuffModel> {
         isValid(token)
         val tokenUser = getUserDataByToken(token)
         if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.BusinessMan))) {
@@ -73,7 +70,7 @@ class ExtraEDIRequestService: ExtraEDIService() {
         }
         isLive(tokenUser)
 
-        val ret = userRelationRepository.selectAllByInvisible().distinctBy { it.thisPK }
+        val ret = extraUserRelationRepository.selectAllByInvisible().distinctBy { it.thisPK }
         if (withMedicine) {
 //          val pharmaPK = ret.map { it.thisPK }
 //			val medicine = userRelationRepository.selectAllMyMedicine(tokenUser.thisPK, hosPK).distinctBy { it.thisPK }.filter { it.pharmaPK in pharmaPK }
@@ -82,7 +79,7 @@ class ExtraEDIRequestService: ExtraEDIService() {
 
         return ret
     }
-    fun getPharmaList(token: String, hosPK: String, applyDate: Date, withMedicine: Boolean = true): List<EDIPharmaBuffModel> {
+    fun getPharmaList(token: String, hosPK: String, applyDate: Date, withMedicine: Boolean = true): List<ExtraEDIPharmaBuffModel> {
         isValid(token)
         val tokenUser = getUserDataByToken(token)
         if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.BusinessMan))) {
@@ -91,16 +88,16 @@ class ExtraEDIRequestService: ExtraEDIService() {
 
         val year = FExtensions.parseDateTimeString(applyDate, "yyyy") ?: throw NotValidOperationException()
         val month = FExtensions.parseDateTimeString(applyDate, "MM") ?: throw NotValidOperationException()
-        val ret = userRelationRepository.selectAllMyPharmaAble(tokenUser.thisPK, hosPK, year, month).distinctBy { it.thisPK }
+        val ret = extraUserRelationRepository.selectAllMyPharmaAble(tokenUser.thisPK, hosPK, year, month).distinctBy { it.thisPK }
         if (withMedicine) {
             val pharmaPK = ret.map { it.thisPK }
-            val medicine = userRelationRepository.selectAllMyMedicine(tokenUser.thisPK, hosPK).distinctBy { it.thisPK }.filter { it.pharmaPK in pharmaPK }
+            val medicine = extraUserRelationRepository.selectAllMyMedicine(tokenUser.thisPK, hosPK).distinctBy { it.thisPK }.filter { it.pharmaPK in pharmaPK }
             mergePharmaMedicine(ret, medicine)
         }
 
         return ret
     }
-    fun getMedicineList(token: String, hosPK: String, pharmaPK: List<String>): List<EDIMedicineBuffModel> {
+    fun getMedicineList(token: String, hosPK: String, pharmaPK: List<String>): List<ExtraEDIMedicineBuffModel> {
         isValid(token)
         val tokenUser = getUserDataByToken(token)
         if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.BusinessMan))) {
@@ -110,7 +107,7 @@ class ExtraEDIRequestService: ExtraEDIService() {
             return arrayListOf()
         }
 
-        return userRelationRepository.selectAllMyMedicine(tokenUser.thisPK, hosPK).distinctBy { it.thisPK }.filter { it.pharmaPK in pharmaPK }
+        return extraUserRelationRepository.selectAllMyMedicine(tokenUser.thisPK, hosPK).distinctBy { it.thisPK }.filter { it.pharmaPK in pharmaPK }
     }
 
     @Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)

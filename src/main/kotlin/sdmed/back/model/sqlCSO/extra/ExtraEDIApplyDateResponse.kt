@@ -1,6 +1,6 @@
 package sdmed.back.model.sqlCSO.extra
 
-data class ExtraEDIDueDateResponse(
+data class ExtraEDIApplyDateResponse(
     var year: String = "",
     var month: String = "",
 ) {

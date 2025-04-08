@@ -4,9 +4,9 @@ import org.springframework.beans.factory.annotation.Autowired
 import sdmed.back.advice.exception.NotValidOperationException
 import sdmed.back.config.FExtensions
 import sdmed.back.config.FServiceBase
-import sdmed.back.model.sqlCSO.edi.EDIHosBuffModel
-import sdmed.back.model.sqlCSO.edi.EDIMedicineBuffModel
-import sdmed.back.model.sqlCSO.edi.EDIPharmaBuffModel
+import sdmed.back.model.sqlCSO.extra.ExtraEDIHosBuffModel
+import sdmed.back.model.sqlCSO.extra.ExtraEDIMedicineBuffModel
+import sdmed.back.model.sqlCSO.extra.ExtraEDIPharmaBuffModel
 import sdmed.back.model.sqlCSO.edi.EDIPharmaDueDateModel
 import sdmed.back.model.sqlCSO.edi.EDIState
 import sdmed.back.model.sqlCSO.edi.EDIUploadModel
@@ -58,7 +58,7 @@ open class ExtraEDIService: FServiceBase() {
         ret.pharmaList = pharmaList.toMutableList()
         return ret
     }
-    protected fun mergePharmaMedicine(pharmaList: List<EDIPharmaBuffModel>, medicineList: List<EDIMedicineBuffModel>) {
+    protected fun mergePharmaMedicine(pharmaList: List<ExtraEDIPharmaBuffModel>, medicineList: List<ExtraEDIMedicineBuffModel>) {
         val medicineMap = medicineList.groupBy { it.pharmaPK }
         for (pharma in pharmaList) {
             val buff = medicineMap[pharma.thisPK]?.filter { it.hosPK == pharma.hosPK }
@@ -67,7 +67,7 @@ open class ExtraEDIService: FServiceBase() {
             }
         }
     }
-    protected fun mergeHosPharma(hosList: List<EDIHosBuffModel>, pharmaList: MutableList<EDIPharmaBuffModel>) {
+    protected fun mergeHosPharma(hosList: List<ExtraEDIHosBuffModel>, pharmaList: MutableList<ExtraEDIPharmaBuffModel>) {
         pharmaList.removeIf { it.medicineList.isEmpty() }
         val pharmaMap = pharmaList.groupBy { it.hosPK }
         for (hos in hosList) {

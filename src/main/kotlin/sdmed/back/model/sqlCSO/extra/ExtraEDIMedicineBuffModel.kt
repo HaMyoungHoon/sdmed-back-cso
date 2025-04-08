@@ -1,6 +1,6 @@
-package sdmed.back.model.sqlCSO.edi
+package sdmed.back.model.sqlCSO.extra
 
-data class EDIMedicineBuffModel(
+data class ExtraEDIMedicineBuffModel(
 	var thisPK: String = "",
 	var code: String = "",
 	var pharma: String = "",
