@@ -9,7 +9,7 @@ spring:
 #      username: cso
 #      password: Tldptmdh1234
       driver-class-name: com.mysql.cj.jdbc.Driver
-      jdbc-url: jdbc:mysql://dev-db-cso.sdmed.co.kr:33066/cso
+      jdbc-url: jdbc:mysql://db-cso.sdmed.co.kr:33066/cso
       username: cso
       password: Tldptmdh1234
 

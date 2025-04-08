@@ -3,6 +3,11 @@ package sdmed.back.config
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import sdmed.back.service.*
+import sdmed.back.service.extra.ExtraEDIListService
+import sdmed.back.service.extra.ExtraEDIRequestService
+import sdmed.back.service.extra.ExtraEDIService
+import sdmed.back.service.intra.IntraEDIListService
+import sdmed.back.service.intra.IntraEDIService
 
 @Configuration
 open class FServiceConfig {
@@ -31,10 +36,16 @@ open class FServiceConfig {
 	@Bean open fun ediService() = EDIService()
 	@Bean open fun ediDueDateService() = EDIDueDateService()
 	@Bean open fun ediApplyDateService() = EDIApplyDateService()
-	@Bean open fun ediListService() = EDIListService()
 	@Bean open fun ediRequestService() = EDIRequestService()
 	@Bean open fun ediUploadCheckService() = EDIUploadCheckService()
 
 	@Bean open fun qnaService() = QnAService()
 	@Bean open fun qnaListService() = QnAListService()
+
+	@Bean open fun intraEDIService() = IntraEDIService()
+	@Bean open fun intraEDIListService() = IntraEDIListService()
+
+	@Bean open fun extraEDIService() = ExtraEDIService()
+	@Bean open fun extraEDIListService() = ExtraEDIListService()
+	@Bean open fun extraEDIRequestService() = ExtraEDIRequestService()
 }

@@ -64,8 +64,6 @@ data class EDIUploadModel(
 	@Transient
 	var pharmaList: MutableList<EDIUploadPharmaModel> = mutableListOf(),
 	@Transient
-	var fileList: MutableList<EDIUploadFileModel> = mutableListOf(),
-	@Transient
 	var responseList: MutableList<EDIUploadResponseModel> = mutableListOf(),
 ) {
 	fun safeCopy(data: EDIUploadModel): EDIUploadModel {

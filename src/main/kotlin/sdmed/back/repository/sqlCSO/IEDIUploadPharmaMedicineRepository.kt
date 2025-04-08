@@ -9,8 +9,6 @@ import sdmed.back.model.sqlCSO.edi.EDIUploadPharmaMedicineModel
 @Repository
 interface IEDIUploadPharmaMedicineRepository: JpaRepository<EDIUploadPharmaMedicineModel, String> {
 	fun findByThisPK(thisPK: String): EDIUploadPharmaMedicineModel?
-	fun findByThisPKIn(thisPK: List<String>): List<EDIUploadPharmaMedicineModel>
-	fun findAllByEdiPKAndInVisibleAndPharmaPKInOrderByMedicinePK(ediPK: String, inVisible: Boolean = false, pharmaPK: List<String>): List<EDIUploadPharmaMedicineModel>
 
 	@Query("SELECT new sdmed.back.model.sqlCSO.HowMuchModel(c.hospitalPK, c.orgName, b.pharmaPK, b.orgName, a.medicinePK, a.name, a.count, a.charge, a.price, c.ediState) FROM EDIUploadPharmaMedicineModel a " +
 			"LEFT JOIN EDIUploadPharmaModel b ON a.pharmaPK = b.pharmaPK " +

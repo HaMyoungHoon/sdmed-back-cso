@@ -19,8 +19,4 @@ interface IEDIApplyDateRepository: JpaRepository<EDIApplyDateModel, String> {
 	@Query("SELECT a FROM EDIApplyDateModel a " +
 			"WHERE a.year = :year AND a.month = :month")
 	fun selectByApplyDate(year: String, month: String): EDIApplyDateModel?
-
-	@Query("SELECT a FROM EDIApplyDateModel a " +
-			"WHERE a.applyDateState = :applyDateState AND a.year = :year AND a.month = :month")
-	fun selectByApplyDateAndUse(year: String, month: String, applyDateState: EDIApplyDateState = EDIApplyDateState.Use): EDIApplyDateModel?
 }

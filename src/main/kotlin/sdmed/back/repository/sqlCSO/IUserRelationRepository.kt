@@ -36,18 +36,18 @@ interface IUserRelationRepository: JpaRepository<UserRelationModel, String> {
 			"ORDER BY a.orgName ASC ")
 	fun selectAllMyHospital(userPK: String): List<EDIHosBuffModel>
 
-	@Query("SELECT new sdmed.back.model.sqlCSO.edi.EDIPharmaBuffModel(a.thisPK, b.hosPK, a.code, a.orgName, a.innerName) " +
+	@Query("SELECT new sdmed.back.model.sqlCSO.edi.EDIPharmaBuffModel(a.thisPK, b.hosPK, a.code, a.orgName) " +
 			"FROM PharmaModel a " +
 			"LEFT JOIN UserRelationModel b ON a.thisPK = b.pharmaPK " +
 			"WHERE a.inVisible = false AND b.userPK = :userPK AND b.hosPK = :hosPK " +
 			"ORDER BY a.orgName ASC ")
 	fun selectAllMyPharma(userPK: String, hosPK: String): List<EDIPharmaBuffModel>
-	@Query("SELECT new sdmed.back.model.sqlCSO.edi.EDIPharmaBuffModel(a.thisPK, '', a.code, a.orgName, a.innerName) " +
+	@Query("SELECT new sdmed.back.model.sqlCSO.edi.EDIPharmaBuffModel(a.thisPK, '', a.code, a.orgName) " +
 			"FROM PharmaModel a " +
 			"WHERE a.inVisible = :inVisible " +
 			"ORDER BY a.orgName ASC")
 	fun selectAllByInvisible(inVisible: Boolean = false): List<EDIPharmaBuffModel>
-	@Query("SELECT new sdmed.back.model.sqlCSO.edi.EDIPharmaBuffModel(a.thisPK, b.hosPK, a.code, a.orgName, a.innerName) " +
+	@Query("SELECT new sdmed.back.model.sqlCSO.edi.EDIPharmaBuffModel(a.thisPK, b.hosPK, a.code, a.orgName) " +
 			"FROM PharmaModel a " +
 			"LEFT JOIN UserRelationModel b ON a.thisPK = b.pharmaPK " +
 			"WHERE a.inVisible = false AND b.userPK = :userPK AND b.hosPK = :hosPK " +
@@ -57,7 +57,7 @@ interface IUserRelationRepository: JpaRepository<UserRelationModel, String> {
 			"WHERE d.userPK = :userPK AND d.year = :year AND d.month = :month AND c.ediState != 2) " +
 			"ORDER BY a.orgName ASC ")
 	fun selectAllMyPharmaAble(userPK: String, hosPK: String, year: String, month: String): List<EDIPharmaBuffModel>
-	@Query("SELECT new sdmed.back.model.sqlCSO.edi.EDIPharmaBuffModel(a.thisPK, b.hosPK, a.code, a.orgName, a.innerName) " +
+	@Query("SELECT new sdmed.back.model.sqlCSO.edi.EDIPharmaBuffModel(a.thisPK, b.hosPK, a.code, a.orgName) " +
 			"FROM PharmaModel a " +
 			"LEFT JOIN UserRelationModel b ON a.thisPK = b.pharmaPK " +
 			"WHERE a.inVisible = false AND b.userPK = :userPK AND b.hosPK IN (:hosPK) " +

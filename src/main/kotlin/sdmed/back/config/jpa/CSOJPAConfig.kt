@@ -17,7 +17,7 @@ import java.util.*
 @Configuration
 @EnableTransactionManagement
 @EnableJpaRepositories(
-	basePackages = ["sdmed.back.repository.sqlCSO"],
+	basePackages = ["sdmed.back.repository.sqlCSO", "sdmed.back.repository.intra", "sdmed.back.repository.extra"],
 	entityManagerFactoryRef = CSOJPAConfig.ENTITY_MANAGER,
 	transactionManagerRef = CSOJPAConfig.TRANSACTION_MANAGER,
 	enableDefaultTransactions = true)

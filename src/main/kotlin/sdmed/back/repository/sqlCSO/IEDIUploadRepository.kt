@@ -11,26 +11,6 @@ import java.util.Date
 @Repository
 interface IEDIUploadRepository: JpaRepository<EDIUploadModel, String> {
 	fun findByThisPK(thisPK: String): EDIUploadModel?
-	fun findByThisPKIn(thisPK: List<String>): List<EDIUploadModel>
-	fun findByUserPKAndThisPK(userPK: String, thisPK: String): EDIUploadModel?
-
-	@Query("SELECT a FROM EDIUploadModel a " +
-			"WHERE a.regDate BETWEEN :startDate AND :endDate " +
-			"ORDER BY a.regDate DESC")
-	fun selectAllByDate(startDate: Date, endDate: Date): List<EDIUploadModel>
-	@Query("SELECT a FROM EDIUploadModel a " +
-			"WHERE a.regDate BETWEEN :startDate AND :endDate " +
-			"ORDER BY a.regDate DESC")
-	fun selectAllByMyChildAndDate(startDate: Date, endDate: Date): List<EDIUploadModel>
-	@Query("SELECT a FROM EDIUploadModel a " +
-			"WHERE a.userPK = :userPK AND a.regDate BETWEEN :startDate AND :endDate " +
-			"ORDER BY a.regDate DESC")
-	fun selectAllByMe(userPK: String, startDate: Date, endDate: Date): List<EDIUploadModel>
-
-	@Query("SELECT a FROM EDIUploadModel a " +
-			"LEFT JOIN EDIUploadPharmaModel b on a.thisPK = b.ediPK " +
-			"WHERE b.thisPK = :pharmaPK")
-	fun selectByPharmaPK(pharmaPK: String): EDIUploadModel?
 
 	@Query("SELECT DISTINCT new sdmed.back.model.sqlCSO.edi.EDIUploadCheckModel(c.id, c.name, c.thisPK, b.thisPK, b.orgName, b.innerName) " +
 			"FROM UserRelationModel a " +

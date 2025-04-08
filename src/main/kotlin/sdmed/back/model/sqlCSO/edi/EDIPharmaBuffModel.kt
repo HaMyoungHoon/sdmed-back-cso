@@ -5,7 +5,6 @@ data class EDIPharmaBuffModel(
 	var hosPK: String = "",
 	var code: String = "",
 	var orgName: String = "",
-	var innerName: String = "",
 ) {
 	var medicineList: MutableList<EDIMedicineBuffModel> = mutableListOf()
 }
