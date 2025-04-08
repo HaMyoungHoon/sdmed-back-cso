@@ -12,7 +12,6 @@ interface IPharmaRepository: JpaRepository<PharmaModel, String> {
 	fun findAllByThisPKIn(thisPK: List<String>): List<PharmaModel>
 	fun findAllByCodeIn(codes: List<String>): List<PharmaModel>
 	fun findAllByOrgNameIn(orgNames: List<String>): List<PharmaModel>
-	fun findAllByInnerNameIn(innerNames: List<String>): List<PharmaModel>
 
 	@Query("SELECT * FROM PharmaModel " +
 			"WHERE inVisible = :inVisible AND code LIKE %:code% " +

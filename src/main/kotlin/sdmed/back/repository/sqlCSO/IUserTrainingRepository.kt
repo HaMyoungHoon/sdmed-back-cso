@@ -9,7 +9,6 @@ import java.util.Date
 @Repository
 interface IUserTrainingRepository: JpaRepository<UserTrainingModel, String> {
     fun findAllByUserPKOrderByTrainingDateDesc(userPK: String): List<UserTrainingModel>
-    fun findAllByUserPKInOrderByTrainingDateDesc(userPKs: List<String>): List<UserTrainingModel>
     fun findByUserPKAndTrainingDate(userPK: String, trainingDate: Date): UserTrainingModel?
 
     @Query("WITH RankedUserTrainingModel AS (" +

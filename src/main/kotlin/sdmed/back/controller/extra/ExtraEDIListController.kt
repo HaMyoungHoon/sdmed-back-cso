@@ -6,9 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.web.bind.annotation.*
 import sdmed.back.config.FControllerBase
-import sdmed.back.model.sqlCSO.edi.EDIUploadFileModel
 import sdmed.back.model.sqlCSO.edi.EDIUploadPharmaFileModel
-import sdmed.back.service.EDIRequestService
 import sdmed.back.service.extra.ExtraEDIListService
 import java.util.*
 

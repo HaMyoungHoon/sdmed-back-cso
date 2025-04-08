@@ -6,10 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.web.bind.annotation.*
 import sdmed.back.config.FControllerBase
-import sdmed.back.model.common.IRestResult
 import sdmed.back.model.sqlCSO.BlobUploadModel
 import sdmed.back.model.sqlCSO.user.UserFileType
-import sdmed.back.service.MyInfoService
+import sdmed.back.service.extra.ExtraMyInfoService
 import java.util.Date
 
 
@@ -17,17 +16,12 @@ import java.util.Date
 @RestController
 @RequestMapping(value = ["/extra/myInfo"])
 class ExtraMyInfoController: FControllerBase() {
-	@Autowired lateinit var myInfoService: MyInfoService
+	@Autowired lateinit var extraMyInfoService: ExtraMyInfoService
 
 	@Operation(summary = "유저 정보")
 	@GetMapping(value = ["/data"])
-	fun getData(@RequestHeader token: String,
-	            @RequestParam(required = false) childView: Boolean = false,
-	            @RequestParam(required = false) relationView: Boolean = false,
-	            @RequestParam(required = false) pharmaOwnMedicineView: Boolean = false,
-				@RequestParam(required = false) relationMedicineView: Boolean = false,
-				@RequestParam(required = false) trainingModelView: Boolean = false) =
-		responseService.getResult(myInfoService.getMyData(token, childView, relationView, pharmaOwnMedicineView, relationMedicineView, trainingModelView))
+	fun getData(@RequestHeader token: String) =
+		responseService.getResult(extraMyInfoService.getMyData(token))
 
 	@Operation(summary = "패스워드 변경")
 	@PutMapping(value = ["/passwordChange"])
@@ -35,7 +29,7 @@ class ExtraMyInfoController: FControllerBase() {
 	                      @RequestParam currentPW: String,
 	                      @RequestParam afterPW: String,
 	                      @RequestParam confirmPW: String) =
-		responseService.getResult(myInfoService.passwordChange(token, currentPW, afterPW, confirmPW))
+		responseService.getResult(extraMyInfoService.passwordChange(token, currentPW, afterPW, confirmPW))
 
 	@Operation(summary = "유저 파일 이미지 url 변경")
 	@PutMapping(value = ["/file/{thisPK}"])
@@ -43,7 +37,7 @@ class ExtraMyInfoController: FControllerBase() {
 	                        @PathVariable thisPK: String,
 	                        @RequestParam userFileType: UserFileType,
 	                        @RequestBody blobModel: BlobUploadModel) =
-		responseService.getResult(myInfoService.userFileUrlModify(token, thisPK, blobModel, userFileType).apply {
+		responseService.getResult(extraMyInfoService.userFileUrlModify(token, thisPK, blobModel, userFileType).apply {
 			azureBlobService.blobUploadSave(blobModel.newSave())
 		})
 	@Operation(summary = "유저 교육수료증 등록")
@@ -52,5 +46,5 @@ class ExtraMyInfoController: FControllerBase() {
 							 @PathVariable thisPK: String,
 							 @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) trainingDate: Date,
 							 @RequestBody blobModel: BlobUploadModel) =
-		responseService.getResult(myInfoService.addMyTrainingModel(token, thisPK, trainingDate, blobModel))
+		responseService.getResult(extraMyInfoService.addMyTrainingModel(token, thisPK, trainingDate, blobModel))
 }

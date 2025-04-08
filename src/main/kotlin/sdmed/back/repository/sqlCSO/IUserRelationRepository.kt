@@ -9,7 +9,6 @@ import sdmed.back.model.sqlCSO.user.UserRelationModel
 @Repository
 interface IUserRelationRepository: JpaRepository<UserRelationModel, String> {
 	fun findAllByUserPK(userPK: String): List<UserRelationModel>
-	fun findAllByUserPKAndHosPKAndPharmaPK(userPK: String, hosPK: String, pharmaPK: String): List<UserRelationModel>
 
 	@Query("SELECT new sdmed.back.model.sqlCSO.user.UserMappingExcelModel(b.id, b.companyInnerName, c.orgName, d.orgName, e.orgName) FROM UserRelationModel a " +
 			"LEFT JOIN UserDataModel b ON a.userPK = b.thisPK " +

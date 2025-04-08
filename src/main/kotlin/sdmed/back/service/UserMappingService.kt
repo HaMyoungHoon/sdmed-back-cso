@@ -41,18 +41,6 @@ open class UserMappingService: UserService() {
 		pharmaService.getPharmaAllSearch(token, searchString, isSearchTypeCode)
 	fun getPharmaData(token: String, pharmaPK: String, pharmaOwnMedicineView: Boolean = false) =
 		pharmaService.getPharmaData(token, pharmaPK, pharmaOwnMedicineView)
-	fun getPharmaData(token: String, userPK: String, hospitalPK: String, pharmaPK: String, pharmaOwnMedicineView: Boolean = false): PharmaModel {
-		isValid(token)
-		val tokenUser = getUserDataByToken(token)
-		isLive(tokenUser)
-
-		val ret = pharmaRepository.findByThisPK(pharmaPK) ?: throw PharmaNotFoundException()
-		if (pharmaOwnMedicineView) {
-			val medicinePKs = userRelationRepository.findAllByUserPKAndHosPKAndPharmaPK(userPK, hospitalPK, ret.thisPK).map { x -> x.medicinePK }
-			ret.medicineList = medicineRepository.findAllByThisPKIn(medicinePKs).toMutableList()
-		}
-		return ret
-	}
 
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
 	open fun userRelationModify(token: String, userPK: String, hosPharmaMedicinePairModel: List<HosPharmaMedicinePairModel>): UserDataModel {

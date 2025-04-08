@@ -9,16 +9,11 @@ import sdmed.back.model.sqlCSO.medicine.MedicinePriceModel
 interface IMedicinePriceRepository: JpaRepository<MedicinePriceModel, String> {
 	fun findAllByOrderByApplyDateDesc(): List<MedicinePriceModel>
 	fun findAllByKdCodeOrderByApplyDateDesc(kdCode: String): List<MedicinePriceModel>
-	fun findAllByKdCodeIn(kdCode: List<String>): List<MedicinePriceModel>
 
 	@Query("WITH RankedMedicinePrice AS ( " +
 			"SELECT *, ROW_NUMBER() OVER (PARTITION BY kdCode ORDER BY applyDate DESC) as RN FROM MedicinePriceModel) " +
 			"SELECT * FROM RankedMedicinePrice as MedicinePriceModel WHERE RN = 1", nativeQuery = true)
 	fun selectAllByRecentData(): List<MedicinePriceModel>
-	@Query("WITH RankedMedicinePrice AS ( " +
-			"SELECT *, ROW_NUMBER() OVER (PARTITION BY kdCode ORDER BY applyDate DESC) as RN FROM MedicinePriceModel) " +
-			"SELECT * FROM RankedMedicinePrice as MedicinePriceModel WHERE RN = 1 AND kdCode IN (:kdCodeString)", nativeQuery = true)
-	fun selectAllByRecentData(kdCodeString: List<String>): List<MedicinePriceModel>
 
 	@Query("WITH RankedMedicinePrice AS (" +
 			"SELECT *, ROW_NUMBER() OVER (PARTITION BY kdCode ORDER BY applyDate DESC) as RN FROM MedicinePriceModel " +

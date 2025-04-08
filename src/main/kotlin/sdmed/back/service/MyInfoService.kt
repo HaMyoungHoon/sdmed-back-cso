@@ -27,30 +27,6 @@ open class MyInfoService: UserService() {
 		return getUserDataByPK(tokenUser.thisPK, childView, relationView, pharmaOwnMedicineView, relationMedicineView, trainingModelView)
 	}
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
-	open fun addMyTrainingModel(token: String, userPK: String, trainingDate: Date, uploadModel: BlobUploadModel): UserTrainingModel {
-		isValid(token)
-		val tokenUser = getUserDataByToken(token)
-		isLive(tokenUser)
-		if (tokenUser.thisPK != userPK) {
-			throw AuthenticationEntryPointException()
-		}
-		val user = getUserDataByPK(userPK)
-		val buff = UserTrainingModel().safeCopy(uploadModel).apply {
-			this.userPK = userPK
-			this.trainingDate = trainingDate
-		}
-		if (userTrainingRepository.findByUserPKAndTrainingDate(buff.userPK, buff.trainingDate) != null) {
-			throw UserTrainingFileUploadException("already exist")
-		}
-
-		val ret = userTrainingRepository.save(buff)
-
-		val stackTrace = Thread.currentThread().stackTrace
-		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "${user.id} ${buff.blobUrl} : ${buff.trainingDate}")
-		logRepository.save(logModel)
-		return ret
-	}
-	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
 	open fun passwordChange(token: String, currentPW: String, afterPW: String, confirmPW: String): UserDataModel {
 		val tokenUser = getUserDataByToken(token)
 		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee, UserRole.BusinessMan))) {

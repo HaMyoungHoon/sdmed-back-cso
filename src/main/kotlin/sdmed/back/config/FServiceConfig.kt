@@ -9,6 +9,7 @@ import sdmed.back.service.extra.ExtraEDIRequestService
 import sdmed.back.service.extra.ExtraEDIService
 import sdmed.back.service.extra.ExtraMedicinePriceListService
 import sdmed.back.service.extra.ExtraMedicineService
+import sdmed.back.service.extra.ExtraMyInfoService
 import sdmed.back.service.intra.IntraEDIListService
 import sdmed.back.service.intra.IntraEDIService
 
@@ -39,7 +40,6 @@ open class FServiceConfig {
 	@Bean open fun ediService() = EDIService()
 	@Bean open fun ediDueDateService() = EDIDueDateService()
 	@Bean open fun ediApplyDateService() = EDIApplyDateService()
-	@Bean open fun ediRequestService() = EDIRequestService()
 	@Bean open fun ediUploadCheckService() = EDIUploadCheckService()
 
 	@Bean open fun qnaService() = QnAService()
@@ -55,4 +55,6 @@ open class FServiceConfig {
 
 	@Bean open fun extraMedicineService() = ExtraMedicineService()
 	@Bean open fun extraMedicinePriceListService() = ExtraMedicinePriceListService()
+
+	@Bean open fun extraMyInfoService() = ExtraMyInfoService()
 }

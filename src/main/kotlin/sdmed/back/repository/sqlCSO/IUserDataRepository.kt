@@ -5,12 +5,12 @@ import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.stereotype.Repository
+import sdmed.back.model.sqlCSO.extra.ExtraMyInfoResponse
 import sdmed.back.model.sqlCSO.user.UserDataModel
 
 @Repository
 interface IUserDataRepository: JpaRepository<UserDataModel, String> {
 	fun findAllByOrderByNameDesc(): List<UserDataModel>
-	fun findAllByOrderByNameDesc(pageable: Pageable): Page<UserDataModel>
 	fun findAllByIdIn(ids: List<String>): List<UserDataModel>
 	fun findByThisPK(thisPK: String): UserDataModel?
 	fun findAllByThisPKIn(thisPK: List<String>): List<UserDataModel>
@@ -29,10 +29,6 @@ interface IUserDataRepository: JpaRepository<UserDataModel, String> {
 			"WHERE dept & :flag > 0 " +
 			"ORDER BY name Asc", nativeQuery = true)
 	fun selectWhereDeptOrderByNameAsc(flag: Int): List<UserDataModel>
-	@Query("SELECT * FROM UserDataModel " +
-			"WHERE role & :flag > 0 " +
-			"ORDER BY name Asc", nativeQuery = true)
-	fun selectWhereRoleOrderByNameAsc(flag: Int): List<UserDataModel>
 
 	@Query("SELECT * FROM UserDataModel " +
 			"WHERE role & :role > 0 And status = :status " +

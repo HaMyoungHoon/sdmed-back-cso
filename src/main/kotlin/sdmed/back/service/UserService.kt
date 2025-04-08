@@ -178,51 +178,6 @@ open class UserService: FServiceBase() {
 	}
 
 	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
-	open fun passwordChangeByID(token: String, id: String, changePW: String): UserDataModel {
-		if (FExtensions.regexPasswordCheck(changePW) != true) {
-			throw AuthenticationEntryPointException()
-		}
-
-		isValid(token)
-		val tokenUser = getUserDataByToken(token)
-		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.UserChanger))) {
-			throw AuthenticationEntryPointException()
-		}
-		isLive(tokenUser)
-
-		val pwBuff = changePW.trim()
-		val user = getUserDataByID(id)
-		user.pw = fAmhohwa.encrypt(pwBuff)
-		val ret = userDataRepository.save(user)
-		val stackTrace = Thread.currentThread().stackTrace
-		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "${user.id} password change")
-		logRepository.save(logModel)
-		return ret
-	}
-	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
-	open fun passwordChangeByPK(token: String, userPK: String, changePW: String): UserDataModel {
-		if (FExtensions.regexPasswordCheck(changePW) != true) {
-			throw AuthenticationEntryPointException()
-		}
-
-		isValid(token)
-		val tokenUser = getUserDataByToken(token)
-		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.UserChanger))) {
-			throw AuthenticationEntryPointException()
-		}
-		isLive(tokenUser)
-
-		val pwBuff = changePW.trim()
-		val user = getUserDataByPK(userPK)
-		user.pw = fAmhohwa.encrypt(pwBuff)
-		val ret = userDataRepository.save(user)
-		val stackTrace = Thread.currentThread().stackTrace
-		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "${user.id} password change")
-		logRepository.save(logModel)
-		return ret
-	}
-
-	@Transactional(value = CSOJPAConfig.TRANSACTION_MANAGER)
 	open fun tokenRefresh(token: String): String {
 		isValid(token)
 		val user = getUserDataByToken(token)

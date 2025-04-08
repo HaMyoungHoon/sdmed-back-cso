@@ -3,6 +3,7 @@ package sdmed.back.model.sqlCSO.extra
 import sdmed.back.model.sqlCSO.medicine.MedicineModel
 
 data class ExtraMedicinePriceResponse(
+    var thisPK: String = "",
     var mainIngredientCode: String = "",
     var mainIngredientName: String = "",
     var clientName: String? = null,
@@ -15,6 +16,7 @@ data class ExtraMedicinePriceResponse(
     var etc1: String = "",
 ) {
     constructor(buff: MedicineModel, makerName: String?, clientName: String?) : this() {
+        this.thisPK = buff.thisPK
         this.orgName = buff.orgName
         this.kdCode = buff.kdCode
         this.standard = buff.standard

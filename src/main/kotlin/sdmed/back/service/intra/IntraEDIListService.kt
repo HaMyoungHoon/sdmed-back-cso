@@ -14,7 +14,6 @@ import sdmed.back.model.common.user.UserRole
 import sdmed.back.model.common.user.UserRoles
 import sdmed.back.model.sqlCSO.LogModel
 import sdmed.back.model.sqlCSO.edi.EDIState
-import sdmed.back.model.sqlCSO.edi.EDIUploadFileModel
 import sdmed.back.model.sqlCSO.edi.EDIUploadModel
 import sdmed.back.model.sqlCSO.edi.EDIUploadPharmaFileModel
 import sdmed.back.model.sqlCSO.edi.EDIUploadPharmaMedicineModel

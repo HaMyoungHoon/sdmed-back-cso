@@ -11,12 +11,7 @@ import sdmed.back.model.sqlCSO.hospital.PharmacyTempModel
 interface IPharmacyTempRepository: JpaRepository<PharmacyTempModel, String> {
 	fun findByThisPK(thisPK: String): PharmacyTempModel?
 	fun findAllByCodeInOrderByOrgNameAsc(code: List<String>): List<PharmacyTempModel>
-	fun findAllByOrderByOrgNameAsc(pageable: Pageable): Page<PharmacyTempModel>
 
-	@Query("SELECT a FROM HospitalTempModel a " +
-			"WHERE a.orgName LIKE %:name% OR a.address LIKE %:address% " +
-			"ORDER BY a.orgName ASC ")
-	fun selectAllContains(name: String, address: String): List<PharmacyTempModel>
 	@Query("SELECT a.* FROM PharmacyTempModel a " +
 			"WHERE (6371 * acos(cos(radians(:latitude)) * cos(radians(a.latitude)) " +
 			"* cos(radians(a.longitude) - radians(:longitude)) " +

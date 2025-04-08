@@ -1,6 +1,5 @@
 package sdmed.back.service
 
-import org.springframework.beans.factory.annotation.Autowired
 import sdmed.back.advice.exception.AuthenticationEntryPointException
 import sdmed.back.advice.exception.NotValidOperationException
 import sdmed.back.config.FConstants
@@ -10,14 +9,10 @@ import sdmed.back.model.common.user.UserRoles
 import sdmed.back.model.sqlCSO.edi.EDIUploadCheckModel
 import sdmed.back.model.sqlCSO.edi.EDIUploadCheckSubModel
 import sdmed.back.model.sqlCSO.user.UserDataModel
-import sdmed.back.repository.sqlCSO.IHospitalRepository
-import sdmed.back.repository.sqlCSO.IUserRelationRepository
 import java.util.*
 
 
 class EDIUploadCheckService: EDIService() {
-	@Autowired lateinit var userRelationRepository: IUserRelationRepository
-
 	fun getList(token: String, date: Date, isEDIDate: Boolean = true, isMyChild: Boolean = true): List<EDIUploadCheckModel> {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)

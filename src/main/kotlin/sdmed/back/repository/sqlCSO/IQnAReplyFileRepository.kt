@@ -6,6 +6,5 @@ import sdmed.back.model.sqlCSO.qna.QnAReplyFileModel
 
 @Repository
 interface IQnAReplyFileRepository: JpaRepository<QnAReplyFileModel, String> {
-	fun findAllByReplyPK(replyPK: String): List<QnAReplyFileModel>
 	fun findAllByReplyPKIn(replyPK: List<String>): List<QnAReplyFileModel>
 }
