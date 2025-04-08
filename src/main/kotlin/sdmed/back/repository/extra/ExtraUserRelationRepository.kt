@@ -8,6 +8,7 @@ import sdmed.back.model.sqlCSO.extra.ExtraEDIPharmaBuffModel
 import sdmed.back.model.sqlCSO.user.UserRelationModel
 
 interface ExtraUserRelationRepository: JpaRepository<UserRelationModel, String> {
+    fun findAllByUserPK(userPK: String): List<UserRelationModel>
     @Query("SELECT new sdmed.back.model.sqlCSO.extra.ExtraEDIHosBuffModel(a.thisPK, a.orgName) FROM HospitalModel a " +
             "LEFT JOIN UserRelationModel b ON a.thisPK = b.hosPK " +
             "WHERE a.inVisible = false AND b.userPK = :userPK " +

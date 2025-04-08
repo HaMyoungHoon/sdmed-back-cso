@@ -1,6 +1,5 @@
 package sdmed.back.service
 
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
 import sdmed.back.advice.exception.*
@@ -11,11 +10,9 @@ import sdmed.back.model.common.user.UserRoles
 import sdmed.back.model.sqlCSO.LogModel
 import sdmed.back.model.sqlCSO.edi.EDIPharmaDueDateModel
 import sdmed.back.model.sqlCSO.pharma.PharmaModel
-import sdmed.back.repository.sqlCSO.IUserRelationRepository
 import java.util.*
 
 open class EDIDueDateService: EDIService() {
-	@Autowired lateinit var userRelationModel: IUserRelationRepository
 	fun getEDIDueDateList(token: String, date: Date, isYear: Boolean = false): List<EDIPharmaDueDateModel> {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
@@ -28,21 +25,6 @@ open class EDIDueDateService: EDIService() {
 		return if (isYear) ediPharmaDueDateRepository.selectAllByThisYearDueDate(year)
 		else ediPharmaDueDateRepository.selectAllByThisYearMonthDueDate(year, month)
 	}
-	fun getEDIDueDateMyList(token: String, date: Date, isYear: Boolean = false): List<EDIPharmaDueDateModel> {
-		isValid(token)
-		val tokenUser = getUserDataByToken(token)
-		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee, UserRole.BusinessMan))) {
-			throw AuthenticationEntryPointException()
-		}
-		isLive(tokenUser)
-		val year = FExtensions.parseDateTimeString(date, "yyyy") ?: throw NotValidOperationException()
-		val month = FExtensions.parseDateTimeString(date, "MM") ?: throw NotValidOperationException()
-		val myPharmaPK = userRelationModel.findAllByUserPK(tokenUser.thisPK).map { it.pharmaPK }
-
-		val ret = if (isYear) ediPharmaDueDateRepository.selectAllByThisYearDueDate(year)
-		else ediPharmaDueDateRepository.selectAllByThisYearMonthDueDate(year, month)
-		return ret.filter { it.pharmaPK in myPharmaPK }
-	}
 	fun getEDIDueDateRangeList(token: String, startDate: Date, endDate: Date): List<EDIPharmaDueDateModel> {
 		isValid(token)
 		val tokenUser = getUserDataByToken(token)
@@ -53,17 +35,6 @@ open class EDIDueDateService: EDIService() {
 
 		val queryDate = FExtensions.getStartEndQueryDate(startDate, endDate)
 		return ediPharmaDueDateRepository.selectAllByThisYearMonthRangeDueDate(queryDate.first, queryDate.second)
-	}
-	fun getEDIDueDateRangeMyList(token: String, startDate: Date, endDate: Date): List<EDIPharmaDueDateModel> {
-		isValid(token)
-		val tokenUser = getUserDataByToken(token)
-		if (!haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee, UserRole.BusinessMan))) {
-			throw AuthenticationEntryPointException()
-		}
-		isLive(tokenUser)
-		val myPharmaPK = userRelationModel.findAllByUserPK(tokenUser.thisPK).map { it.pharmaPK }
-		val queryDate = FExtensions.getStartEndQueryDate(startDate, endDate)
-		return ediPharmaDueDateRepository.selectAllByThisYearMonthRangeDueDate(queryDate.first, queryDate.second).filter { it.pharmaPK in myPharmaPK }
 	}
 	fun getEDIPharmaDueDateList(token: String, pharmaPK: String, year: String): List<EDIPharmaDueDateModel> {
 		isValid(token)
