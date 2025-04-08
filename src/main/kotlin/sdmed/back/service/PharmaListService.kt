@@ -11,6 +11,7 @@ import sdmed.back.config.jpa.CSOJPAConfig
 import sdmed.back.model.common.user.UserRole
 import sdmed.back.model.common.user.UserRoles
 import sdmed.back.model.sqlCSO.LogModel
+import sdmed.back.model.sqlCSO.medicine.MedicineIngredientModel
 import sdmed.back.model.sqlCSO.medicine.MedicineModel
 import sdmed.back.model.sqlCSO.pharma.PharmaModel
 import sdmed.back.repository.sqlCSO.IMedicineIngredientRepository
@@ -157,5 +158,12 @@ open class PharmaListService: PharmaService() {
 		entityManager.flush()
 		entityManager.clear()
 		return data.size
+	}
+
+	protected fun medicineMerge(mother: List<MedicineModel>, ingredient: List<MedicineIngredientModel>) {
+		val ingredientMap = ingredient.associateBy { it.mainIngredientCode }
+		mother.map { x ->
+			ingredientMap[x.mainIngredientCode]?.let { y -> x.medicineIngredientModel = y }
+		}
 	}
 }

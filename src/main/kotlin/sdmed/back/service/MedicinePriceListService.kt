@@ -14,9 +14,6 @@ import java.util.*
 open class MedicinePriceListService: MedicineService() {
 
 	fun getList(token: String, withAllPrice: Boolean = false) = getAllMedicine(token, withAllPrice)
-	fun getLike(token: String, searchString: String, withAllPrice: Boolean = false) = getLikeMedicine(token, searchString, withAllPrice)
-	fun getPagingList(token: String, page: Int = 0, size: Int = 100, withAllPrice: Boolean = false) = getPagingAllMedicine(token, page, size, withAllPrice)
-	fun getPagingLike(token: String, searchString: String, page: Int = 0, size: Int = 100, withAllPrice: Boolean = false) = getPagingLikeMedicine(token, searchString, page, size, withAllPrice)
 	fun getMedicinePriceList(token: String, kdCode: String): List<MedicinePriceModel> {
 		isValid(token)
 		isLive(getUserDataByToken(token))

@@ -48,11 +48,4 @@ open class FServiceBase {
 		val user = UserDataModel().buildData(jwtTokenProvider.getAllClaimsFromToken(token))
 		return haveRole(user, targetRole)
 	}
-
-	protected fun medicineMerge(mother: List<MedicineModel>, ingredient: List<MedicineIngredientModel>) {
-		val ingredientMap = ingredient.associateBy { it.mainIngredientCode }
-		mother.map { x ->
-			ingredientMap[x.mainIngredientCode]?.let { y -> x.medicineIngredientModel = y }
-		}
-	}
 }

@@ -49,7 +49,7 @@ open class IPControlService: FServiceBase() {
 
 	fun isAdmin(token: String?, notAdminThrow: Boolean = true): Boolean =
 		token?.let { x ->
-			val user = getUserDataByToken(token)
+			val user = getUserDataByToken(x)
 			if (UserRole.fromFlag(user.role).contains(UserRole.Admin)) true
 			else if (notAdminThrow) throw AuthenticationEntryPointException()
 			else false

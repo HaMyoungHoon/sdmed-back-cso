@@ -11,6 +11,8 @@ import sdmed.back.model.common.ResponseType
 import sdmed.back.model.common.user.*
 import sdmed.back.model.sqlCSO.*
 import sdmed.back.model.sqlCSO.hospital.HospitalModel
+import sdmed.back.model.sqlCSO.medicine.MedicineIngredientModel
+import sdmed.back.model.sqlCSO.medicine.MedicineModel
 import sdmed.back.model.sqlCSO.pharma.PharmaModel
 import sdmed.back.model.sqlCSO.request.RequestModel
 import sdmed.back.model.sqlCSO.user.UserDataModel
@@ -344,5 +346,12 @@ open class UserService: FServiceBase() {
 		}
 		ret = ret.distinct().toMutableList()
 		return ret
+	}
+
+	protected fun medicineMerge(mother: List<MedicineModel>, ingredient: List<MedicineIngredientModel>) {
+		val ingredientMap = ingredient.associateBy { it.mainIngredientCode }
+		mother.map { x ->
+			ingredientMap[x.mainIngredientCode]?.let { y -> x.medicineIngredientModel = y }
+		}
 	}
 }

@@ -41,74 +41,6 @@ open class MedicineService: FServiceBase() {
 		ret.onEach { it.init() }
 		return ret
 	}
-	protected fun getLikeMedicine(token: String, searchString: String, withAllPrice: Boolean = false): List<MedicineModel> {
-		isValid(token)
-		val tokenUser = getUserDataByToken(token)
-		isLive(tokenUser)
-		val ret = if (haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee))) {
-			medicineRepository.selectAllByInvisibleLikeOrderByCode(searchString)
-		} else {
-			medicineRepository.selectAllByInvisibleOpenLikeOrderByCode(searchString)
-		}
-		val ingredient = medicineIngredientRepository.findAllByMainIngredientCodeIn(ret.map { it.mainIngredientCode })
-		medicineMerge(ret, ingredient)
-		if (withAllPrice) {
-			val allPrice = medicinePriceRepository.findAllByKdCodeIn(ret.map { it.kdCode })
-			medicinePriceMerge(ret, allPrice)
-		} else {
-			val recentPrice = medicinePriceRepository.selectAllByRecentData(ret.map { it.kdCode })
-			medicinePriceMerge(ret, recentPrice)
-		}
-		ret.onEach { it.init() }
-		return ret
-	}
-	protected fun getPagingAllMedicine(token: String, page: Int, size: Int, withAllPrice: Boolean = false): Page<MedicineModel> {
-		isValid(token)
-		val tokenUser = getUserDataByToken(token)
-		isLive(tokenUser)
-		val pageable = PageRequest.of(page, size)
-		val ret = if (haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee))) {
-			medicineRepository.selectPagingByInvisibleOrderByCode(pageable)
-		} else {
-			medicineRepository.selectPagingByInvisibleOpenOrderByCode(pageable)
-		}
-		val ingredient = medicineIngredientRepository.findAllByMainIngredientCodeIn(ret.content.map { it.mainIngredientCode })
-		medicineMerge(ret.content, ingredient)
-		if (withAllPrice) {
-			val allPrice = medicinePriceRepository.findAllByKdCodeIn(ret.content.map { it.kdCode })
-			medicinePriceMerge(ret.content, allPrice)
-		} else {
-			val recentPrice = medicinePriceRepository.selectAllByRecentData(ret.content.map { it.kdCode })
-			medicinePriceMerge(ret.content, recentPrice)
-		}
-		ret.onEach { it.init() }
-		return ret
-	}
-	protected fun getPagingLikeMedicine(token: String, searchString: String, page: Int, size: Int, withAllPrice: Boolean = false): Page<MedicineModel> {
-		if (searchString.isBlank()) {
-			return Page.empty()
-		}
-		isValid(token)
-		val tokenUser = getUserDataByToken(token)
-		isLive(tokenUser)
-		val pageable = PageRequest.of(page, size)
-		val ret = if (haveRole(tokenUser, UserRoles.of(UserRole.Admin, UserRole.CsoAdmin, UserRole.Employee))) {
-			medicineRepository.selectPagingByInvisibleLikeOrderByCode(searchString, pageable)
-		} else {
-			medicineRepository.selectPagingByInvisibleOpenLikeOrderByCode(searchString, pageable)
-		}
-		val ingredient = medicineIngredientRepository.findAllByMainIngredientCodeIn(ret.content.map { it.mainIngredientCode })
-		medicineMerge(ret.content, ingredient)
-		if (withAllPrice) {
-			val allPrice = medicinePriceRepository.findAllByKdCodeIn(ret.content.map { it.kdCode })
-			medicinePriceMerge(ret.content, allPrice)
-		} else {
-			val recentPrice = medicinePriceRepository.selectAllByRecentData(ret.content.map { it.kdCode })
-			medicinePriceMerge(ret.content, recentPrice)
-		}
-		ret.onEach { it.init() }
-		return ret
-	}
 	protected fun medicinePriceMerge(mother: List<MedicineModel>, price: List<MedicinePriceModel>) {
 		val priceMap = price.groupBy { it.kdCode }
 		mother.map { x ->
@@ -166,5 +98,12 @@ open class MedicineService: FServiceBase() {
 		entityManager.flush()
 		entityManager.clear()
 		return ret
+	}
+
+	protected fun medicineMerge(mother: List<MedicineModel>, ingredient: List<MedicineIngredientModel>) {
+		val ingredientMap = ingredient.associateBy { it.mainIngredientCode }
+		mother.map { x ->
+			ingredientMap[x.mainIngredientCode]?.let { y -> x.medicineIngredientModel = y }
+		}
 	}
 }

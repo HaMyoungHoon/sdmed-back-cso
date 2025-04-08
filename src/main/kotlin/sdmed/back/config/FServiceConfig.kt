@@ -7,6 +7,8 @@ import sdmed.back.service.extra.ExtraEDIDueDateService
 import sdmed.back.service.extra.ExtraEDIListService
 import sdmed.back.service.extra.ExtraEDIRequestService
 import sdmed.back.service.extra.ExtraEDIService
+import sdmed.back.service.extra.ExtraMedicinePriceListService
+import sdmed.back.service.extra.ExtraMedicineService
 import sdmed.back.service.intra.IntraEDIListService
 import sdmed.back.service.intra.IntraEDIService
 
@@ -50,4 +52,7 @@ open class FServiceConfig {
 	@Bean open fun extraEDIListService() = ExtraEDIListService()
 	@Bean open fun extraEDIRequestService() = ExtraEDIRequestService()
 	@Bean open fun extraEDIDueDateService() = ExtraEDIDueDateService()
+
+	@Bean open fun extraMedicineService() = ExtraMedicineService()
+	@Bean open fun extraMedicinePriceListService() = ExtraMedicinePriceListService()
 }
