@@ -9,7 +9,7 @@ import sdmed.back.model.sqlCSO.extra.ExtraEDIApplyDateResponse
 
 @Repository
 interface ExtraApplyDateRepository: JpaRepository<EDIApplyDateModel, String> {
-    @Query("SELECT new sdmed.back.model.sqlCSO.extra.ExtraEDIApplyDateResponse(a.year, a.month)" +
+    @Query("SELECT new sdmed.back.model.sqlCSO.extra.ExtraEDIApplyDateResponse(a.thisPK, a.year, a.month)" +
             "FROM EDIApplyDateModel a " +
             "WHERE a.applyDateState = :applyDateState " +
             "ORDER BY a.year DESC, a.month DESC")

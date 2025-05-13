@@ -5,20 +5,9 @@ spring:
   datasource:
     sql-cso:
       driver-class-name: com.mysql.cj.jdbc.Driver
-      jdbc-url: jdbc:mysql://10.0.0.103:33066/cso
+      jdbc-url: jdbc:mysql://192.168.2.100:33066/cso
       username: cso
       password: Tldptmdh1234
-
-    hikari:
-      maximum-pool-size: 10
-      connection-timeout: 5000
-      validation-timeout: 2000
-      minimum-idle: 10
-      idle-timeout: 600000
-      max-lifetime: 1800000
-      keepalive-time: 60000
-      leak-detection-threshold: 20000
-      connection-test-query: "SELECT 1"
 
   messages:
     basename: i18n/exception
@@ -48,8 +37,8 @@ spring:
 server:
   port: 25800
   ssl:
-    key-store: dev-back-cso.sdmed.co.kr.jks
-    key-store-password: 'dev_back_cso_sdmed_ssl'
+    key-store: dev-back-cso.mhha.kr.jks
+    key-store-password: 'dev_back_cso_mhha_ssl'
   shutdown: immediate
   forward-headers-strategy: native
 
@@ -82,15 +71,15 @@ str:
   version: 1.0.0
   profile: test
   blob:
-    blobUrl: https://devsdmed1.blob.core.windows.net
-    containerName: devsdmed1
-    defaultKey: s31JKySWQQ67+LQ/o79G0yOdc9QE1408KuANaZdiVupmU3Q6DRGmUpsMmR1UNK/2WcuIMCrp5rdt+ASt4LY89Q==
+    blobUrl: https://mhhablob1.blob.core.windows.net
+    containerName: mhhablob1
+    defaultKey: y85lApcIsXQ5znb9/G2axqe8V/dwKfcg0dn8WTtd35vPrFbj/XNv7qOi6aOVBi0Qx8DxLh4ZZMF3+ASt/K9zPA==
     subKey: /9enjdo1lvLbN48QO47gZiF5w8CzKuaV7rBZfA8vlbLxfEppmjgAKtMjPxYnH4eDVr0ejBQvRq88+AStz4LMdA==
-    connectionString: DefaultEndpointsProtocol=https;AccountName=devsdmed1;AccountKey=s31JKySWQQ67+LQ/o79G0yOdc9QE1408KuANaZdiVupmU3Q6DRGmUpsMmR1UNK/2WcuIMCrp5rdt+ASt4LY89Q==;EndpointSuffix=core.windows.net
+    connectionString: DefaultEndpointsProtocol=https;AccountName=mhhablob1;AccountKey=y85lApcIsXQ5znb9/G2axqe8V/dwKfcg0dn8WTtd35vPrFbj/XNv7qOi6aOVBi0Qx8DxLh4ZZMF3+ASt/K9zPA==;EndpointSuffix=core.windows.net
 
 mqtt:
-  brokerUrl1: tcp://dev-mqtt-cso.sdmed.co.kr:18883
-  brokerUrl2: wss://dev-mqtt-cso.sdmed.co.kr:18884
+  brokerUrl1: tcp://mqtt.mhha.kr:18883
+  brokerUrl2: wss://mqtt.mhha.co.kr:18884
   clientId: def-cso-mqtt
-  username: cso
-  password: csoMQ1234
+  username: mqtt
+  password: mqtt1234
