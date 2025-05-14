@@ -82,7 +82,7 @@ str:
 
 mqtt:
   brokerUrl1: tcp://mqtt.mhha.kr:18883
-  brokerUrl2: wss://mqtt.mhha.co.kr:18884
+  brokerUrl2: wss://mqtt.mhha.kr:18884
   clientId: def-cso-mqtt
   username: mqtt
   password: mqtt1234
