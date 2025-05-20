@@ -54,7 +54,13 @@ data class PharmacyTempModel(
 			9 -> zipCode = data.toIntOrNull() ?: 0
 			10 -> address = data
 			11 -> phoneNumber = data
-			12 -> openDate = FExtensions.parseStringToJavaDate(data, "yyyyMMdd")
+			12 -> {
+				try {
+					openDate = FExtensions.parseStringToJavaDate(data, "M/d/yy")
+				} catch (_: Exception) {
+					openDate = FExtensions.parseStringToJavaDate(data, "yyyyMMdd")
+				}
+			}
 			13 -> longitude = data.toDoubleOrNull() ?: 0.0
 			14 -> latitude = data.toDoubleOrNull() ?: 0.0
 		}

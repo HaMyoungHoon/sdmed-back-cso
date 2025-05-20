@@ -62,7 +62,13 @@ data class HospitalTempModel(
 			10 -> address = data
 			11 -> phoneNumber = data
 			12 -> websiteUrl = data
-			13 -> openDate = FExtensions.parseStringToJavaDate(data, "yyyyMMdd")
+			13 -> {
+				try {
+					openDate = FExtensions.parseStringToJavaDate(data, "M/d/yy")
+				} catch (_: Exception) {
+					openDate = FExtensions.parseStringToJavaDate(data, "yyyyMMdd")
+				}
+			}
 			14 -> longitude = data.toDoubleOrNull() ?: 0.0
 			15 -> latitude = data.toDoubleOrNull() ?: 0.0
 		}

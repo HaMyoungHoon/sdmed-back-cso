@@ -71,26 +71,26 @@ open class HospitalTempService: FServiceBase() {
 		}
 
 		val excelModel = excelFileParser.hospitalTempUploadExcelParse(tokenUser.id, file).distinctBy { it.code }
-		val already = mutableListOf<HospitalTempModel>()
-		if (alreadyUpdate) {
-			excelModel.chunked(500).forEach { x -> already.addAll(hospitalTempRepository.findAllByCodeInOrderByOrgNameAsc(x.map { y -> y.code })) }
-		}
+		val already = hospitalTempRepository.findAll()
 		var retCount = 0
 		val saveList = excelModel.toMutableList()
-		saveList.removeIf { x -> x.code in already.map { y -> y.code } }
+		val alreadyCodes = already.map { it.code }.toHashSet()
+		saveList.removeIf { it.code in alreadyCodes }
 		saveList.chunked(500).forEach { x -> retCount += insertHospitalAll(x) }
-		if (already.isNotEmpty()) {
-			val buffMap = excelModel.associateBy { it.code }
+		if (alreadyUpdate) {
 			if (already.isNotEmpty()) {
-				already.forEach { x ->
-					val buff = buffMap[x.code]
-					if (buff != null) {
-						x.safeCopy(buff)
+				val buffMap = excelModel.associateBy { it.code }
+				if (already.isNotEmpty()) {
+					already.forEach { x ->
+						val buff = buffMap[x.code]
+						if (buff != null) {
+							x.safeCopy(buff)
+						}
 					}
 				}
 			}
+			already.chunked(500).forEach { x -> retCount += updateHospitalAll(x) }
 		}
-		already.chunked(500).forEach { x -> retCount += updateHospitalAll(x) }
 		val stackTrace = Thread.currentThread().stackTrace
 		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "add hospital count : $retCount")
 		logRepository.save(logModel)
@@ -135,26 +135,26 @@ open class HospitalTempService: FServiceBase() {
 		}
 
 		val excelModel = excelFileParser.pharmacyTempUploadExcelParse(tokenUser.id, file).distinctBy { it.code }
-		val already = mutableListOf<PharmacyTempModel>()
-		if (alreadyUpdate) {
-			excelModel.chunked(500).forEach { x -> already.addAll(pharmacyTempRepository.findAllByCodeInOrderByOrgNameAsc(x.map { y -> y.code })) }
-		}
+		val already = pharmacyTempRepository.findAll()
 		var retCount = 0
 		val saveList = excelModel.toMutableList()
-		saveList.removeIf { x -> x.code in already.map { y -> y.code } }
+		val alreadyCodes = already.map { it.code }.toHashSet()
+		saveList.removeIf { it.code in alreadyCodes }
 		saveList.chunked(500).forEach { x -> retCount += insertPharmacyAll(x) }
-		if (already.isNotEmpty()) {
-			val buffMap = excelModel.associateBy { it.code }
+		if (alreadyUpdate) {
 			if (already.isNotEmpty()) {
-				already.forEach { x ->
-					val buff = buffMap[x.code]
-					if (buff != null) {
-						x.safeCopy(buff)
+				val buffMap = excelModel.associateBy { it.code }
+				if (already.isNotEmpty()) {
+					already.forEach { x ->
+						val buff = buffMap[x.code]
+						if (buff != null) {
+							x.safeCopy(buff)
+						}
 					}
 				}
 			}
+			already.chunked(500).forEach { x -> retCount += updatePharmacyAll(x) }
 		}
-		already.chunked(500).forEach { x -> retCount += updatePharmacyAll(x) }
 		val stackTrace = Thread.currentThread().stackTrace
 		val logModel = LogModel().build(tokenUser.thisPK, stackTrace[1].className, stackTrace[1].methodName, "add pharmacy count : $retCount")
 		logRepository.save(logModel)
